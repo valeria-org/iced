@@ -41,6 +41,11 @@ CodeAssembler create_asm(std::uint32_t bitness, std::uint32_t flags);
 /// that the decoded instruction is the same as the added instruction.
 void test_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), Instruction expected, std::uint32_t flags, std::uint32_t decoder_options);
 
+/// Same as `test_instr(bitness, create, expected, flags, decoder_options)` but the expected instruction is created by
+/// `create_expected()` (used by the generated tests: it's much faster to compile)
+void test_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), Result<Instruction> (*create_expected)(), std::uint32_t flags,
+	std::uint32_t decoder_options);
+
 /// Calls `create()` which must fail (sticky error) and not add an instruction
 void test_invalid_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), std::uint32_t flags);
 
@@ -50,6 +55,9 @@ inline Instruction add_op_mask(Instruction instruction, Register op_mask) {
 	return instruction;
 }
 
+/// Sets the opmask register if it's not an error
+Result<Instruction> add_op_mask(Result<Instruction> instruction, Register op_mask);
+
 /// Creates a label and emits it (it's the label of the next instruction)
 CodeLabel create_and_emit_label(CodeAssembler& a);
 
@@ -58,5 +66,8 @@ inline Instruction assign_label(Instruction instruction, std::uint64_t label) {
 	instruction.set_ip(label);
 	return instruction;
 }
+
+/// Sets the instruction's IP to the label id if it's not an error
+Result<Instruction> assign_label(Result<Instruction> instruction, std::uint64_t label);
 
 } // namespace iced_x86::tests::code_asm_tests

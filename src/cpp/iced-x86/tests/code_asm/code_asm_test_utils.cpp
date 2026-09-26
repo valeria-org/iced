@@ -141,6 +141,23 @@ void test_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), Instruc
 		CHECK_MSG(decoded_instr == asm_instr, instr_codes_to_string(decoded_instr, asm_instr));
 }
 
+void test_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), Result<Instruction> (*create_expected)(), std::uint32_t flags,
+	std::uint32_t decoder_options) {
+	test_instr(bitness, create, unwrap(create_expected()), flags, decoder_options);
+}
+
+Result<Instruction> add_op_mask(Result<Instruction> instruction, Register op_mask) {
+	if (instruction.is_err())
+		return instruction;
+	return add_op_mask(instruction.value(), op_mask);
+}
+
+Result<Instruction> assign_label(Result<Instruction> instruction, std::uint64_t label) {
+	if (instruction.is_err())
+		return instruction;
+	return assign_label(instruction.value(), label);
+}
+
 void test_invalid_instr(std::uint32_t bitness, void (*create)(CodeAssembler& a), std::uint32_t flags) {
 	CodeAssembler a = create_asm(bitness, flags);
 	create(a);

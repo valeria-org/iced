@@ -12,448 +12,448 @@ using namespace iced_x86::code_asm;
 TEST_CASE("code_asm/instr16/vpternlogq_xmm_xmm_xmm_i") {
 	// EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_ymm_ymm_ymm_i") {
 	// EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_zmm_zmm_zmm_i") {
 	// EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_xmm_xmm_m_i") {
 	// EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_ymm_ymm_m_i") {
 	// EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_zmm_zmm_m_i") {
 	// EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_xmm_xmm_xmm_u") {
 	// EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_ymm_ymm_ymm_u") {
 	// EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_zmm_zmm_zmm_u") {
 	// EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_xmm_xmm_m_u") {
 	// EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_ymm_ymm_m_u") {
 	// EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpternlogq_zmm_zmm_m_u") {
 	// EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vpternlogq(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vpternlogq_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptest_xmm_xmm") {
 	// VEX_Vptest_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptest(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vptest_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vptest_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptest_ymm_ymm") {
 	// VEX_Vptest_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptest(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vptest_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vptest_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptest_xmm_m") {
 	// VEX_Vptest_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptest(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vptest_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vptest_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptest_ymm_m") {
 	// VEX_Vptest_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptest(ymm2, ymmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vptest_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vptest_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_xmm_xmm") {
 	// EVEX_Vptestmb_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_ymm_ymm") {
 	// EVEX_Vptestmb_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_zmm_zmm") {
 	// EVEX_Vptestmb_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_xmm_m") {
 	// EVEX_Vptestmb_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_ymm_m") {
 	// EVEX_Vptestmb_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmb_kr_zmm_m") {
 	// EVEX_Vptestmb_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestmb(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_xmm_xmm") {
 	// EVEX_Vptestmd_kr_k1_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_ymm_ymm") {
 	// EVEX_Vptestmd_kr_k1_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_zmm_zmm") {
 	// EVEX_Vptestmd_kr_k1_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_xmm_m") {
 	// EVEX_Vptestmd_kr_k1_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_ymm_m") {
 	// EVEX_Vptestmd_kr_k1_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmd_kr_zmm_m") {
 	// EVEX_Vptestmd_kr_k1_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestmd(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_xmm_xmm") {
 	// EVEX_Vptestmq_kr_k1_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_ymm_ymm") {
 	// EVEX_Vptestmq_kr_k1_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_zmm_zmm") {
 	// EVEX_Vptestmq_kr_k1_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_xmm_m") {
 	// EVEX_Vptestmq_kr_k1_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_ymm_m") {
 	// EVEX_Vptestmq_kr_k1_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmq_kr_zmm_m") {
 	// EVEX_Vptestmq_kr_k1_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestmq(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_xmm_xmm") {
 	// EVEX_Vptestmw_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_ymm_ymm") {
 	// EVEX_Vptestmw_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_zmm_zmm") {
 	// EVEX_Vptestmw_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_xmm_m") {
 	// EVEX_Vptestmw_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_ymm_m") {
 	// EVEX_Vptestmw_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestmw_kr_zmm_m") {
 	// EVEX_Vptestmw_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestmw(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_xmm_xmm") {
 	// EVEX_Vptestnmb_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_ymm_ymm") {
 	// EVEX_Vptestnmb_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_zmm_zmm") {
 	// EVEX_Vptestnmb_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_xmm_m") {
 	// EVEX_Vptestnmb_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_ymm_m") {
 	// EVEX_Vptestnmb_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmb_kr_zmm_m") {
 	// EVEX_Vptestnmb_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmb(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmb_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_xmm_xmm") {
 	// EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_ymm_ymm") {
 	// EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_zmm_zmm") {
 	// EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_xmm_m") {
 	// EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_xmm_xmmm128b32, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_ymm_m") {
 	// EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_ymm_ymmm256b32, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmd_kr_zmm_m") {
 	// EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmd(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmd_kr_k1_zmm_zmmm512b32, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_xmm_xmm") {
 	// EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_ymm_ymm") {
 	// EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_zmm_zmm") {
 	// EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_xmm_m") {
 	// EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_xmm_xmmm128b64, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_ymm_m") {
 	// EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_ymm_ymmm256b64, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmq_kr_zmm_m") {
 	// EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmq(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmq_kr_k1_zmm_zmmm512b64, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_xmm_xmm") {
 	// EVEX_Vptestnmw_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_ymm_ymm") {
 	// EVEX_Vptestnmw_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_zmm_zmm") {
 	// EVEX_Vptestnmw_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_xmm_m") {
 	// EVEX_Vptestnmw_kr_k1_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_xmm_xmmm128, Register::K2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_ymm_m") {
 	// EVEX_Vptestnmw_kr_k1_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_ymm_ymmm256, Register::K2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vptestnmw_kr_zmm_m") {
 	// EVEX_Vptestnmw_kr_k1_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vptestnmw(k2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vptestnmw_kr_k1_zmm_zmmm512, Register::K2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -461,12 +461,12 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhbw_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -475,12 +475,12 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhbw_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -488,7 +488,7 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpckhbw_zmm_zmm_zmm") {
 	// EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -496,12 +496,12 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhbw_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -510,12 +510,12 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_ymm_ymm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhbw_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -523,7 +523,7 @@ TEST_CASE("code_asm/instr16/vpunpckhbw_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpckhbw_zmm_zmm_m") {
 	// EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhbw(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -531,12 +531,12 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -545,12 +545,12 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -558,7 +558,7 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpckhdq_zmm_zmm_zmm") {
 	// EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -566,17 +566,17 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -585,17 +585,17 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -603,7 +603,7 @@ TEST_CASE("code_asm/instr16/vpunpckhdq_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpckhdq_zmm_zmm_m") {
 	// EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhdq(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhdq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -611,12 +611,12 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhqdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -625,12 +625,12 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhqdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -638,7 +638,7 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpckhqdq_zmm_zmm_zmm") {
 	// EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -646,17 +646,17 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhqdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -665,17 +665,17 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhqdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -683,7 +683,7 @@ TEST_CASE("code_asm/instr16/vpunpckhqdq_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpckhqdq_zmm_zmm_m") {
 	// EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhqdq(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -691,12 +691,12 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhwd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -705,12 +705,12 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhwd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -718,7 +718,7 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpckhwd_zmm_zmm_zmm") {
 	// EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -726,12 +726,12 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhwd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -740,12 +740,12 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_ymm_ymm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckhwd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckhwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckhwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -753,7 +753,7 @@ TEST_CASE("code_asm/instr16/vpunpckhwd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpckhwd_zmm_zmm_m") {
 	// EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckhwd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckhwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -761,12 +761,12 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklbw_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -775,12 +775,12 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklbw_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -788,7 +788,7 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpcklbw_zmm_zmm_zmm") {
 	// EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -796,12 +796,12 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklbw_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklbw_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -810,12 +810,12 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_ymm_ymm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklbw_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklbw_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -823,7 +823,7 @@ TEST_CASE("code_asm/instr16/vpunpcklbw_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpcklbw_zmm_zmm_m") {
 	// EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklbw(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklbw_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -831,12 +831,12 @@ TEST_CASE("code_asm/instr16/vpunpckldq_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckldq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckldq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckldq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -845,12 +845,12 @@ TEST_CASE("code_asm/instr16/vpunpckldq_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckldq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckldq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckldq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -858,7 +858,7 @@ TEST_CASE("code_asm/instr16/vpunpckldq_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpckldq_zmm_zmm_zmm") {
 	// EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -866,17 +866,17 @@ TEST_CASE("code_asm/instr16/vpunpckldq_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckldq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckldq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckldq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -885,17 +885,17 @@ TEST_CASE("code_asm/instr16/vpunpckldq_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpckldq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpckldq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpckldq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -903,7 +903,7 @@ TEST_CASE("code_asm/instr16/vpunpckldq_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpckldq_zmm_zmm_m") {
 	// EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpunpckldq(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpckldq_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -911,12 +911,12 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklqdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -925,12 +925,12 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklqdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -938,7 +938,7 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpcklqdq_zmm_zmm_zmm") {
 	// EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -946,17 +946,17 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklqdq_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklqdq_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -965,17 +965,17 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklqdq_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklqdq_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -983,7 +983,7 @@ TEST_CASE("code_asm/instr16/vpunpcklqdq_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpcklqdq_zmm_zmm_m") {
 	// EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklqdq(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklqdq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -991,12 +991,12 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklwd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -1005,12 +1005,12 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklwd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -1018,7 +1018,7 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vpunpcklwd_zmm_zmm_zmm") {
 	// EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -1026,12 +1026,12 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklwd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklwd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_xmm_k1z_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -1040,12 +1040,12 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_ymm_ymm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vpunpcklwd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vpunpcklwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpunpcklwd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_ymm_k1z_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -1053,2002 +1053,2002 @@ TEST_CASE("code_asm/instr16/vpunpcklwd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vpunpcklwd_zmm_zmm_m") {
 	// EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512
 	test_instr(16, [](CodeAssembler& a) { a.vpunpcklwd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpunpcklwd_zmm_k1z_zmm_zmmm512, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxor_xmm_xmm_xmm") {
 	// VEX_Vpxor_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vpxor(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vpxor_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpxor_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxor_ymm_ymm_ymm") {
 	// VEX_Vpxor_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vpxor(ymm2, ymm3, ymm4); },
-		unwrap(Instruction::with3(Code::VEX_Vpxor_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpxor_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxor_xmm_xmm_m") {
 	// VEX_Vpxor_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vpxor(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vpxor_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpxor_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxor_ymm_ymm_m") {
 	// VEX_Vpxor_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vpxor(ymm2, ymm3, ymmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vpxor_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vpxor_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_xmm_xmm_xmm") {
 	// EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_ymm_ymm_ymm") {
 	// EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_zmm_zmm_zmm") {
 	// EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_xmm_xmm_m") {
 	// EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_ymm_ymm_m") {
 	// EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxord_zmm_zmm_m") {
 	// EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vpxord(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxord_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_xmm_xmm_xmm") {
 	// EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_ymm_ymm_ymm") {
 	// EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_zmm_zmm_zmm") {
 	// EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_xmm_xmm_m") {
 	// EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_ymm_ymm_m") {
 	// EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vpxorq_zmm_zmm_m") {
 	// EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vpxorq(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vpxorq_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_xmm_xmm_xmm_i") {
 	// EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_ymm_ymm_ymm_i") {
 	// EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_zmm_zmm_zmm_i") {
 	// EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_xmm_xmm_m_i") {
 	// EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_ymm_ymm_m_i") {
 	// EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_zmm_zmm_m_i") {
 	// EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_xmm_xmm_xmm_u") {
 	// EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_ymm_ymm_ymm_u") {
 	// EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_zmm_zmm_zmm_u") {
 	// EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_xmm_xmm_m_u") {
 	// EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_ymm_ymm_m_u") {
 	// EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangepd_zmm_zmm_m_u") {
 	// EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangepd(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangepd_zmm_k1z_zmm_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_xmm_xmm_xmm_i") {
 	// EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_ymm_ymm_ymm_i") {
 	// EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_zmm_zmm_zmm_i") {
 	// EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_xmm_xmm_m_i") {
 	// EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_ymm_ymm_m_i") {
 	// EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_zmm_zmm_m_i") {
 	// EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_xmm_xmm_xmm_u") {
 	// EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_ymm_ymm_ymm_u") {
 	// EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_zmm_zmm_zmm_u") {
 	// EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_xmm_xmm_m_u") {
 	// EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_ymm_ymm_m_u") {
 	// EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangeps_zmm_zmm_m_u") {
 	// EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangeps(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangeps_zmm_k1z_zmm_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangesd_xmm_xmm_xmm_i") {
 	// EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangesd(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangesd_xmm_xmm_m_i") {
 	// EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangesd(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangesd_xmm_xmm_xmm_u") {
 	// EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangesd(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangesd_xmm_xmm_m_u") {
 	// EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangesd(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangess_xmm_xmm_xmm_i") {
 	// EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangess(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangess_xmm_xmm_m_i") {
 	// EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangess(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangess_xmm_xmm_xmm_u") {
 	// EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangess(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrangess_xmm_xmm_m_u") {
 	// EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrangess(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrangess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_xmm_xmm") {
 	// EVEX_Vrcp14pd_xmm_k1z_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_ymm_ymm") {
 	// EVEX_Vrcp14pd_ymm_k1z_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_zmm_zmm") {
 	// EVEX_Vrcp14pd_zmm_k1z_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_zmm_k1z_zmmm512b64, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_zmm_k1z_zmmm512b64, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_xmm_m") {
 	// EVEX_Vrcp14pd_xmm_k1z_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_ymm_m") {
 	// EVEX_Vrcp14pd_ymm_k1z_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14pd_zmm_m") {
 	// EVEX_Vrcp14pd_zmm_k1z_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14pd(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14pd_zmm_k1z_zmmm512b64, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14pd_zmm_k1z_zmmm512b64, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_xmm_xmm") {
 	// EVEX_Vrcp14ps_xmm_k1z_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_ymm_ymm") {
 	// EVEX_Vrcp14ps_ymm_k1z_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_zmm_zmm") {
 	// EVEX_Vrcp14ps_zmm_k1z_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_zmm_k1z_zmmm512b32, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_zmm_k1z_zmmm512b32, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_xmm_m") {
 	// EVEX_Vrcp14ps_xmm_k1z_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_ymm_m") {
 	// EVEX_Vrcp14ps_ymm_k1z_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ps_zmm_m") {
 	// EVEX_Vrcp14ps_zmm_k1z_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ps(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp14ps_zmm_k1z_zmmm512b32, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp14ps_zmm_k1z_zmmm512b32, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14sd_xmm_xmm_xmm") {
 	// EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14sd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14sd_xmm_xmm_m") {
 	// EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14sd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ss_xmm_xmm_xmm") {
 	// EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ss(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp14ss_xmm_xmm_m") {
 	// EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrcp14ss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28pd_zmm_zmm") {
 	// EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28pd(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28pd_zmm_m") {
 	// EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28pd(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28ps_zmm_zmm") {
 	// EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28ps(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28ps_zmm_m") {
 	// EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28ps(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcp28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28sd_xmm_xmm_xmm") {
 	// EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28sd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28sd_xmm_xmm_m") {
 	// EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28sd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28ss_xmm_xmm_xmm") {
 	// EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28ss(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcp28ss_xmm_xmm_m") {
 	// EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrcp28ss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcp28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_xmm_xmm") {
 	// EVEX_Vrcpph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_ymm_ymm") {
 	// EVEX_Vrcpph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_zmm_zmm") {
 	// EVEX_Vrcpph_zmm_k1z_zmmm512b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_zmm_k1z_zmmm512b16, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_zmm_k1z_zmmm512b16, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_xmm_m") {
 	// EVEX_Vrcpph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_ymm_m") {
 	// EVEX_Vrcpph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpph_zmm_m") {
 	// EVEX_Vrcpph_zmm_k1z_zmmm512b16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpph(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrcpph_zmm_k1z_zmmm512b16, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrcpph_zmm_k1z_zmmm512b16, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpps_xmm_xmm") {
 	// VEX_Vrcpps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vrcpps(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vrcpps_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrcpps_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpps_ymm_ymm") {
 	// VEX_Vrcpps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vrcpps(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vrcpps_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrcpps_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpps_xmm_m") {
 	// VEX_Vrcpps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vrcpps(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vrcpps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrcpps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpps_ymm_m") {
 	// VEX_Vrcpps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vrcpps(ymm2, ymmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vrcpps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrcpps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpsh_xmm_xmm_xmm") {
 	// EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpsh(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpsh_xmm_xmm_m") {
 	// EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16
 	test_instr(16, [](CodeAssembler& a) { a.vrcpsh(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrcpsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpss_xmm_xmm_xmm") {
 	// VEX_Vrcpss_xmm_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrcpss(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vrcpss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vrcpss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrcpss_xmm_xmm_m") {
 	// VEX_Vrcpss_xmm_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrcpss(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vrcpss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vrcpss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_xmm_xmm_i") {
 	// EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_ymm_ymm_i") {
 	// EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_zmm_zmm_i") {
 	// EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_xmm_m_i") {
 	// EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_ymm_m_i") {
 	// EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_zmm_m_i") {
 	// EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_xmm_xmm_u") {
 	// EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_ymm_ymm_u") {
 	// EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_zmm_zmm_u") {
 	// EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_xmm_m_u") {
 	// EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_ymm_m_u") {
 	// EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducepd_zmm_m_u") {
 	// EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducepd(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreducepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_xmm_xmm_i") {
 	// EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_ymm_ymm_i") {
 	// EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_zmm_zmm_i") {
 	// EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_xmm_m_i") {
 	// EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_ymm_m_i") {
 	// EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_zmm_m_i") {
 	// EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_xmm_xmm_u") {
 	// EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_ymm_ymm_u") {
 	// EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_zmm_zmm_u") {
 	// EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_xmm_m_u") {
 	// EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_ymm_m_u") {
 	// EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceph_zmm_m_u") {
 	// EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceph(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_xmm_xmm_i") {
 	// EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_ymm_ymm_i") {
 	// EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_zmm_zmm_i") {
 	// EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_xmm_m_i") {
 	// EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_ymm_m_i") {
 	// EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_zmm_m_i") {
 	// EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_xmm_xmm_u") {
 	// EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_ymm_ymm_u") {
 	// EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_zmm_zmm_u") {
 	// EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_xmm_m_u") {
 	// EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_ymm_m_u") {
 	// EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreduceps_zmm_m_u") {
 	// EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreduceps(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vreduceps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesd_xmm_xmm_xmm_i") {
 	// EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesd(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesd_xmm_xmm_m_i") {
 	// EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesd(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesd_xmm_xmm_xmm_u") {
 	// EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesd(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesd_xmm_xmm_m_u") {
 	// EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesd(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesh_xmm_xmm_xmm_i") {
 	// EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesh(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesh_xmm_xmm_m_i") {
 	// EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesh(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesh_xmm_xmm_xmm_u") {
 	// EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesh(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducesh_xmm_xmm_m_u") {
 	// EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducesh(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducess_xmm_xmm_xmm_i") {
 	// EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducess(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducess_xmm_xmm_m_i") {
 	// EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducess(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducess_xmm_xmm_xmm_u") {
 	// EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducess(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vreducess_xmm_xmm_m_u") {
 	// EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vreducess(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vreducess_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_xmm_xmm_i") {
 	// EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_ymm_ymm_i") {
 	// EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_zmm_zmm_i") {
 	// EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_xmm_m_i") {
 	// EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_ymm_m_i") {
 	// EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_zmm_m_i") {
 	// EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_xmm_xmm_u") {
 	// EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_ymm_ymm_u") {
 	// EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_zmm_zmm_u") {
 	// EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_xmm_m_u") {
 	// EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_xmm_k1z_xmmm128b64_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_ymm_m_u") {
 	// EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_ymm_k1z_ymmm256b64_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalepd_zmm_m_u") {
 	// EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalepd(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscalepd_zmm_k1z_zmmm512b64_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_xmm_xmm_i") {
 	// EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_ymm_ymm_i") {
 	// EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_zmm_zmm_i") {
 	// EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_xmm_m_i") {
 	// EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_ymm_m_i") {
 	// EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_zmm_m_i") {
 	// EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_xmm_xmm_u") {
 	// EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_ymm_ymm_u") {
 	// EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_zmm_zmm_u") {
 	// EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_xmm_m_u") {
 	// EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_xmm_k1z_xmmm128b16_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_ymm_m_u") {
 	// EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_ymm_k1z_ymmm256b16_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleph_zmm_m_u") {
 	// EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleph(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleph_zmm_k1z_zmmm512b16_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_xmm_xmm_i") {
 	// EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(xmm2.k1(), xmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_ymm_ymm_i") {
 	// EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(ymm2.k1(), ymm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_zmm_zmm_i") {
 	// EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(zmm2.k1(), zmm3, -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_xmm_m_i") {
 	// EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(xmm2.k1(), xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_ymm_m_i") {
 	// EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(ymm2.k1(), ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_zmm_m_i") {
 	// EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(zmm2.k1(), zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_xmm_xmm_u") {
 	// EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(xmm2.k1(), xmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, Register::XMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_ymm_ymm_u") {
 	// EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(ymm2.k1(), ymm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, Register::YMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_zmm_zmm_u") {
 	// EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(zmm2.k1(), zmm3, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, Register::ZMM3, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_xmm_m_u") {
 	// EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(xmm2.k1(), xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_xmm_k1z_xmmm128b32_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_ymm_m_u") {
 	// EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(ymm2.k1(), ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_ymm_k1z_ymmm256b32_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaleps_zmm_m_u") {
 	// EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaleps(zmm2.k1(), zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrndscaleps_zmm_k1z_zmmm512b32_imm8_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesd_xmm_xmm_xmm_i") {
 	// EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesd(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesd_xmm_xmm_m_i") {
 	// EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesd(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesd_xmm_xmm_xmm_u") {
 	// EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesd(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesd_xmm_xmm_m_u") {
 	// EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesd(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesd_xmm_k1z_xmm_xmmm64_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesh_xmm_xmm_xmm_i") {
 	// EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesh(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesh_xmm_xmm_m_i") {
 	// EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesh(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesh_xmm_xmm_xmm_u") {
 	// EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesh(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscalesh_xmm_xmm_m_u") {
 	// EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscalesh(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscalesh_xmm_k1z_xmm_xmmm16_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaless_xmm_xmm_xmm_i") {
 	// EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaless(xmm2.k1(), xmm3, xmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaless_xmm_xmm_m_i") {
 	// EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaless(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaless_xmm_xmm_xmm_u") {
 	// EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaless(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrndscaless_xmm_xmm_m_u") {
 	// EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrndscaless(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vrndscaless_xmm_k1z_xmm_xmmm32_imm8_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_xmm_xmm_i") {
 	// VEX_Vroundpd_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(xmm2, xmm3, -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_ymm_ymm_i") {
 	// VEX_Vroundpd_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(ymm2, ymm3, -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_xmm_m_i") {
 	// VEX_Vroundpd_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(xmm2, xmmword_ptr(si), -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_ymm_m_i") {
 	// VEX_Vroundpd_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(ymm2, ymmword_ptr(si), -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_xmm_xmm_u") {
 	// VEX_Vroundpd_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(xmm2, xmm3, 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_ymm_ymm_u") {
 	// VEX_Vroundpd_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(ymm2, ymm3, 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_xmm_m_u") {
 	// VEX_Vroundpd_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(xmm2, xmmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundpd_ymm_m_u") {
 	// VEX_Vroundpd_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundpd(ymm2, ymmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundpd_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_xmm_xmm_i") {
 	// VEX_Vroundps_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(xmm2, xmm3, -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_ymm_ymm_i") {
 	// VEX_Vroundps_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(ymm2, ymm3, -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_xmm_m_i") {
 	// VEX_Vroundps_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(xmm2, xmmword_ptr(si), -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_ymm_m_i") {
 	// VEX_Vroundps_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(ymm2, ymmword_ptr(si), -5); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_xmm_xmm_u") {
 	// VEX_Vroundps_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(xmm2, xmm3, 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_ymm_ymm_u") {
 	// VEX_Vroundps_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(ymm2, ymm3, 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_xmm_m_u") {
 	// VEX_Vroundps_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(xmm2, xmmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_xmm_xmmm128_imm8, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundps_ymm_m_u") {
 	// VEX_Vroundps_ymm_ymmm256_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundps(ymm2, ymmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vroundps_ymm_ymmm256_imm8, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundsd_xmm_xmm_xmm_i") {
 	// VEX_Vroundsd_xmm_xmm_xmmm64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundsd(xmm2, xmm3, xmm4, -5); },
-		unwrap(Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundsd_xmm_xmm_m_i") {
 	// VEX_Vroundsd_xmm_xmm_xmmm64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundsd(xmm2, xmm3, xmmword_ptr(si), -5); },
-		unwrap(Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundsd_xmm_xmm_xmm_u") {
 	// VEX_Vroundsd_xmm_xmm_xmmm64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundsd(xmm2, xmm3, xmm4, 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundsd_xmm_xmm_m_u") {
 	// VEX_Vroundsd_xmm_xmm_xmmm64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundsd(xmm2, xmm3, xmmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundsd_xmm_xmm_xmmm64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundss_xmm_xmm_xmm_i") {
 	// VEX_Vroundss_xmm_xmm_xmmm32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundss(xmm2, xmm3, xmm4, -5); },
-		unwrap(Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundss_xmm_xmm_m_i") {
 	// VEX_Vroundss_xmm_xmm_xmmm32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundss(xmm2, xmm3, xmmword_ptr(si), -5); },
-		unwrap(Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundss_xmm_xmm_xmm_u") {
 	// VEX_Vroundss_xmm_xmm_xmmm32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundss(xmm2, xmm3, xmm4, 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vroundss_xmm_xmm_m_u") {
 	// VEX_Vroundss_xmm_xmm_xmmm32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vroundss(xmm2, xmm3, xmmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vroundss_xmm_xmm_xmmm32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_xmm_xmm") {
 	// EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_ymm_ymm") {
 	// EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_zmm_zmm") {
 	// EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_xmm_m") {
 	// EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_ymm_m") {
 	// EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14pd_zmm_m") {
 	// EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14pd(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14pd_zmm_k1z_zmmm512b64, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_xmm_xmm") {
 	// EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_ymm_ymm") {
 	// EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_zmm_zmm") {
 	// EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_xmm_m") {
 	// EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_ymm_m") {
 	// EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ps_zmm_m") {
 	// EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ps(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt14ps_zmm_k1z_zmmm512b32, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14sd_xmm_xmm_xmm") {
 	// EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14sd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14sd_xmm_xmm_m") {
 	// EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14sd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt14sd_xmm_k1z_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ss_xmm_xmm_xmm") {
 	// EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ss(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt14ss_xmm_xmm_m") {
 	// EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt14ss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt14ss_xmm_k1z_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28pd_zmm_zmm") {
 	// EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28pd(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28pd_zmm_m") {
 	// EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28pd(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt28pd_zmm_k1z_zmmm512b64_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28ps_zmm_zmm") {
 	// EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28ps(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28ps_zmm_m") {
 	// EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28ps(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrt28ps_zmm_k1z_zmmm512b32_sae, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28sd_xmm_xmm_xmm") {
 	// EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28sd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28sd_xmm_xmm_m") {
 	// EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28sd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt28sd_xmm_k1z_xmm_xmmm64_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28ss_xmm_xmm_xmm") {
 	// EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28ss(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrt28ss_xmm_xmm_m") {
 	// EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrt28ss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrt28ss_xmm_k1z_xmm_xmmm32_sae, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_xmm_xmm") {
 	// EVEX_Vrsqrtph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_ymm_ymm") {
 	// EVEX_Vrsqrtph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_zmm_zmm") {
 	// EVEX_Vrsqrtph_zmm_k1z_zmmm512b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_zmm_k1z_zmmm512b16, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_zmm_k1z_zmmm512b16, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_xmm_m") {
 	// EVEX_Vrsqrtph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_ymm_m") {
 	// EVEX_Vrsqrtph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtph_zmm_m") {
 	// EVEX_Vrsqrtph_zmm_k1z_zmmm512b16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtph(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vrsqrtph_zmm_k1z_zmmm512b16, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vrsqrtph_zmm_k1z_zmmm512b16, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtps_xmm_xmm") {
 	// VEX_Vrsqrtps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtps(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vrsqrtps_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrsqrtps_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtps_ymm_ymm") {
 	// VEX_Vrsqrtps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtps(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vrsqrtps_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrsqrtps_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtps_xmm_m") {
 	// VEX_Vrsqrtps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtps(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vrsqrtps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrsqrtps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtps_ymm_m") {
 	// VEX_Vrsqrtps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtps(ymm2, ymmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vrsqrtps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vrsqrtps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtsh_xmm_xmm_xmm") {
 	// EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtsh(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtsh_xmm_xmm_m") {
 	// EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtsh(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vrsqrtsh_xmm_k1z_xmm_xmmm16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtss_xmm_xmm_xmm") {
 	// VEX_Vrsqrtss_xmm_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtss(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vrsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vrsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vrsqrtss_xmm_xmm_m") {
 	// VEX_Vrsqrtss_xmm_xmm_xmmm32
 	test_instr(16, [](CodeAssembler& a) { a.vrsqrtss(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vrsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vrsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_xmm_xmm_xmm") {
 	// EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_ymm_ymm_ymm") {
 	// EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_zmm_zmm_zmm") {
 	// EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_xmm_xmm_m") {
 	// EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_ymm_ymm_m") {
 	// EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefpd_zmm_zmm_m") {
 	// EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefpd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_xmm_xmm_xmm") {
 	// EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_ymm_ymm_ymm") {
 	// EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_zmm_zmm_zmm") {
 	// EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_xmm_xmm_m") {
 	// EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_ymm_ymm_m") {
 	// EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefph_zmm_zmm_m") {
 	// EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefph(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_xmm_xmm_xmm") {
 	// EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_ymm_ymm_ymm") {
 	// EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_zmm_zmm_zmm") {
 	// EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_xmm_xmm_m") {
 	// EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_ymm_ymm_m") {
 	// EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefps_zmm_zmm_m") {
 	// EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefps(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefsd_xmm_xmm_xmm") {
 	// EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefsd(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefsd_xmm_xmm_m") {
 	// EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefsd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefsh_xmm_xmm_xmm") {
 	// EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefsh(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefsh_xmm_xmm_m") {
 	// EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefsh(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefss_xmm_xmm_xmm") {
 	// EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefss(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscalefss_xmm_xmm_m") {
 	// EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er
 	test_instr(16, [](CodeAssembler& a) { a.vscalefss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vscalefss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdpd_m_xmm") {
 	// EVEX_Vscatterdpd_vm32x_k1_xmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdpd(ptr(edx+xmm2).k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdpd_vm32x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdpd_vm32x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdpd_m_ymm") {
 	// EVEX_Vscatterdpd_vm32x_k1_ymm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdpd(ptr(edx+xmm2).k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdpd_vm32x_k1_ymm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdpd_vm32x_k1_ymm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdpd_m_zmm") {
 	// EVEX_Vscatterdpd_vm32y_k1_zmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdpd(ptr(edx+ymm2).k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdpd_vm32y_k1_zmm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdpd_vm32y_k1_zmm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdps_m_xmm") {
 	// EVEX_Vscatterdps_vm32x_k1_xmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdps(ptr(edx+xmm2).k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdps_vm32x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdps_vm32x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdps_m_ymm") {
 	// EVEX_Vscatterdps_vm32y_k1_ymm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdps(ptr(edx+ymm2).k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdps_vm32y_k1_ymm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdps_vm32y_k1_ymm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterdps_m_zmm") {
 	// EVEX_Vscatterdps_vm32z_k1_zmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterdps(ptr(edx+zmm2).k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterdps_vm32z_k1_zmm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterdps_vm32z_k1_zmm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf0dpd_m") {
 	// EVEX_Vscatterpf0dpd_vm32y_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf0dpd(ptr(edx+ymm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf0dpd_vm32y_k1, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf0dpd_vm32y_k1, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf0dps_m") {
 	// EVEX_Vscatterpf0dps_vm32z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf0dps(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf0dps_vm32z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf0dps_vm32z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf0qpd_m") {
 	// EVEX_Vscatterpf0qpd_vm64z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf0qpd(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf0qpd_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf0qpd_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf0qps_m") {
 	// EVEX_Vscatterpf0qps_vm64z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf0qps(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf0qps_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf0qps_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf1dpd_m") {
 	// EVEX_Vscatterpf1dpd_vm32y_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf1dpd(ptr(edx+ymm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf1dpd_vm32y_k1, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf1dpd_vm32y_k1, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf1dps_m") {
 	// EVEX_Vscatterpf1dps_vm32z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf1dps(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf1dps_vm32z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf1dps_vm32z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf1qpd_m") {
 	// EVEX_Vscatterpf1qpd_vm64z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf1qpd(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf1qpd_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf1qpd_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterpf1qps_m") {
 	// EVEX_Vscatterpf1qps_vm64z_k1
 	test_instr(16, [](CodeAssembler& a) { a.vscatterpf1qps(ptr(edx+zmm2).k1()); },
-		add_op_mask(unwrap(Instruction::with1(Code::EVEX_Vscatterpf1qps_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with1(Code::EVEX_Vscatterpf1qps_vm64z_k1, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterqpd_m_xmm") {
 	// EVEX_Vscatterqpd_vm64x_k1_xmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterqpd(ptr(edx+xmm2).k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqpd_vm64x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqpd_vm64x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterqpd_m_ymm") {
 	// EVEX_Vscatterqpd_vm64y_k1_ymm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterqpd(ptr(edx+ymm2).k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqpd_vm64y_k1_ymm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqpd_vm64y_k1_ymm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vscatterqpd_m_zmm") {
 	// EVEX_Vscatterqpd_vm64z_k1_zmm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterqpd(ptr(edx+zmm2).k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqpd_vm64z_k1_zmm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqpd_vm64z_k1_zmm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3056,12 +3056,12 @@ TEST_CASE("code_asm/instr16/vscatterqps_m_xmm") {
 	/* if (register_ext::is_xmm(op0.index())) */ {
 		// EVEX_Vscatterqps_vm64x_k1_xmm
 		test_instr(16, [](CodeAssembler& a) { a.vscatterqps(ptr(edx+xmm2).k1(), xmm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqps_vm64x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqps_vm64x_k1_xmm, MemoryOperand(Register::EDX, Register::XMM2, 1, 0x0, 0, false, Register::None), Register::XMM3), Register::K1); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else if (register_ext::is_ymm(op0.index())) */ {
 		// EVEX_Vscatterqps_vm64y_k1_xmm
 		test_instr(16, [](CodeAssembler& a) { a.vscatterqps(ptr(edx+ymm2).k1(), xmm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqps_vm64y_k1_xmm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::XMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqps_vm64y_k1_xmm, MemoryOperand(Register::EDX, Register::YMM2, 1, 0x0, 0, false, Register::None), Register::XMM3), Register::K1); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vscatterqps_vm64y_k1_xmm
@@ -3072,252 +3072,252 @@ TEST_CASE("code_asm/instr16/vscatterqps_m_xmm") {
 TEST_CASE("code_asm/instr16/vscatterqps_m_ymm") {
 	// EVEX_Vscatterqps_vm64z_k1_ymm
 	test_instr(16, [](CodeAssembler& a) { a.vscatterqps(ptr(edx+zmm2).k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vscatterqps_vm64z_k1_ymm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vscatterqps_vm64z_k1_ymm, MemoryOperand(Register::EDX, Register::ZMM2, 1, 0x0, 0, false, Register::None), Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsha512msg1_ymm_xmm") {
 	// VEX_Vsha512msg1_ymm_xmm
 	test_instr(16, [](CodeAssembler& a) { a.vsha512msg1(ymm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vsha512msg1_ymm_xmm, Register::YMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsha512msg1_ymm_xmm, Register::YMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsha512msg2_ymm_ymm") {
 	// VEX_Vsha512msg2_ymm_ymm
 	test_instr(16, [](CodeAssembler& a) { a.vsha512msg2(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vsha512msg2_ymm_ymm, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsha512msg2_ymm_ymm, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsha512rnds2_ymm_ymm_xmm") {
 	// VEX_Vsha512rnds2_ymm_ymm_xmm
 	test_instr(16, [](CodeAssembler& a) { a.vsha512rnds2(ymm2, ymm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsha512rnds2_ymm_ymm_xmm, Register::YMM2, Register::YMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsha512rnds2_ymm_ymm_xmm, Register::YMM2, Register::YMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_ymm_ymm_ymm_i") {
 	// EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_zmm_zmm_zmm_i") {
 	// EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_ymm_ymm_m_i") {
 	// EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_zmm_zmm_m_i") {
 	// EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_ymm_ymm_ymm_u") {
 	// EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_zmm_zmm_zmm_u") {
 	// EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_ymm_ymm_m_u") {
 	// EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff32x4_zmm_zmm_m_u") {
 	// EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff32x4(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_ymm_ymm_ymm_i") {
 	// EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_zmm_zmm_zmm_i") {
 	// EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_ymm_ymm_m_i") {
 	// EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_zmm_zmm_m_i") {
 	// EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_ymm_ymm_ymm_u") {
 	// EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_zmm_zmm_zmm_u") {
 	// EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_ymm_ymm_m_u") {
 	// EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshuff64x2_zmm_zmm_m_u") {
 	// EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshuff64x2(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshuff64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_ymm_ymm_ymm_i") {
 	// EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_zmm_zmm_zmm_i") {
 	// EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_ymm_ymm_m_i") {
 	// EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_zmm_zmm_m_i") {
 	// EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_ymm_ymm_ymm_u") {
 	// EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_zmm_zmm_zmm_u") {
 	// EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_ymm_ymm_m_u") {
 	// EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi32x4_zmm_zmm_m_u") {
 	// EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi32x4(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi32x4_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_ymm_ymm_ymm_i") {
 	// EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(ymm2.k1(), ymm3, ymm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_zmm_zmm_zmm_i") {
 	// EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_ymm_ymm_m_i") {
 	// EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_zmm_zmm_m_i") {
 	// EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_ymm_ymm_ymm_u") {
 	// EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_zmm_zmm_zmm_u") {
 	// EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_ymm_ymm_m_u") {
 	// EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vshufi64x2_zmm_zmm_m_u") {
 	// EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufi64x2(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufi64x2_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3325,12 +3325,12 @@ TEST_CASE("code_asm/instr16/vshufpd_xmm_xmm_xmm_i") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2, xmm3, xmm4, -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, xmm4, -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3339,12 +3339,12 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_ymm_i") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2, ymm3, ymm4, -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, ymm4, -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3352,7 +3352,7 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_ymm_i") {
 TEST_CASE("code_asm/instr16/vshufpd_zmm_zmm_zmm_i") {
 	// EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufpd(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3360,17 +3360,17 @@ TEST_CASE("code_asm/instr16/vshufpd_xmm_xmm_m_i") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, dword_bcst(di), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2, xmm3, xmmword_ptr(si), -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3379,17 +3379,17 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_m_i") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, dword_bcst(di), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2, ymm3, ymmword_ptr(si), -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3397,7 +3397,7 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_m_i") {
 TEST_CASE("code_asm/instr16/vshufpd_zmm_zmm_m_i") {
 	// EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufpd(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3405,12 +3405,12 @@ TEST_CASE("code_asm/instr16/vshufpd_xmm_xmm_xmm_u") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2, xmm3, xmm4, 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3419,12 +3419,12 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_ymm_u") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2, ymm3, ymm4, 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3432,7 +3432,7 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_ymm_u") {
 TEST_CASE("code_asm/instr16/vshufpd_zmm_zmm_zmm_u") {
 	// EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufpd(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3440,17 +3440,17 @@ TEST_CASE("code_asm/instr16/vshufpd_xmm_xmm_m_u") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, dword_bcst(di), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2, xmm3, xmmword_ptr(si), 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_xmm_k1z_xmm_xmmm128b64_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3459,17 +3459,17 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_m_u") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, dword_bcst(di), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufpd_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2, ymm3, ymmword_ptr(si), 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufpd_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufpd(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_ymm_k1z_ymm_ymmm256b64_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3477,7 +3477,7 @@ TEST_CASE("code_asm/instr16/vshufpd_ymm_ymm_m_u") {
 TEST_CASE("code_asm/instr16/vshufpd_zmm_zmm_m_u") {
 	// EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufpd(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufpd_zmm_k1z_zmm_zmmm512b64_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3485,12 +3485,12 @@ TEST_CASE("code_asm/instr16/vshufps_xmm_xmm_xmm_i") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2, xmm3, xmm4, -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, xmm4, -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3499,12 +3499,12 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_ymm_i") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2, ymm3, ymm4, -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, ymm4, -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3512,7 +3512,7 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_ymm_i") {
 TEST_CASE("code_asm/instr16/vshufps_zmm_zmm_zmm_i") {
 	// EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufps(zmm2.k1(), zmm3, zmm4, -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3520,17 +3520,17 @@ TEST_CASE("code_asm/instr16/vshufps_xmm_xmm_m_i") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, dword_bcst(di), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2, xmm3, xmmword_ptr(si), -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, xmmword_ptr(si), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3539,17 +3539,17 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_m_i") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, dword_bcst(di), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2, ymm3, ymmword_ptr(si), -5); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, ymmword_ptr(si), -5); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3557,7 +3557,7 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_m_i") {
 TEST_CASE("code_asm/instr16/vshufps_zmm_zmm_m_i") {
 	// EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufps(zmm2.k1(), zmm3, zmmword_ptr(si), -5); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3565,12 +3565,12 @@ TEST_CASE("code_asm/instr16/vshufps_xmm_xmm_xmm_u") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2, xmm3, xmm4, 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, xmm4, 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3579,12 +3579,12 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_ymm_u") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2, ymm3, ymm4, 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, ymm4, 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, Register::YMM4, 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3592,7 +3592,7 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_ymm_u") {
 TEST_CASE("code_asm/instr16/vshufps_zmm_zmm_zmm_u") {
 	// EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufps(zmm2.k1(), zmm3, zmm4, 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, Register::ZMM4, 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3600,17 +3600,17 @@ TEST_CASE("code_asm/instr16/vshufps_xmm_xmm_m_u") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, dword_bcst(di), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_xmm_xmm_xmmm128_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2, xmm3, xmmword_ptr(si), 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(xmm2.k1(), xmm3, xmmword_ptr(si), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_xmm_k1z_xmm_xmmm128b32_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3619,17 +3619,17 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_m_u") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, dword_bcst(di), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vshufps_ymm_ymm_ymmm256_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2, ymm3, ymmword_ptr(si), 0x7FU); },
-			unwrap(Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vshufps_ymm_ymm_ymmm256_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.vshufps(ymm2.k1(), ymm3, ymmword_ptr(si), 0x7FU); },
-			add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_ymm_k1z_ymm_ymmm256b32_imm8, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3637,119 +3637,119 @@ TEST_CASE("code_asm/instr16/vshufps_ymm_ymm_m_u") {
 TEST_CASE("code_asm/instr16/vshufps_zmm_zmm_m_u") {
 	// EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vshufps(zmm2.k1(), zmm3, zmmword_ptr(si), 0x7FU); },
-		add_op_mask(unwrap(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with4(Code::EVEX_Vshufps_zmm_k1z_zmm_zmmm512b32_imm8, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3msg1_xmm_xmm_xmm") {
 	// VEX_Vsm3msg1_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm3msg1(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm3msg1_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm3msg1_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3msg1_xmm_xmm_m") {
 	// VEX_Vsm3msg1_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm3msg1(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm3msg1_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm3msg1_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3msg2_xmm_xmm_xmm") {
 	// VEX_Vsm3msg2_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm3msg2(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm3msg2_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm3msg2_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3msg2_xmm_xmm_m") {
 	// VEX_Vsm3msg2_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm3msg2(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm3msg2_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm3msg2_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3rnds2_xmm_xmm_xmm_i") {
 	// VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vsm3rnds2(xmm2, xmm3, xmm4, -5); },
-		unwrap(Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3rnds2_xmm_xmm_m_i") {
 	// VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vsm3rnds2(xmm2, xmm3, xmmword_ptr(si), -5); },
-		unwrap(Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3rnds2_xmm_xmm_xmm_u") {
 	// VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vsm3rnds2(xmm2, xmm3, xmm4, 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, Register::XMM4, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm3rnds2_xmm_xmm_m_u") {
 	// VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8
 	test_instr(16, [](CodeAssembler& a) { a.vsm3rnds2(xmm2, xmm3, xmmword_ptr(si), 0x7FU); },
-		unwrap(Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with4(Code::VEX_Vsm3rnds2_xmm_xmm_xmmm128_imm8, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4key4_xmm_xmm_xmm") {
 	// VEX_Vsm4key4_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm4key4(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4key4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4key4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4key4_ymm_ymm_ymm") {
 	// VEX_Vsm4key4_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vsm4key4(ymm2, ymm3, ymm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4key4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4key4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4key4_xmm_xmm_m") {
 	// VEX_Vsm4key4_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm4key4(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4key4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4key4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4key4_ymm_ymm_m") {
 	// VEX_Vsm4key4_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vsm4key4(ymm2, ymm3, ymmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4key4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4key4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4rnds4_xmm_xmm_xmm") {
 	// VEX_Vsm4rnds4_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm4rnds4(xmm2, xmm3, xmm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4rnds4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4rnds4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4rnds4_ymm_ymm_ymm") {
 	// VEX_Vsm4rnds4_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vsm4rnds4(ymm2, ymm3, ymm4); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4rnds4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4rnds4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4rnds4_xmm_xmm_m") {
 	// VEX_Vsm4rnds4_xmm_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vsm4rnds4(xmm2, xmm3, xmmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4rnds4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4rnds4_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsm4rnds4_ymm_ymm_m") {
 	// VEX_Vsm4rnds4_ymm_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vsm4rnds4(ymm2, ymm3, ymmword_ptr(si)); },
-		unwrap(Instruction::with3(Code::VEX_Vsm4rnds4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsm4rnds4_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3757,12 +3757,12 @@ TEST_CASE("code_asm/instr16/vsqrtpd_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtpd_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtpd_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtpd_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtpd_xmm_k1z_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(xmm2.k1(), xmm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, Register::XMM3), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3771,12 +3771,12 @@ TEST_CASE("code_asm/instr16/vsqrtpd_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtpd_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(ymm2, ymm3); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtpd_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtpd_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtpd_ymm_k1z_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(ymm2.k1(), ymm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, Register::YMM3), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3784,7 +3784,7 @@ TEST_CASE("code_asm/instr16/vsqrtpd_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vsqrtpd_zmm_zmm") {
 	// EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3792,17 +3792,17 @@ TEST_CASE("code_asm/instr16/vsqrtpd_xmm_m") {
 	/* if (op1.is_broadcast()) */ {
 		// EVEX_Vsqrtpd_xmm_k1z_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(xmm2.k1(), dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtpd_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtpd_xmm_k1z_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(xmm2.k1(), xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_xmm_k1z_xmmm128b64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3811,17 +3811,17 @@ TEST_CASE("code_asm/instr16/vsqrtpd_ymm_m") {
 	/* if (op1.is_broadcast()) */ {
 		// EVEX_Vsqrtpd_ymm_k1z_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(ymm2.k1(), dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtpd_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(ymm2, ymmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtpd_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtpd_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtpd_ymm_k1z_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(ymm2.k1(), ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_ymm_k1z_ymmm256b64, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3829,49 +3829,49 @@ TEST_CASE("code_asm/instr16/vsqrtpd_ymm_m") {
 TEST_CASE("code_asm/instr16/vsqrtpd_zmm_m") {
 	// EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtpd(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtpd_zmm_k1z_zmmm512b64_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_xmm_xmm") {
 	// EVEX_Vsqrtph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(xmm2.k1(), xmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, Register::XMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_ymm_ymm") {
 	// EVEX_Vsqrtph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(ymm2.k1(), ymm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, Register::YMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_zmm_zmm") {
 	// EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_xmm_m") {
 	// EVEX_Vsqrtph_xmm_k1z_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(xmm2.k1(), xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_xmm_k1z_xmmm128b16, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_ymm_m") {
 	// EVEX_Vsqrtph_ymm_k1z_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(ymm2.k1(), ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_ymm_k1z_ymmm256b16, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtph_zmm_m") {
 	// EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtph(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtph_zmm_k1z_zmmm512b16_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3879,12 +3879,12 @@ TEST_CASE("code_asm/instr16/vsqrtps_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtps_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtps_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtps_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtps_xmm_k1z_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(xmm2.k1(), xmm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, Register::XMM3), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3893,12 +3893,12 @@ TEST_CASE("code_asm/instr16/vsqrtps_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtps_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(ymm2, ymm3); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtps_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtps_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtps_ymm_k1z_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(ymm2.k1(), ymm3); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, Register::YMM3), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3906,7 +3906,7 @@ TEST_CASE("code_asm/instr16/vsqrtps_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vsqrtps_zmm_zmm") {
 	// EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtps(zmm2.k1(), zmm3); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er, Register::ZMM2, Register::ZMM3)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er, Register::ZMM2, Register::ZMM3), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3914,17 +3914,17 @@ TEST_CASE("code_asm/instr16/vsqrtps_xmm_m") {
 	/* if (op1.is_broadcast()) */ {
 		// EVEX_Vsqrtps_xmm_k1z_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(xmm2.k1(), dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtps_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtps_xmm_k1z_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(xmm2.k1(), xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_xmm_k1z_xmmm128b32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3933,17 +3933,17 @@ TEST_CASE("code_asm/instr16/vsqrtps_ymm_m") {
 	/* if (op1.is_broadcast()) */ {
 		// EVEX_Vsqrtps_ymm_k1z_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(ymm2.k1(), dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtps_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(ymm2, ymmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vsqrtps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vsqrtps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtps_ymm_k1z_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtps(ymm2.k1(), ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_ymm_k1z_ymmm256b32, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3951,7 +3951,7 @@ TEST_CASE("code_asm/instr16/vsqrtps_ymm_m") {
 TEST_CASE("code_asm/instr16/vsqrtps_zmm_m") {
 	// EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtps(zmm2.k1(), zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with2(Code::EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with2(Code::EVEX_Vsqrtps_zmm_k1z_zmmm512b32_er, Register::ZMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -3959,12 +3959,12 @@ TEST_CASE("code_asm/instr16/vsqrtsd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtsd_xmm_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtsd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsqrtsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsqrtsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtsd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3973,12 +3973,12 @@ TEST_CASE("code_asm/instr16/vsqrtsd_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtsd_xmm_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtsd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsqrtsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsqrtsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtsd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -3986,14 +3986,14 @@ TEST_CASE("code_asm/instr16/vsqrtsd_xmm_xmm_m") {
 TEST_CASE("code_asm/instr16/vsqrtsh_xmm_xmm_xmm") {
 	// EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtsh(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsqrtsh_xmm_xmm_m") {
 	// EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsqrtsh(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4001,12 +4001,12 @@ TEST_CASE("code_asm/instr16/vsqrtss_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtss_xmm_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtss(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtss(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4015,12 +4015,12 @@ TEST_CASE("code_asm/instr16/vsqrtss_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsqrtss_xmm_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtss(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsqrtss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er
 		test_instr(16, [](CodeAssembler& a) { a.vsqrtss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsqrtss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4028,7 +4028,7 @@ TEST_CASE("code_asm/instr16/vsqrtss_xmm_xmm_m") {
 TEST_CASE("code_asm/instr16/vstmxcsr_m") {
 	// VEX_Vstmxcsr_m32
 	test_instr(16, [](CodeAssembler& a) { a.vstmxcsr(ptr(si)); },
-		unwrap(Instruction::with1(Code::VEX_Vstmxcsr_m32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::VEX_Vstmxcsr_m32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4036,12 +4036,12 @@ TEST_CASE("code_asm/instr16/vsubpd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4050,12 +4050,12 @@ TEST_CASE("code_asm/instr16/vsubpd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4063,7 +4063,7 @@ TEST_CASE("code_asm/instr16/vsubpd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vsubpd_zmm_zmm_zmm") {
 	// EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubpd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4071,17 +4071,17 @@ TEST_CASE("code_asm/instr16/vsubpd_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsubpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4090,17 +4090,17 @@ TEST_CASE("code_asm/instr16/vsubpd_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsubpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vsubpd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4108,49 +4108,49 @@ TEST_CASE("code_asm/instr16/vsubpd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vsubpd_zmm_zmm_m") {
 	// EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubpd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubpd_zmm_k1z_zmm_zmmm512b64_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_xmm_xmm_xmm") {
 	// EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_ymm_ymm_ymm") {
 	// EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(ymm2.k1(), ymm3, ymm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_zmm_zmm_zmm") {
 	// EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_xmm_xmm_m") {
 	// EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_xmm_k1z_xmm_xmmm128b16, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_ymm_ymm_m") {
 	// EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_ymm_k1z_ymm_ymmm256b16, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubph_zmm_zmm_m") {
 	// EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubph(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubph_zmm_k1z_zmm_zmmm512b16_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4158,12 +4158,12 @@ TEST_CASE("code_asm/instr16/vsubps_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4172,12 +4172,12 @@ TEST_CASE("code_asm/instr16/vsubps_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4185,7 +4185,7 @@ TEST_CASE("code_asm/instr16/vsubps_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vsubps_zmm_zmm_zmm") {
 	// EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubps(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4193,17 +4193,17 @@ TEST_CASE("code_asm/instr16/vsubps_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsubps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4212,17 +4212,17 @@ TEST_CASE("code_asm/instr16/vsubps_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vsubps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vsubps(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4230,7 +4230,7 @@ TEST_CASE("code_asm/instr16/vsubps_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vsubps_zmm_zmm_m") {
 	// EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubps(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubps_zmm_k1z_zmm_zmmm512b32_er, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4238,12 +4238,12 @@ TEST_CASE("code_asm/instr16/vsubsd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubsd_xmm_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vsubsd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er
 		test_instr(16, [](CodeAssembler& a) { a.vsubsd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4252,12 +4252,12 @@ TEST_CASE("code_asm/instr16/vsubsd_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubsd_xmm_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vsubsd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubsd_xmm_xmm_xmmm64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er
 		test_instr(16, [](CodeAssembler& a) { a.vsubsd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubsd_xmm_k1z_xmm_xmmm64_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4265,14 +4265,14 @@ TEST_CASE("code_asm/instr16/vsubsd_xmm_xmm_m") {
 TEST_CASE("code_asm/instr16/vsubsh_xmm_xmm_xmm") {
 	// EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubsh(xmm2.k1(), xmm3, xmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vsubsh_xmm_xmm_m") {
 	// EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er
 	test_instr(16, [](CodeAssembler& a) { a.vsubsh(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubsh_xmm_k1z_xmm_xmmm16_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4280,12 +4280,12 @@ TEST_CASE("code_asm/instr16/vsubss_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubss_xmm_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vsubss(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vsubss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er
 		test_instr(16, [](CodeAssembler& a) { a.vsubss(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4294,12 +4294,12 @@ TEST_CASE("code_asm/instr16/vsubss_xmm_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vsubss_xmm_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vsubss(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vsubss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vsubss_xmm_xmm_xmmm32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er
 		test_instr(16, [](CodeAssembler& a) { a.vsubss(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vsubss_xmm_k1z_xmm_xmmm32_er, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4307,56 +4307,56 @@ TEST_CASE("code_asm/instr16/vsubss_xmm_xmm_m") {
 TEST_CASE("code_asm/instr16/vtestpd_xmm_xmm") {
 	// VEX_Vtestpd_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vtestpd(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vtestpd_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestpd_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestpd_ymm_ymm") {
 	// VEX_Vtestpd_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vtestpd(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vtestpd_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestpd_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestpd_xmm_m") {
 	// VEX_Vtestpd_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vtestpd(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vtestpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestpd_ymm_m") {
 	// VEX_Vtestpd_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vtestpd(ymm2, ymmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vtestpd_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestpd_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestps_xmm_xmm") {
 	// VEX_Vtestps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vtestps(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::VEX_Vtestps_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestps_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestps_ymm_ymm") {
 	// VEX_Vtestps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vtestps(ymm2, ymm3); },
-		unwrap(Instruction::with2(Code::VEX_Vtestps_ymm_ymmm256, Register::YMM2, Register::YMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestps_ymm_ymmm256, Register::YMM2, Register::YMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestps_xmm_m") {
 	// VEX_Vtestps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.vtestps(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vtestps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vtestps_ymm_m") {
 	// VEX_Vtestps_ymm_ymmm256
 	test_instr(16, [](CodeAssembler& a) { a.vtestps(ymm2, ymmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::VEX_Vtestps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vtestps_ymm_ymmm256, Register::YMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4364,12 +4364,12 @@ TEST_CASE("code_asm/instr16/vucomisd_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vucomisd_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vucomisd(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::VEX_Vucomisd_xmm_xmmm64, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vucomisd_xmm_xmmm64, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vucomisd_xmm_xmmm64_sae
 		test_instr(16, [](CodeAssembler& a) { a.vucomisd(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::EVEX_Vucomisd_xmm_xmmm64_sae, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomisd_xmm_xmmm64_sae, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4378,12 +4378,12 @@ TEST_CASE("code_asm/instr16/vucomisd_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vucomisd_xmm_xmmm64
 		test_instr(16, [](CodeAssembler& a) { a.vucomisd(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vucomisd_xmm_xmmm64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vucomisd_xmm_xmmm64, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vucomisd_xmm_xmmm64_sae
 		test_instr(16, [](CodeAssembler& a) { a.vucomisd(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::EVEX_Vucomisd_xmm_xmmm64_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomisd_xmm_xmmm64_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4391,14 +4391,14 @@ TEST_CASE("code_asm/instr16/vucomisd_xmm_m") {
 TEST_CASE("code_asm/instr16/vucomish_xmm_xmm") {
 	// EVEX_Vucomish_xmm_xmmm16_sae
 	test_instr(16, [](CodeAssembler& a) { a.vucomish(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::EVEX_Vucomish_xmm_xmmm16_sae, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomish_xmm_xmmm16_sae, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vucomish_xmm_m") {
 	// EVEX_Vucomish_xmm_xmmm16_sae
 	test_instr(16, [](CodeAssembler& a) { a.vucomish(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::EVEX_Vucomish_xmm_xmmm16_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomish_xmm_xmmm16_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4406,12 +4406,12 @@ TEST_CASE("code_asm/instr16/vucomiss_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vucomiss_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vucomiss(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::VEX_Vucomiss_xmm_xmmm32, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vucomiss_xmm_xmmm32, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vucomiss_xmm_xmmm32_sae
 		test_instr(16, [](CodeAssembler& a) { a.vucomiss(xmm2, xmm3); },
-			unwrap(Instruction::with2(Code::EVEX_Vucomiss_xmm_xmmm32_sae, Register::XMM2, Register::XMM3)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomiss_xmm_xmmm32_sae, Register::XMM2, Register::XMM3); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4420,12 +4420,12 @@ TEST_CASE("code_asm/instr16/vucomiss_xmm_m") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vucomiss_xmm_xmmm32
 		test_instr(16, [](CodeAssembler& a) { a.vucomiss(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::VEX_Vucomiss_xmm_xmmm32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::VEX_Vucomiss_xmm_xmmm32, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vucomiss_xmm_xmmm32_sae
 		test_instr(16, [](CodeAssembler& a) { a.vucomiss(xmm2, xmmword_ptr(si)); },
-			unwrap(Instruction::with2(Code::EVEX_Vucomiss_xmm_xmmm32_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::EVEX_Vucomiss_xmm_xmmm32_sae, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4434,12 +4434,12 @@ TEST_CASE("code_asm/instr16/vunpckhpd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4448,12 +4448,12 @@ TEST_CASE("code_asm/instr16/vunpckhpd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4461,7 +4461,7 @@ TEST_CASE("code_asm/instr16/vunpckhpd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vunpckhpd_zmm_zmm_zmm") {
 	// EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4469,17 +4469,17 @@ TEST_CASE("code_asm/instr16/vunpckhpd_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4488,17 +4488,17 @@ TEST_CASE("code_asm/instr16/vunpckhpd_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4506,7 +4506,7 @@ TEST_CASE("code_asm/instr16/vunpckhpd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vunpckhpd_zmm_zmm_m") {
 	// EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vunpckhpd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4514,12 +4514,12 @@ TEST_CASE("code_asm/instr16/vunpckhps_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4528,12 +4528,12 @@ TEST_CASE("code_asm/instr16/vunpckhps_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4541,7 +4541,7 @@ TEST_CASE("code_asm/instr16/vunpckhps_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vunpckhps_zmm_zmm_zmm") {
 	// EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vunpckhps(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4549,17 +4549,17 @@ TEST_CASE("code_asm/instr16/vunpckhps_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4568,17 +4568,17 @@ TEST_CASE("code_asm/instr16/vunpckhps_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpckhps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpckhps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpckhps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpckhps(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4586,7 +4586,7 @@ TEST_CASE("code_asm/instr16/vunpckhps_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vunpckhps_zmm_zmm_m") {
 	// EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vunpckhps(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpckhps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4594,12 +4594,12 @@ TEST_CASE("code_asm/instr16/vunpcklpd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4608,12 +4608,12 @@ TEST_CASE("code_asm/instr16/vunpcklpd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4621,7 +4621,7 @@ TEST_CASE("code_asm/instr16/vunpcklpd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vunpcklpd_zmm_zmm_zmm") {
 	// EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4629,17 +4629,17 @@ TEST_CASE("code_asm/instr16/vunpcklpd_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4648,17 +4648,17 @@ TEST_CASE("code_asm/instr16/vunpcklpd_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4666,7 +4666,7 @@ TEST_CASE("code_asm/instr16/vunpcklpd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vunpcklpd_zmm_zmm_m") {
 	// EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vunpcklpd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4674,12 +4674,12 @@ TEST_CASE("code_asm/instr16/vunpcklps_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4688,12 +4688,12 @@ TEST_CASE("code_asm/instr16/vunpcklps_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4701,7 +4701,7 @@ TEST_CASE("code_asm/instr16/vunpcklps_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vunpcklps_zmm_zmm_zmm") {
 	// EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vunpcklps(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4709,17 +4709,17 @@ TEST_CASE("code_asm/instr16/vunpcklps_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4728,17 +4728,17 @@ TEST_CASE("code_asm/instr16/vunpcklps_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vunpcklps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vunpcklps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vunpcklps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vunpcklps(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4746,7 +4746,7 @@ TEST_CASE("code_asm/instr16/vunpcklps_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vunpcklps_zmm_zmm_m") {
 	// EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vunpcklps(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vunpcklps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4754,12 +4754,12 @@ TEST_CASE("code_asm/instr16/vxorpd_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vxorpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vxorpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4768,12 +4768,12 @@ TEST_CASE("code_asm/instr16/vxorpd_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vxorpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vxorpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4781,7 +4781,7 @@ TEST_CASE("code_asm/instr16/vxorpd_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vxorpd_zmm_zmm_zmm") {
 	// EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vxorpd(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4789,17 +4789,17 @@ TEST_CASE("code_asm/instr16/vxorpd_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vxorpd_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vxorpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorpd_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_xmm_k1z_xmm_xmmm128b64, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4808,17 +4808,17 @@ TEST_CASE("code_asm/instr16/vxorpd_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vxorpd_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vxorpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorpd_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64
 		test_instr(16, [](CodeAssembler& a) { a.vxorpd(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_ymm_k1z_ymm_ymmm256b64, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4826,7 +4826,7 @@ TEST_CASE("code_asm/instr16/vxorpd_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vxorpd_zmm_zmm_m") {
 	// EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64
 	test_instr(16, [](CodeAssembler& a) { a.vxorpd(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorpd_zmm_k1z_zmm_zmmm512b64, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4834,12 +4834,12 @@ TEST_CASE("code_asm/instr16/vxorps_xmm_xmm_xmm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vxorps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(xmm2, xmm3, xmm4); },
-			unwrap(Instruction::with3(Code::VEX_Vxorps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, Register::XMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(xmm2.k1(), xmm3, xmm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, Register::XMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4848,12 +4848,12 @@ TEST_CASE("code_asm/instr16/vxorps_ymm_ymm_ymm") {
 	/* if (instruction_prefer_vex()) */ {
 		// VEX_Vxorps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(ymm2, ymm3, ymm4); },
-			unwrap(Instruction::with3(Code::VEX_Vxorps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4)),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, Register::YMM4); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(ymm2.k1(), ymm3, ymm4); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4)), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, Register::YMM4), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4861,7 +4861,7 @@ TEST_CASE("code_asm/instr16/vxorps_ymm_ymm_ymm") {
 TEST_CASE("code_asm/instr16/vxorps_zmm_zmm_zmm") {
 	// EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vxorps(zmm2.k1(), zmm3, zmm4); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4)), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, Register::ZMM4), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -4869,17 +4869,17 @@ TEST_CASE("code_asm/instr16/vxorps_xmm_xmm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(xmm2.k1(), xmm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vxorps_xmm_xmm_xmmm128
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(xmm2, xmm3, xmmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vxorps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorps_xmm_xmm_xmmm128, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(xmm2.k1(), xmm3, xmmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_xmm_k1z_xmm_xmmm128b32, Register::XMM2, Register::XMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4888,17 +4888,17 @@ TEST_CASE("code_asm/instr16/vxorps_ymm_ymm_m") {
 	/* if (op2.is_broadcast()) */ {
 		// EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(ymm2.k1(), ymm3, dword_bcst(di)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, true, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX | TestInstrFlags::BROADCAST, DecoderOptions::NONE);
 	} /* else if (instruction_prefer_vex()) */ {
 		// VEX_Vxorps_ymm_ymm_ymmm256
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(ymm2, ymm3, ymmword_ptr(si)); },
-			unwrap(Instruction::with3(Code::VEX_Vxorps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+			[]() -> Result<Instruction> { return Instruction::with3(Code::VEX_Vxorps_ymm_ymm_ymmm256, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 			TestInstrFlags::PREFER_VEX, DecoderOptions::NONE);
 	} /* else */ {
 		// EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32
 		test_instr(16, [](CodeAssembler& a) { a.vxorps(ymm2.k1(), ymm3, ymmword_ptr(si)); },
-			add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+			[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_ymm_k1z_ymm_ymmm256b32, Register::YMM2, Register::YMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 			TestInstrFlags::PREFER_EVEX, DecoderOptions::NONE);
 	}
 }
@@ -4906,196 +4906,196 @@ TEST_CASE("code_asm/instr16/vxorps_ymm_ymm_m") {
 TEST_CASE("code_asm/instr16/vxorps_zmm_zmm_m") {
 	// EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32
 	test_instr(16, [](CodeAssembler& a) { a.vxorps(zmm2.k1(), zmm3, zmmword_ptr(si)); },
-		add_op_mask(unwrap(Instruction::with3(Code::EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))), Register::K1),
+		[]() -> Result<Instruction> { return add_op_mask(Instruction::with3(Code::EVEX_Vxorps_zmm_k1z_zmm_zmmm512b32, Register::ZMM2, Register::ZMM3, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)), Register::K1); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vzeroall") {
 	// VEX_Vzeroall
 	test_instr(16, [](CodeAssembler& a) { a.vzeroall(); },
-		Instruction::with(Code::VEX_Vzeroall),
+		[]() -> Result<Instruction> { return Instruction::with(Code::VEX_Vzeroall); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/vzeroupper") {
 	// VEX_Vzeroupper
 	test_instr(16, [](CodeAssembler& a) { a.vzeroupper(); },
-		Instruction::with(Code::VEX_Vzeroupper),
+		[]() -> Result<Instruction> { return Instruction::with(Code::VEX_Vzeroupper); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wait") {
 	// Wait
 	test_instr(16, [](CodeAssembler& a) { a.wait(); },
-		Instruction::with(Code::Wait),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wait); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wbinvd") {
 	// Wbinvd
 	test_instr(16, [](CodeAssembler& a) { a.wbinvd(); },
-		Instruction::with(Code::Wbinvd),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wbinvd); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wbnoinvd") {
 	// Wbnoinvd
 	test_instr(16, [](CodeAssembler& a) { a.wbnoinvd(); },
-		Instruction::with(Code::Wbnoinvd),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wbnoinvd); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wrmsr") {
 	// Wrmsr
 	test_instr(16, [](CodeAssembler& a) { a.wrmsr(); },
-		Instruction::with(Code::Wrmsr),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wrmsr); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wrmsrns") {
 	// Wrmsrns
 	test_instr(16, [](CodeAssembler& a) { a.wrmsrns(); },
-		Instruction::with(Code::Wrmsrns),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wrmsrns); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wrpkru") {
 	// Wrpkru
 	test_instr(16, [](CodeAssembler& a) { a.wrpkru(); },
-		Instruction::with(Code::Wrpkru),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wrpkru); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wrshr_r32") {
 	// Wrshr_rm32
 	test_instr(16, [](CodeAssembler& a) { a.wrshr(edx); },
-		unwrap(Instruction::with1(Code::Wrshr_rm32, Register::EDX)),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Wrshr_rm32, Register::EDX); },
 		TestInstrFlags::NONE, DecoderOptions::CYRIX);
 }
 
 TEST_CASE("code_asm/instr16/wrshr_m") {
 	// Wrshr_rm32
 	test_instr(16, [](CodeAssembler& a) { a.wrshr(dword_ptr(si)); },
-		unwrap(Instruction::with1(Code::Wrshr_rm32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Wrshr_rm32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::CYRIX);
 }
 
 TEST_CASE("code_asm/instr16/wrssd_m_r32") {
 	// Wrssd_m32_r32
 	test_instr(16, [](CodeAssembler& a) { a.wrssd(ptr(si), ebx); },
-		unwrap(Instruction::with2(Code::Wrssd_m32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Wrssd_m32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/wrudbg") {
 	// Wrudbg
 	test_instr(16, [](CodeAssembler& a) { a.wrudbg(); },
-		Instruction::with(Code::Wrudbg),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Wrudbg); },
 		TestInstrFlags::NONE, DecoderOptions::UDBG);
 }
 
 TEST_CASE("code_asm/instr16/wrussd_m_r32") {
 	// Wrussd_m32_r32
 	test_instr(16, [](CodeAssembler& a) { a.wrussd(ptr(si), ebx); },
-		unwrap(Instruction::with2(Code::Wrussd_m32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Wrussd_m32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xabort_i") {
 	// Xabort_imm8
 	test_instr(16, [](CodeAssembler& a) { a.xabort(-5); },
-		unwrap(Instruction::with1(Code::Xabort_imm8, -5)),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xabort_imm8, -5); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xabort_u") {
 	// Xabort_imm8
 	test_instr(16, [](CodeAssembler& a) { a.xabort(0x7FU); },
-		unwrap(Instruction::with1(Code::Xabort_imm8, 0x7FU)),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xabort_imm8, 0x7FU); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_r8_r8") {
 	// Xadd_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xadd(dl, bl); },
-		unwrap(Instruction::with2(Code::Xadd_rm8_r8, Register::DL, Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm8_r8, Register::DL, Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_m_r8") {
 	// Xadd_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xadd(byte_ptr(si), bl); },
-		unwrap(Instruction::with2(Code::Xadd_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_r16_r16") {
 	// Xadd_rm16_r16
 	test_instr(16, [](CodeAssembler& a) { a.xadd(dx, bx); },
-		unwrap(Instruction::with2(Code::Xadd_rm16_r16, Register::DX, Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm16_r16, Register::DX, Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_m_r16") {
 	// Xadd_rm16_r16
 	test_instr(16, [](CodeAssembler& a) { a.xadd(word_ptr(si), bx); },
-		unwrap(Instruction::with2(Code::Xadd_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_r32_r32") {
 	// Xadd_rm32_r32
 	test_instr(16, [](CodeAssembler& a) { a.xadd(edx, ebx); },
-		unwrap(Instruction::with2(Code::Xadd_rm32_r32, Register::EDX, Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm32_r32, Register::EDX, Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xadd_m_r32") {
 	// Xadd_rm32_r32
 	test_instr(16, [](CodeAssembler& a) { a.xadd(dword_ptr(si), ebx); },
-		unwrap(Instruction::with2(Code::Xadd_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xadd_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xbts_r16_r16") {
 	// Xbts_r16_rm16
 	test_instr(16, [](CodeAssembler& a) { a.xbts(dx, bx); },
-		unwrap(Instruction::with2(Code::Xbts_r16_rm16, Register::DX, Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xbts_r16_rm16, Register::DX, Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::XBTS);
 }
 
 TEST_CASE("code_asm/instr16/xbts_r32_r32") {
 	// Xbts_r32_rm32
 	test_instr(16, [](CodeAssembler& a) { a.xbts(edx, ebx); },
-		unwrap(Instruction::with2(Code::Xbts_r32_rm32, Register::EDX, Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xbts_r32_rm32, Register::EDX, Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::XBTS);
 }
 
 TEST_CASE("code_asm/instr16/xbts_r16_m") {
 	// Xbts_r16_rm16
 	test_instr(16, [](CodeAssembler& a) { a.xbts(dx, word_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xbts_r16_rm16, Register::DX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xbts_r16_rm16, Register::DX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::XBTS);
 }
 
 TEST_CASE("code_asm/instr16/xbts_r32_m") {
 	// Xbts_r32_rm32
 	test_instr(16, [](CodeAssembler& a) { a.xbts(edx, dword_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xbts_r32_rm32, Register::EDX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xbts_r32_rm32, Register::EDX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::XBTS);
 }
 
 TEST_CASE("code_asm/instr16/xchg_r8_r8") {
 	// Xchg_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xchg(dl, bl); },
-		unwrap(Instruction::with2(Code::Xchg_rm8_r8, Register::DL, Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm8_r8, Register::DL, Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xchg_m_r8") {
 	// Xchg_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xchg(byte_ptr(si), bl); },
-		unwrap(Instruction::with2(Code::Xchg_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -5103,12 +5103,12 @@ TEST_CASE("code_asm/instr16/xchg_r16_r16") {
 	/* if (op1.register_() == Register::AX) */ {
 		// Xchg_r16_AX
 		test_instr(16, [](CodeAssembler& a) { a.xchg(dx, ax); },
-			unwrap(Instruction::with2(Code::Xchg_r16_AX, Register::DX, Register::AX)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_r16_AX, Register::DX, Register::AX); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xchg_rm16_r16
 		test_instr(16, [](CodeAssembler& a) { a.xchg(dx, bx); },
-			unwrap(Instruction::with2(Code::Xchg_rm16_r16, Register::DX, Register::BX)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm16_r16, Register::DX, Register::BX); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5116,7 +5116,7 @@ TEST_CASE("code_asm/instr16/xchg_r16_r16") {
 TEST_CASE("code_asm/instr16/xchg_m_r16") {
 	// Xchg_rm16_r16
 	test_instr(16, [](CodeAssembler& a) { a.xchg(word_ptr(si), bx); },
-		unwrap(Instruction::with2(Code::Xchg_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -5124,12 +5124,12 @@ TEST_CASE("code_asm/instr16/xchg_r32_r32") {
 	/* if (op1.register_() == Register::EAX) */ {
 		// Xchg_r32_EAX
 		test_instr(16, [](CodeAssembler& a) { a.xchg(edx, eax); },
-			unwrap(Instruction::with2(Code::Xchg_r32_EAX, Register::EDX, Register::EAX)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_r32_EAX, Register::EDX, Register::EAX); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xchg_rm32_r32
 		test_instr(16, [](CodeAssembler& a) { a.xchg(edx, ebx); },
-			unwrap(Instruction::with2(Code::Xchg_rm32_r32, Register::EDX, Register::EBX)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm32_r32, Register::EDX, Register::EBX); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5137,7 +5137,7 @@ TEST_CASE("code_asm/instr16/xchg_r32_r32") {
 TEST_CASE("code_asm/instr16/xchg_m_r32") {
 	// Xchg_rm32_r32
 	test_instr(16, [](CodeAssembler& a) { a.xchg(dword_ptr(si), ebx); },
-		unwrap(Instruction::with2(Code::Xchg_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xchg_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -5149,7 +5149,7 @@ TEST_CASE("code_asm/instr16/xcryptcbc") {
 	} /* else */ {
 		// Xcryptcbc_16
 		test_instr(16, [](CodeAssembler& a) { a.xcryptcbc(); },
-			Instruction::with(Code::Xcryptcbc_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xcryptcbc_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5162,7 +5162,7 @@ TEST_CASE("code_asm/instr16/xcryptcfb") {
 	} /* else */ {
 		// Xcryptcfb_16
 		test_instr(16, [](CodeAssembler& a) { a.xcryptcfb(); },
-			Instruction::with(Code::Xcryptcfb_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xcryptcfb_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5175,7 +5175,7 @@ TEST_CASE("code_asm/instr16/xcryptctr") {
 	} /* else */ {
 		// Xcryptctr_16
 		test_instr(16, [](CodeAssembler& a) { a.xcryptctr(); },
-			Instruction::with(Code::Xcryptctr_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xcryptctr_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5188,7 +5188,7 @@ TEST_CASE("code_asm/instr16/xcryptecb") {
 	} /* else */ {
 		// Xcryptecb_16
 		test_instr(16, [](CodeAssembler& a) { a.xcryptecb(); },
-			Instruction::with(Code::Xcryptecb_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xcryptecb_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5201,7 +5201,7 @@ TEST_CASE("code_asm/instr16/xcryptofb") {
 	} /* else */ {
 		// Xcryptofb_16
 		test_instr(16, [](CodeAssembler& a) { a.xcryptofb(); },
-			Instruction::with(Code::Xcryptofb_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xcryptofb_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5209,77 +5209,77 @@ TEST_CASE("code_asm/instr16/xcryptofb") {
 TEST_CASE("code_asm/instr16/xend") {
 	// Xend
 	test_instr(16, [](CodeAssembler& a) { a.xend(); },
-		Instruction::with(Code::Xend),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xend); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xgetbv") {
 	// Xgetbv
 	test_instr(16, [](CodeAssembler& a) { a.xgetbv(); },
-		Instruction::with(Code::Xgetbv),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xgetbv); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r8_r8") {
 	// Xor_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xor_(dl, bl); },
-		unwrap(Instruction::with2(Code::Xor_rm8_r8, Register::DL, Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_r8, Register::DL, Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_m_r8") {
 	// Xor_rm8_r8
 	test_instr(16, [](CodeAssembler& a) { a.xor_(byte_ptr(si), bl); },
-		unwrap(Instruction::with2(Code::Xor_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_r8, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BL); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r16_r16") {
 	// Xor_rm16_r16
 	test_instr(16, [](CodeAssembler& a) { a.xor_(dx, bx); },
-		unwrap(Instruction::with2(Code::Xor_rm16_r16, Register::DX, Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_r16, Register::DX, Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_m_r16") {
 	// Xor_rm16_r16
 	test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(si), bx); },
-		unwrap(Instruction::with2(Code::Xor_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_r16, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::BX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r32_r32") {
 	// Xor_rm32_r32
 	test_instr(16, [](CodeAssembler& a) { a.xor_(edx, ebx); },
-		unwrap(Instruction::with2(Code::Xor_rm32_r32, Register::EDX, Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_r32, Register::EDX, Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_m_r32") {
 	// Xor_rm32_r32
 	test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(si), ebx); },
-		unwrap(Instruction::with2(Code::Xor_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_r32, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None), Register::EBX); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r8_m") {
 	// Xor_r8_rm8
 	test_instr(16, [](CodeAssembler& a) { a.xor_(dl, byte_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xor_r8_rm8, Register::DL, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_r8_rm8, Register::DL, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r16_m") {
 	// Xor_r16_rm16
 	test_instr(16, [](CodeAssembler& a) { a.xor_(dx, word_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xor_r16_rm16, Register::DX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_r16_rm16, Register::DX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xor_r32_m") {
 	// Xor_r32_rm32
 	test_instr(16, [](CodeAssembler& a) { a.xor_(edx, dword_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xor_r32_rm32, Register::EDX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_r32_rm32, Register::EDX, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -5287,12 +5287,12 @@ TEST_CASE("code_asm/instr16/xor_r8_i") {
 	/* if (op0.register_() == Register::AL) */ {
 		// Xor_AL_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(al, -5); },
-			unwrap(Instruction::with2(Code::Xor_AL_imm8, Register::AL, -5)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_AL_imm8, Register::AL, -5); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm8_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dl, -5); },
-			unwrap(Instruction::with2(Code::Xor_rm8_imm8, Register::DL, -5)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_imm8, Register::DL, -5); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5301,21 +5301,21 @@ TEST_CASE("code_asm/instr16/xor_r16_i") {
 	/* if (op0.register_() == Register::AX) */ {
 		// Xor_AX_imm16
 		test_instr(16, [](CodeAssembler& a) { a.xor_(ax, 0x40B7); },
-			unwrap(Instruction::with2(Code::Xor_AX_imm16, Register::AX, 0x40B7)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_AX_imm16, Register::AX, 0x40B7); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else if ((op1 >= -0x80 && op1 <= 0x7F)) */ {
 		// Xor_rm16_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, -0x80); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm8, Register::DX, -0x80)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, Register::DX, -0x80); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 		// Xor_rm16_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, 0x7F); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0x7F)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0x7F); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm16_imm16
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, 0x40B7); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm16, Register::DX, 0x40B7)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm16, Register::DX, 0x40B7); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5324,21 +5324,21 @@ TEST_CASE("code_asm/instr16/xor_r32_i") {
 	/* if (op0.register_() == Register::EAX) */ {
 		// Xor_EAX_imm32
 		test_instr(16, [](CodeAssembler& a) { a.xor_(eax, 0x7FFFFFFF); },
-			unwrap(Instruction::with2(Code::Xor_EAX_imm32, Register::EAX, 0x7FFFFFFF)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_EAX_imm32, Register::EAX, 0x7FFFFFFF); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else if ((op1 >= -0x80 && op1 <= 0x7F)) */ {
 		// Xor_rm32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, -0x80); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, -0x80)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, -0x80); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 		// Xor_rm32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, 0x7F); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0x7F)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0x7F); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm32_imm32
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, 0x7FFFFFFF); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm32, Register::EDX, 0x7FFFFFFF)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm32, Register::EDX, 0x7FFFFFFF); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5355,38 +5355,38 @@ TEST_CASE("code_asm/instr16/xor_m_i") {
 		/* if ((op1 >= -0x80 && op1 <= 0x7F)) */ {
 			// Xor_rm32_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), -0x80); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -0x80)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -0x80); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 			// Xor_rm32_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), 0x7F); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7F)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7F); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		} /* else */ {
 			// Xor_rm32_imm32
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), 0x7FFFFFFF); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm32, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FFFFFFF)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm32, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FFFFFFF); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		}
 	} /* else if (op0.size() == MemoryOperandSize::Word) */ {
 		/* if ((op1 >= -0x80 && op1 <= 0x7F)) */ {
 			// Xor_rm16_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), -0x80); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -0x80)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -0x80); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 			// Xor_rm16_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), 0x7F); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7F)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7F); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		} /* else */ {
 			// Xor_rm16_imm16
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), 0x40B7); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm16, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x40B7)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm16, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x40B7); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		}
 	} /* else if (op0.size() == MemoryOperandSize::Byte) */ {
 		// Xor_rm8_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(byte_ptr(di), -5); },
-			unwrap(Instruction::with2(Code::Xor_rm8_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -5)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), -5); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm8_imm8
@@ -5398,12 +5398,12 @@ TEST_CASE("code_asm/instr16/xor_r8_u") {
 	/* if (op0.register_() == Register::AL) */ {
 		// Xor_AL_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(al, 0x7FU); },
-			unwrap(Instruction::with2(Code::Xor_AL_imm8, Register::AL, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_AL_imm8, Register::AL, 0x7FU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm8_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dl, 0x7FU); },
-			unwrap(Instruction::with2(Code::Xor_rm8_imm8, Register::DL, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_imm8, Register::DL, 0x7FU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5412,21 +5412,21 @@ TEST_CASE("code_asm/instr16/xor_r16_u") {
 	/* if (op0.register_() == Register::AX) */ {
 		// Xor_AX_imm16
 		test_instr(16, [](CodeAssembler& a) { a.xor_(ax, 0x40B7U); },
-			unwrap(Instruction::with2(Code::Xor_AX_imm16, Register::AX, 0x40B7U)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_AX_imm16, Register::AX, 0x40B7U); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else if ((op1 <= 0x7FU || (0xFF80U <= op1 && op1 <= 0xFFFFU))) */ {
 		// Xor_rm16_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, 0xFF80U); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0xFF80U)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0xFF80U); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 		// Xor_rm16_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, 0x7FU); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, Register::DX, 0x7FU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm16_imm16
 		test_instr(16, [](CodeAssembler& a) { a.xor_(dx, 0x40B7U); },
-			unwrap(Instruction::with2(Code::Xor_rm16_imm16, Register::DX, 0x40B7U)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm16, Register::DX, 0x40B7U); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5435,21 +5435,21 @@ TEST_CASE("code_asm/instr16/xor_r32_u") {
 	/* if (op0.register_() == Register::EAX) */ {
 		// Xor_EAX_imm32
 		test_instr(16, [](CodeAssembler& a) { a.xor_(eax, 0x7FFFFFFFU); },
-			unwrap(Instruction::with2(Code::Xor_EAX_imm32, Register::EAX, 0x7FFFFFFFU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_EAX_imm32, Register::EAX, 0x7FFFFFFFU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else if ((op1 <= 0x7FU || 0xFFFFFF80U <= op1)) */ {
 		// Xor_rm32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, 0xFFFFFF80U); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0xFFFFFF80U)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0xFFFFFF80U); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 		// Xor_rm32_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, 0x7FU); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, Register::EDX, 0x7FU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm32_imm32
 		test_instr(16, [](CodeAssembler& a) { a.xor_(edx, 0x7FFFFFFFU); },
-			unwrap(Instruction::with2(Code::Xor_rm32_imm32, Register::EDX, 0x7FFFFFFFU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm32, Register::EDX, 0x7FFFFFFFU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	}
 }
@@ -5459,38 +5459,38 @@ TEST_CASE("code_asm/instr16/xor_m_u") {
 		/* if ((op1 <= 0x7FU || 0xFFFFFF80U <= op1)) */ {
 			// Xor_rm32_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), 0xFFFFFF80U); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0xFFFFFF80U)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0xFFFFFF80U); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 			// Xor_rm32_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), 0x7FU); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		} /* else */ {
 			// Xor_rm32_imm32
 			test_instr(16, [](CodeAssembler& a) { a.xor_(dword_ptr(di), 0x7FFFFFFFU); },
-				unwrap(Instruction::with2(Code::Xor_rm32_imm32, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FFFFFFFU)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm32_imm32, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FFFFFFFU); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		}
 	} /* else if (op0.size() == MemoryOperandSize::Word) */ {
 		/* if ((op1 <= 0x7FU || (0xFF80U <= op1 && op1 <= 0xFFFFU))) */ {
 			// Xor_rm16_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), 0xFF80U); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0xFF80U)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0xFF80U); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 			// Xor_rm16_imm8
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), 0x7FU); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		} /* else */ {
 			// Xor_rm16_imm16
 			test_instr(16, [](CodeAssembler& a) { a.xor_(word_ptr(di), 0x40B7U); },
-				unwrap(Instruction::with2(Code::Xor_rm16_imm16, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x40B7U)),
+				[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm16_imm16, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x40B7U); },
 				TestInstrFlags::NONE, DecoderOptions::NONE);
 		}
 	} /* else if (op0.size() == MemoryOperandSize::Byte) */ {
 		// Xor_rm8_imm8
 		test_instr(16, [](CodeAssembler& a) { a.xor_(byte_ptr(di), 0x7FU); },
-			unwrap(Instruction::with2(Code::Xor_rm8_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU)),
+			[]() -> Result<Instruction> { return Instruction::with2(Code::Xor_rm8_imm8, MemoryOperand(Register::DI, Register::None, 1, 0x0, 0, false, Register::None), 0x7FU); },
 			TestInstrFlags::NONE, DecoderOptions::NONE);
 	} /* else */ {
 		// Xor_rm8_imm8
@@ -5501,84 +5501,84 @@ TEST_CASE("code_asm/instr16/xor_m_u") {
 TEST_CASE("code_asm/instr16/xorpd_xmm_xmm") {
 	// Xorpd_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.xorpd(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::Xorpd_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xorpd_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xorpd_xmm_m") {
 	// Xorpd_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.xorpd(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xorpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xorpd_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xorps_xmm_xmm") {
 	// Xorps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.xorps(xmm2, xmm3); },
-		unwrap(Instruction::with2(Code::Xorps_xmm_xmmm128, Register::XMM2, Register::XMM3)),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xorps_xmm_xmmm128, Register::XMM2, Register::XMM3); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xorps_xmm_m") {
 	// Xorps_xmm_xmmm128
 	test_instr(16, [](CodeAssembler& a) { a.xorps(xmm2, xmmword_ptr(si)); },
-		unwrap(Instruction::with2(Code::Xorps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with2(Code::Xorps_xmm_xmmm128, Register::XMM2, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xresldtrk") {
 	// Xresldtrk
 	test_instr(16, [](CodeAssembler& a) { a.xresldtrk(); },
-		Instruction::with(Code::Xresldtrk),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xresldtrk); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xrstor_m") {
 	// Xrstor_mem
 	test_instr(16, [](CodeAssembler& a) { a.xrstor(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xrstor_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xrstor_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xrstors_m") {
 	// Xrstors_mem
 	test_instr(16, [](CodeAssembler& a) { a.xrstors(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xrstors_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xrstors_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xsave_m") {
 	// Xsave_mem
 	test_instr(16, [](CodeAssembler& a) { a.xsave(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xsave_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xsave_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xsavec_m") {
 	// Xsavec_mem
 	test_instr(16, [](CodeAssembler& a) { a.xsavec(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xsavec_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xsavec_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xsaveopt_m") {
 	// Xsaveopt_mem
 	test_instr(16, [](CodeAssembler& a) { a.xsaveopt(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xsaveopt_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xsaveopt_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xsaves_m") {
 	// Xsaves_mem
 	test_instr(16, [](CodeAssembler& a) { a.xsaves(ptr(si)); },
-		unwrap(Instruction::with1(Code::Xsaves_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None))),
+		[]() -> Result<Instruction> { return Instruction::with1(Code::Xsaves_mem, MemoryOperand(Register::SI, Register::None, 1, 0x0, 0, false, Register::None)); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xsetbv") {
 	// Xsetbv
 	test_instr(16, [](CodeAssembler& a) { a.xsetbv(); },
-		Instruction::with(Code::Xsetbv),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xsetbv); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
@@ -5590,7 +5590,7 @@ TEST_CASE("code_asm/instr16/xsha1") {
 	} /* else */ {
 		// Xsha1_16
 		test_instr(16, [](CodeAssembler& a) { a.xsha1(); },
-			Instruction::with(Code::Xsha1_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xsha1_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5603,7 +5603,7 @@ TEST_CASE("code_asm/instr16/xsha256") {
 	} /* else */ {
 		// Xsha256_16
 		test_instr(16, [](CodeAssembler& a) { a.xsha256(); },
-			Instruction::with(Code::Xsha256_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xsha256_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5616,7 +5616,7 @@ TEST_CASE("code_asm/instr16/xsha512") {
 	} /* else */ {
 		// Xsha512_16
 		test_instr(16, [](CodeAssembler& a) { a.xsha512(); },
-			Instruction::with(Code::Xsha512_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xsha512_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5629,7 +5629,7 @@ TEST_CASE("code_asm/instr16/xsha512_alt") {
 	} /* else */ {
 		// Xsha512_alt_16
 		test_instr(16, [](CodeAssembler& a) { a.xsha512_alt(); },
-			Instruction::with(Code::Xsha512_alt_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xsha512_alt_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5642,7 +5642,7 @@ TEST_CASE("code_asm/instr16/xstore") {
 	} /* else */ {
 		// Xstore_16
 		test_instr(16, [](CodeAssembler& a) { a.xstore(); },
-			Instruction::with(Code::Xstore_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xstore_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5655,7 +5655,7 @@ TEST_CASE("code_asm/instr16/xstore_alt") {
 	} /* else */ {
 		// Xstore_alt_16
 		test_instr(16, [](CodeAssembler& a) { a.xstore_alt(); },
-			Instruction::with(Code::Xstore_alt_16),
+			[]() -> Result<Instruction> { return Instruction::with(Code::Xstore_alt_16); },
 			TestInstrFlags::REMOVE_REP_REPNE_PREFIXES, DecoderOptions::NONE);
 	}
 }
@@ -5663,21 +5663,21 @@ TEST_CASE("code_asm/instr16/xstore_alt") {
 TEST_CASE("code_asm/instr16/xsusldtrk") {
 	// Xsusldtrk
 	test_instr(16, [](CodeAssembler& a) { a.xsusldtrk(); },
-		Instruction::with(Code::Xsusldtrk),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xsusldtrk); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/xtest") {
 	// Xtest
 	test_instr(16, [](CodeAssembler& a) { a.xtest(); },
-		Instruction::with(Code::Xtest),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Xtest); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 
 TEST_CASE("code_asm/instr16/zero_bytes") {
 	// Zero_bytes
 	test_instr(16, [](CodeAssembler& a) { a.zero_bytes(); },
-		Instruction::with(Code::Zero_bytes),
+		[]() -> Result<Instruction> { return Instruction::with(Code::Zero_bytes); },
 		TestInstrFlags::NONE, DecoderOptions::NONE);
 }
 

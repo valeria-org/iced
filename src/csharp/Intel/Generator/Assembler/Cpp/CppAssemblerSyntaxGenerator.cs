@@ -1059,24 +1059,21 @@ namespace Generator.Assembler.Cpp {
 					asmBody = $"auto {CreatedLabelName} = create_and_emit_label(a); {asmBody}";
 				writer.WriteLine($"test_instr({bitness}, [](CodeAssembler& a) {{ {asmBody} }},");
 				using (writer.Indent()) {
-					bool returnsResult = true;
 					string withFnName;
 					if (group.HasSpecialInstructionEncoding)
 						withFnName = $"with_{group.MnemonicName.ToLowerInvariant()}";
 					else if (group.HasLabel)
 						withFnName = "with_branch";
 					else {
-						if (group.Signature.ArgCount + extraArgsCount == 0)
-							returnsResult = false;
 						withFnName = GetOverloadedCreateName(group.Signature.ArgCount + extraArgsCount);
 					}
 					var withArgsStr = string.Join(", ", withArgs);
 					var withFnsPreStr = string.Join(string.Empty, ((IEnumerable<(string pre, string post)>)withFns).Reverse().Select(x => x.pre));
 					var withFnsPostStr = string.Join(string.Empty, withFns.Select(x => x.post));
+					// The expected instruction is created by a lambda so the (inlined) `Result` code is in one place
+					// (test_instr()) instead of at each call site (much faster to compile).
 					var createExpr = $"Instruction::{withFnName}({withArgsStr})";
-					if (returnsResult)
-						createExpr = $"unwrap({createExpr})";
-					writer.WriteLine($"{withFnsPreStr}{createExpr}{withFnsPostStr},");
+					writer.WriteLine($"[]() -> Result<Instruction> {{ return {withFnsPreStr}{createExpr}{withFnsPostStr}; }},");
 
 					var decOpts = GetDecoderOptions(bitness, def);
 					if (decOpts.Count == 0)
