@@ -478,7 +478,7 @@ public:
 	/// const OpCodeInfo& op_code = code_ext::op_code(Code::EVEX_Vmovapd_ymm_k1z_ymmm256);
 	/// assert(op_code.op_code_string() == "EVEX.256.66.0F.W1 28 /r");
 	/// ```
-	std::string_view op_code_string() const noexcept { return op_code_string_; }
+	std::string_view op_code_string() const noexcept;
 
 	/// Gets the instruction string, eg. `VPBROADCASTB xmm1, xmm2/m8`, see also `op_code_string()`
 	///
@@ -487,14 +487,27 @@ public:
 	///
 	/// ```cpp
 	/// const OpCodeInfo& op_code = code_ext::op_code(Code::EVEX_Vmovapd_ymm_k1z_ymmm256);
-	/// assert(op_code.instruction_string(), "VMOVAPD ymm1 {k1}{z} == ymm2/m256");
+	/// assert(op_code.instruction_string() == "VMOVAPD ymm1 {k1}{z}, ymm2/m256");
 	/// ```
-	std::string_view instruction_string() const noexcept { return instruction_string_; }
+	std::string_view instruction_string() const noexcept;
 
 private:
 	friend struct internal::OpCodeInfoInternal;
 
-	OpCodeInfo() noexcept = default;
+	// All values are generated (src/encoder/op_code_info_table.cpp) so the table is stored in read-only memory
+	constexpr OpCodeInfo(std::uint16_t code, std::uint32_t enc_flags2, std::uint32_t enc_flags3, std::uint32_t opc_flags1, std::uint32_t opc_flags2,
+		std::uint16_t op_code, std::uint16_t flags, std::uint8_t encoding, std::uint8_t operand_size, std::uint8_t address_size, std::uint8_t l,
+		std::uint8_t tuple_type, std::uint8_t table, std::uint8_t mandatory_prefix, std::int8_t group_index, std::int8_t rm_group_index,
+		std::uint8_t op0_kind, std::uint8_t op1_kind, std::uint8_t op2_kind, std::uint8_t op3_kind, std::uint8_t op4_kind,
+		std::uint32_t strings_offset, std::uint8_t op_code_string_len, std::uint8_t instruction_string_len) noexcept
+		: enc_flags2_(enc_flags2), enc_flags3_(enc_flags3), opc_flags1_(opc_flags1), opc_flags2_(opc_flags2), strings_offset_(strings_offset),
+		  code_(static_cast<Code>(code)), op_code_(op_code), flags_(flags), encoding_(static_cast<EncodingKind>(encoding)),
+		  operand_size_(operand_size), address_size_(address_size), l_(l), tuple_type_(static_cast<TupleType>(tuple_type)),
+		  table_(static_cast<OpCodeTableKind>(table)), mandatory_prefix_(static_cast<MandatoryPrefix>(mandatory_prefix)), group_index_(group_index),
+		  rm_group_index_(rm_group_index),
+		  op_kinds_{static_cast<OpCodeOperandKind>(op0_kind), static_cast<OpCodeOperandKind>(op1_kind), static_cast<OpCodeOperandKind>(op2_kind),
+			  static_cast<OpCodeOperandKind>(op3_kind), static_cast<OpCodeOperandKind>(op4_kind)},
+		  op_code_string_len_(op_code_string_len), instruction_string_len_(instruction_string_len) {}
 
 	static OpCodeOperandKind invalid_operand_op_kind() noexcept;
 
@@ -514,25 +527,27 @@ private:
 		static constexpr std::uint16_t CPL3 = 0x0200;
 	};
 
-	std::string op_code_string_;
-	std::string instruction_string_;
-	std::uint32_t enc_flags2_ = 0;
-	std::uint32_t enc_flags3_ = 0;
-	std::uint32_t opc_flags1_ = 0;
-	std::uint32_t opc_flags2_ = 0;
-	Code code_ = Code::INVALID;
-	std::uint16_t op_code_ = 0;
-	std::uint16_t flags_ = 0;
-	EncodingKind encoding_ = EncodingKind::Legacy;
-	std::uint8_t operand_size_ = 0;
-	std::uint8_t address_size_ = 0;
-	std::uint8_t l_ = 0;
-	TupleType tuple_type_ = TupleType::N1;
-	OpCodeTableKind table_ = OpCodeTableKind::Normal;
-	MandatoryPrefix mandatory_prefix_ = MandatoryPrefix::None;
-	std::int8_t group_index_ = -1;
-	std::int8_t rm_group_index_ = -1;
-	OpCodeOperandKind op_kinds_[MAX_OP_COUNT] = {};
+	std::uint32_t enc_flags2_;
+	std::uint32_t enc_flags3_;
+	std::uint32_t opc_flags1_;
+	std::uint32_t opc_flags2_;
+	// Location of the op code string (followed by the instruction string) in the generated strings table
+	std::uint32_t strings_offset_;
+	Code code_;
+	std::uint16_t op_code_;
+	std::uint16_t flags_;
+	EncodingKind encoding_;
+	std::uint8_t operand_size_;
+	std::uint8_t address_size_;
+	std::uint8_t l_;
+	TupleType tuple_type_;
+	OpCodeTableKind table_;
+	MandatoryPrefix mandatory_prefix_;
+	std::int8_t group_index_;
+	std::int8_t rm_group_index_;
+	OpCodeOperandKind op_kinds_[MAX_OP_COUNT];
+	std::uint8_t op_code_string_len_;
+	std::uint8_t instruction_string_len_;
 };
 
 /// Gets the instruction string (same as `OpCodeInfo::instruction_string()`), eg. `VMOVAPD ymm1 {k1}{z}, ymm2/m256`

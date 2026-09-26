@@ -15,7 +15,7 @@ class Instruction;
 
 namespace iced_x86::internal {
 
-// Operand encoder. All instances are `constexpr` objects (see the generated ops_tables.hpp) so they're
+// Operand encoder. All instances are `constexpr` objects (see the generated src/encoder/op_code_handlers_table.cpp) so they're
 // constant initialized (no dynamic initialization, no destructors).
 class Op {
 public:
