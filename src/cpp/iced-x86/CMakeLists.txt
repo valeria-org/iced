@@ -12,7 +12,11 @@ endif()
 
 option(ICED_X86_BUILD_TESTS "Build the iced_x86 unit tests" ${ICED_X86_IS_TOP_LEVEL})
 option(ICED_X86_BUILD_BENCH "Build the iced_x86 benchmarks" ${ICED_X86_IS_TOP_LEVEL})
-option(ICED_X86_NO_EXCEPTIONS_RTTI "Build the library with -fno-exceptions -fno-rtti" ON)
+# The library never uses exceptions or RTTI, so it can always be compiled with -fno-exceptions -fno-rtti.
+# It's OFF by default so the library uses the same flags as the rest of the program: mixing RTTI and
+# non-RTTI code creates two different vtables for the header-only polymorphic classes (ODR violation).
+# Embedded users usually pass -fno-exceptions -fno-rtti for the whole program (CMAKE_CXX_FLAGS) instead.
+option(ICED_X86_NO_EXCEPTIONS_RTTI "Build the library with -fno-exceptions -fno-rtti" OFF)
 option(ICED_X86_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 # Max stack frame size (bytes) before the compiler warns (GCC/Clang). 0 = disabled
 set(ICED_X86_MAX_FRAME_SIZE "1024" CACHE STRING "Warn if a function's stack frame is larger than this")
