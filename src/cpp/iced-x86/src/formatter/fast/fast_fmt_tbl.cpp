@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <string_view>
 #include <vector>
 
 #include "iced_x86/internal/fast_fmt.hpp"
@@ -15,10 +14,13 @@
 #include "internal/formatter/fast/fast_fmt_flags.hpp"
 #include "internal/formatter/fast/fmt_data.hpp"
 #include "internal/formatter/fast/mem_size_tbl_data.hpp"
+#include "internal/formatter/pseudo_ops_defs.hpp"
 #include "internal/formatter/pseudo_ops_kind.hpp"
 #include "internal/formatter/regs_tbl.hpp"
 #include "internal/formatter/strings_data.hpp"
+#include "internal/data_reader.hpp"
 #include "internal/iced_assert.hpp"
+#include "internal/instruction_internal.hpp"
 
 namespace iced_x86::internal::fast {
 
@@ -47,7 +49,6 @@ struct FastFmtTablesHolder {
 	std::array<FastStringMnemonic, IcedConstants::CODE_ENUM_COUNT> mnemonics;
 	std::array<std::uint8_t, IcedConstants::CODE_ENUM_COUNT> flags;
 	std::array<FastStringMemorySize, IcedConstants::MEMORY_SIZE_ENUM_COUNT> memory_sizes;
-	std::array<std::uint8_t, IcedConstants::REGISTER_ENUM_COUNT> reg_to_addr_size;
 	// Mnemonics with a 'v' prefix (the strings table doesn't store the 'v'). std::deque never moves its elements.
 	std::deque<FastStringMnemonicData> v_mnemonics;
 	FastFmtTables tables;
@@ -56,12 +57,11 @@ struct FastFmtTablesHolder {
 		init_registers();
 		init_mnemonics();
 		init_memory_sizes();
-		init_reg_to_addr_size();
 		tables.registers = registers.data();
 		tables.mnemonics = mnemonics.data();
 		tables.flags = flags.data();
 		tables.memory_sizes = memory_sizes.data();
-		tables.reg_to_addr_size = reg_to_addr_size.data();
+		tables.reg_to_addr_size = REG_TO_ADDR_SIZE;
 	}
 
 	void init_registers() {
@@ -80,64 +80,39 @@ struct FastFmtTablesHolder {
 
 	static std::vector<FastStringMnemonic> get_strings_table() {
 		using namespace strings_data;
+		DataReader reader(STRINGS_TBL_DATA, STRINGS_TBL_DATA_SIZE);
 		std::vector<FastStringMnemonic> strings;
 		strings.reserve(STRINGS_COUNT);
-		std::size_t index = 0;
 		for (std::size_t i = 0; i < STRINGS_COUNT; i++) {
 			// It's safe to read FastStringMnemonic::SIZE bytes from the last string since the
 			// table includes extra padding. See the static_asserts above and the table.
-			ICED_ASSERT(index + 1 + FastStringMnemonic::SIZE <= STRINGS_TBL_DATA_SIZE);
-			const std::size_t len = STRINGS_TBL_DATA[index];
-			strings.push_back(FastStringMnemonic{&STRINGS_TBL_DATA[index]});
-			index += 1 + len;
+			std::size_t size;
+			const std::uint8_t* len_data = reader.read_len_data(size);
+			ICED_ASSERT(size >= 1 + FastStringMnemonic::SIZE);
+			strings.push_back(FastStringMnemonic{len_data});
 		}
-		ICED_DEBUG_ASSERT(STRINGS_TBL_DATA_SIZE - index == PADDING_SIZE);
+		ICED_DEBUG_ASSERT(reader.len_left() == PADDING_SIZE);
 		return strings;
 	}
 
-	// Same as Rust's DataReader
-	struct Reader {
-		const std::uint8_t* data;
-		std::size_t size;
-		std::size_t index;
-
-		std::uint32_t read_u8() {
-			ICED_ASSERT(index < size);
-			return data[index++];
-		}
-
-		std::uint32_t read_compressed_u32() {
-			std::uint32_t result = 0;
-			std::uint32_t shift = 0;
-			for (;;) {
-				ICED_DEBUG_ASSERT(shift < 32);
-				const std::uint32_t b = read_u8();
-				if ((b & 0x80) == 0)
-					return result | (b << shift);
-				result |= (b & 0x7F) << shift;
-				shift += 7;
-			}
-		}
-	};
-
 	void init_mnemonics() {
 		const auto strings = get_strings_table();
-		Reader reader{FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE, 0};
+		DataReader reader(FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE);
 		std::size_t prev_index = 0;
 		bool has_prev_index = false;
 		std::uint32_t prev_flags = FastFmtFlags::NONE;
 		for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
-			const std::uint32_t f = reader.read_u8();
+			const auto f = static_cast<std::uint32_t>(reader.read_u8());
 			std::size_t current_index = 0;
 			bool restore_index = false;
 			if ((f & FastFmtFlags::SAME_AS_PREV) != 0) {
 				ICED_ASSERT(has_prev_index);
-				current_index = reader.index;
+				current_index = reader.index();
 				restore_index = true;
-				reader.index = prev_index;
+				reader.set_index(prev_index);
 			}
 			else {
-				prev_index = reader.index;
+				prev_index = reader.index();
 				has_prev_index = true;
 			}
 			FastStringMnemonic mnemonic;
@@ -170,9 +145,9 @@ struct FastFmtTablesHolder {
 			prev_flags = f;
 
 			if (restore_index)
-				reader.index = current_index;
+				reader.set_index(current_index);
 		}
-		ICED_DEBUG_ASSERT(reader.index == reader.size);
+		ICED_DEBUG_ASSERT(!reader.can_read());
 	}
 
 	void init_memory_sizes() {
@@ -182,190 +157,34 @@ struct FastFmtTablesHolder {
 			memory_sizes[i] = FastStringMemorySize{reinterpret_cast<const std::uint8_t*>(MEM_SIZE_TBL_STRINGS[mem_keywords])};
 		}
 	}
-
-	void init_reg_to_addr_size() {
-		for (std::size_t i = 0; i < reg_to_addr_size.size(); i++) {
-			const auto reg = static_cast<Register>(i);
-			std::uint8_t size = 0;
-			if (reg >= Register::AX && reg <= Register::R15W)
-				size = 2;
-			else if (reg >= Register::EAX && reg <= Register::R15D)
-				size = 4;
-			else if (reg >= Register::RAX && reg <= Register::R15)
-				size = 8;
-			else if (reg == Register::EIP)
-				size = 4;
-			else if (reg == Register::RIP)
-				size = 8;
-			reg_to_addr_size[i] = size;
-		}
-	}
 };
 
-// Keep this in sync with pseudo_ops.cpp
 struct FastPseudoOps {
-	static constexpr std::size_t PSEUDO_OPS_KIND_COUNT = static_cast<std::size_t>(PseudoOpsKind::vpcmpud6) + 1;
-
-	std::array<std::vector<FastStringMnemonic>, PSEUDO_OPS_KIND_COUNT> pseudo_ops;
+	std::array<std::vector<FastStringMnemonic>, pseudo_ops_defs::PSEUDO_OPS_KIND_COUNT> pseudo_ops;
 	// std::deque never moves its elements
 	std::deque<FastStringMnemonicData> strings;
 
-	template <std::size_t N>
-	ICED_NOINLINE std::vector<FastStringMnemonic> create(const std::string_view (&cc)[N], std::size_t size, std::string_view prefix, std::string_view suffix) {
-		std::vector<FastStringMnemonic> result;
-		result.reserve(size);
-		for (const auto cc_s : cc) {
-			if (result.size() == size)
-				break;
-			const std::size_t new_len = prefix.size() + cc_s.size() + suffix.size();
-			ICED_ASSERT(new_len <= FastStringMnemonic::SIZE);
-			auto& data = strings.emplace_back();
-			data.fill(' ');
-			data[0] = static_cast<std::uint8_t>(new_len);
-			std::size_t index = 1;
-			for (const char c : prefix)
-				data[index++] = static_cast<std::uint8_t>(c);
-			for (const char c : cc_s)
-				data[index++] = static_cast<std::uint8_t>(c);
-			for (const char c : suffix)
-				data[index++] = static_cast<std::uint8_t>(c);
-			result.push_back(FastStringMnemonic{data.data()});
-		}
-		return result;
-	}
-
-	template <std::size_t N>
-	ICED_NOINLINE void create_strings(PseudoOpsKind kind, const char* const (&values)[N]) {
-		std::vector<FastStringMnemonic> result;
-		result.reserve(N);
-		for (const char* value : values) {
-			const std::string_view s(value);
-			ICED_ASSERT(s.size() <= FastStringMnemonic::SIZE);
-			auto& data = strings.emplace_back();
-			data.fill(' ');
-			data[0] = static_cast<std::uint8_t>(s.size());
-			for (std::size_t i = 0; i < s.size(); i++)
-				data[1 + i] = static_cast<std::uint8_t>(s[i]);
-			result.push_back(FastStringMnemonic{data.data()});
-		}
-		set(kind, std::move(result));
-	}
-
-	ICED_NOINLINE void set(PseudoOpsKind kind, std::vector<FastStringMnemonic> value) { pseudo_ops[static_cast<std::size_t>(kind)] = std::move(value); }
-
 	FastPseudoOps() {
-		static constexpr std::string_view cc[32] = {
-			"eq",
-			"lt",
-			"le",
-			"unord",
-			"neq",
-			"nlt",
-			"nle",
-			"ord",
-			"eq_uq",
-			"nge",
-			"ngt",
-			"false",
-			"neq_oq",
-			"ge",
-			"gt",
-			"true",
-			"eq_os",
-			"lt_oq",
-			"le_oq",
-			"unord_s",
-			"neq_us",
-			"nlt_uq",
-			"nle_uq",
-			"ord_s",
-			"eq_us",
-			"nge_uq",
-			"ngt_uq",
-			"false_os",
-			"neq_os",
-			"ge_oq",
-			"gt_oq",
-			"true_us",
-		};
-		set(PseudoOpsKind::cmpps, create(cc, 8, "cmp", "ps"));
-		set(PseudoOpsKind::vcmpps, create(cc, 32, "vcmp", "ps"));
-		set(PseudoOpsKind::cmppd, create(cc, 8, "cmp", "pd"));
-		set(PseudoOpsKind::vcmppd, create(cc, 32, "vcmp", "pd"));
-		set(PseudoOpsKind::cmpss, create(cc, 8, "cmp", "ss"));
-		set(PseudoOpsKind::vcmpss, create(cc, 32, "vcmp", "ss"));
-		set(PseudoOpsKind::cmpsd, create(cc, 8, "cmp", "sd"));
-		set(PseudoOpsKind::vcmpsd, create(cc, 32, "vcmp", "sd"));
-		set(PseudoOpsKind::vcmpph, create(cc, 32, "vcmp", "ph"));
-		set(PseudoOpsKind::vcmpsh, create(cc, 32, "vcmp", "sh"));
-		set(PseudoOpsKind::vcmpps8, create(cc, 8, "vcmp", "ps"));
-		set(PseudoOpsKind::vcmppd8, create(cc, 8, "vcmp", "pd"));
-
-		static constexpr std::string_view cc6[8] = {
-			"eq",
-			"lt",
-			"le",
-			"??",
-			"neq",
-			"nlt",
-			"nle",
-			"???",
-		};
-		set(PseudoOpsKind::vpcmpd6, create(cc6, 8, "vpcmp", "d"));
-		set(PseudoOpsKind::vpcmpud6, create(cc6, 8, "vpcmp", "ud"));
-
-		static constexpr std::string_view xopcc[8] = {
-			"lt",
-			"le",
-			"gt",
-			"ge",
-			"eq",
-			"neq",
-			"false",
-			"true",
-		};
-		set(PseudoOpsKind::vpcomb, create(xopcc, 8, "vpcom", "b"));
-		set(PseudoOpsKind::vpcomw, create(xopcc, 8, "vpcom", "w"));
-		set(PseudoOpsKind::vpcomd, create(xopcc, 8, "vpcom", "d"));
-		set(PseudoOpsKind::vpcomq, create(xopcc, 8, "vpcom", "q"));
-		set(PseudoOpsKind::vpcomub, create(xopcc, 8, "vpcom", "ub"));
-		set(PseudoOpsKind::vpcomuw, create(xopcc, 8, "vpcom", "uw"));
-		set(PseudoOpsKind::vpcomud, create(xopcc, 8, "vpcom", "ud"));
-		set(PseudoOpsKind::vpcomuq, create(xopcc, 8, "vpcom", "uq"));
-
-		static constexpr std::string_view pcmpcc[8] = {
-			"eq",
-			"lt",
-			"le",
-			"false",
-			"neq",
-			"nlt",
-			"nle",
-			"true",
-		};
-		set(PseudoOpsKind::vpcmpb, create(pcmpcc, 8, "vpcmp", "b"));
-		set(PseudoOpsKind::vpcmpw, create(pcmpcc, 8, "vpcmp", "w"));
-		set(PseudoOpsKind::vpcmpd, create(pcmpcc, 8, "vpcmp", "d"));
-		set(PseudoOpsKind::vpcmpq, create(pcmpcc, 8, "vpcmp", "q"));
-		set(PseudoOpsKind::vpcmpub, create(pcmpcc, 8, "vpcmp", "ub"));
-		set(PseudoOpsKind::vpcmpuw, create(pcmpcc, 8, "vpcmp", "uw"));
-		set(PseudoOpsKind::vpcmpud, create(pcmpcc, 8, "vpcmp", "ud"));
-		set(PseudoOpsKind::vpcmpuq, create(pcmpcc, 8, "vpcmp", "uq"));
-
-		static constexpr const char* pclmulqdq[4] = {
-			"pclmullqlqdq",
-			"pclmulhqlqdq",
-			"pclmullqhqdq",
-			"pclmulhqhqdq",
-		};
-		create_strings(PseudoOpsKind::pclmulqdq, pclmulqdq);
-		static constexpr const char* vpclmulqdq[4] = {
-			"vpclmullqlqdq",
-			"vpclmulhqlqdq",
-			"vpclmullqhqdq",
-			"vpclmulhqhqdq",
-		};
-		create_strings(PseudoOpsKind::vpclmulqdq, vpclmulqdq);
+		for (const auto& def : pseudo_ops_defs::PSEUDO_OPS_DEFS) {
+			auto& result = pseudo_ops[static_cast<std::size_t>(def.kind)];
+			result.reserve(def.size);
+			for (std::size_t i = 0; i < def.size; i++) {
+				const auto cc_s = def.cc[i];
+				const std::size_t new_len = def.prefix.size() + cc_s.size() + def.suffix.size();
+				ICED_ASSERT(new_len <= FastStringMnemonic::SIZE);
+				auto& data = strings.emplace_back();
+				data.fill(' ');
+				data[0] = static_cast<std::uint8_t>(new_len);
+				std::size_t index = 1;
+				for (const char c : def.prefix)
+					data[index++] = static_cast<std::uint8_t>(c);
+				for (const char c : cc_s)
+					data[index++] = static_cast<std::uint8_t>(c);
+				for (const char c : def.suffix)
+					data[index++] = static_cast<std::uint8_t>(c);
+				result.push_back(FastStringMnemonic{data.data()});
+			}
+		}
 	}
 };
 

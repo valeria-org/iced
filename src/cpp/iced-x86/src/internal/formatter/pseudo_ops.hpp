@@ -2,7 +2,7 @@
 // Copyright (C) 2018-present iced project and contributors
 
 // Pseudo op mnemonics used by the gas/intel/masm/nasm formatters (Rust: formatter/pseudo_ops.rs)
-// Keep this file in sync with the fast formatter's pseudo ops (src/formatter/fast/fast_fmt_tbl.cpp)
+// The pseudo ops are defined in pseudo_ops_defs.hpp (shared with the fast formatter)
 
 #pragma once
 
