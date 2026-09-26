@@ -2337,6 +2337,335 @@ TEST_CASE("encoder/verify_that_test_cases_test_enough_bits") {
 		CHECK(std::find_if(std::begin(LIST_NAMES), std::end(LIST_NAMES), [&kv](const char* n) { return kv.first == n; }) != std::end(LIST_NAMES));
 }
 
-// DEC_ENC_PART5
+TEST_CASE("encoder/test_invalid_zero_opmask_reg") {
+	for (const auto& info : decoder_tests(false, false)) {
+		if ((info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) != 0)
+			continue;
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (!op_code.require_op_mask_register())
+			continue;
+
+		auto bytes = to_vec_u8(info.hex_bytes());
+		Instruction orig_instr = decode_one(info.bitness(), bytes, info.decoder_options());
+		CHECK_EQ(orig_instr.code(), info.code());
+
+		const std::size_t evex_index = get_evex_index(bytes);
+		bytes[evex_index + 3] &= 0xF8;
+		{
+			const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+			CHECK_EQ(instruction.code(), Code::INVALID);
+			CHECK(error != DecoderError::None);
+		}
+		{
+			const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+			CHECK_EQ(instruction.code(), info.code());
+			CHECK_EQ(instruction.op_mask(), Register::None);
+			orig_instr.set_op_mask(Register::None);
+			CHECK(orig_instr.eq_all_bits(instruction));
+		}
+	}
+}
+
+TEST_CASE("encoder/verify_cpu_mode") {
+	std::unordered_set<Code> hash1632(code32_only().begin(), code32_only().end());
+	hash1632.insert(not_decoded32_only().begin(), not_decoded32_only().end());
+	std::unordered_set<Code> hash64(code64_only().begin(), code64_only().end());
+	hash64.insert(not_decoded64_only().begin(), not_decoded64_only().end());
+	const auto names = code_names();
+	for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
+		if (is_ignored_code(names[i]))
+			continue;
+		const Code code = static_cast<Code>(i);
+		const OpCodeInfo& op_code = code_ext::op_code(code);
+		if (hash1632.count(code) != 0) {
+			CHECK(op_code.mode16());
+			CHECK(op_code.mode32());
+			CHECK(!op_code.mode64());
+		}
+		else if (hash64.count(code) != 0) {
+			CHECK(!op_code.mode16());
+			CHECK(!op_code.mode32());
+			CHECK(op_code.mode64());
+		}
+		else {
+			CHECK(op_code.mode16());
+			CHECK(op_code.mode32());
+			CHECK(op_code.mode64());
+		}
+	}
+}
+
+TEST_CASE("encoder/verify_can_only_decode_in_correct_mode") {
+	const std::string extra_bytes((IcedConstants::MAX_INSTRUCTION_LENGTH - 1) * 2, '0');
+	for (const auto& info : decoder_tests(false, false)) {
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		const std::string new_hex_bytes = info.hex_bytes() + extra_bytes;
+		if (!op_code.mode16()) {
+			const auto bytes = to_vec_u8(new_hex_bytes);
+			const Instruction instruction = decode_one(16, bytes, info.decoder_options());
+			CHECK(instruction.code() != info.code());
+		}
+		if (!op_code.mode32()) {
+			const auto bytes = to_vec_u8(new_hex_bytes);
+			const Instruction instruction = decode_one(32, bytes, info.decoder_options());
+			CHECK(instruction.code() != info.code());
+		}
+		if (!op_code.mode64()) {
+			const auto bytes = to_vec_u8(new_hex_bytes);
+			const Instruction instruction = decode_one(64, bytes, info.decoder_options());
+			CHECK(instruction.code() != info.code());
+		}
+	}
+}
+
+TEST_CASE("encoder/verify_invalid_table_encoding") {
+	for (const auto& info : decoder_tests(false, false)) {
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX) {
+			auto hex_bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t evex_index = get_evex_index(hex_bytes);
+			const std::uint32_t max_table = op_code.encoding() == EncodingKind::EVEX ? 0x08 : 0x10;
+			for (std::uint32_t i = 0; i < max_table; i++) {
+				if (op_code.encoding() == EncodingKind::EVEX) {
+					if (i == 1 || i == 2 || i == 3 || i == 5 || i == 6)
+						continue;
+				}
+				else {
+					if (i >= 1 && i <= 3)
+						continue;
+				}
+				hex_bytes[evex_index + 1] = static_cast<std::uint8_t>((hex_bytes[evex_index + 1] & ~(max_table - 1)) | i);
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), Code::INVALID);
+					CHECK(error != DecoderError::None);
+				}
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+					CHECK_EQ(instruction.code(), Code::INVALID);
+					CHECK(error != DecoderError::None);
+				}
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::VEX) {
+			auto hex_bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t vex_index = get_vex_xop_index(hex_bytes);
+			if (hex_bytes[vex_index] == 0xC5)
+				continue;
+			for (std::uint32_t i = 0; i < 32; i++) {
+				// 0: MVEX support is always compiled (Rust: #[cfg(feature = "mvex")] continue)
+				if (i <= 3)
+					continue;
+				hex_bytes[vex_index + 1] = static_cast<std::uint8_t>((hex_bytes[vex_index + 1] & 0xE0) | i);
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), Code::INVALID);
+					CHECK(error != DecoderError::None);
+				}
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+					CHECK_EQ(instruction.code(), Code::INVALID);
+					CHECK(error != DecoderError::None);
+				}
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::XOP) {
+			auto hex_bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t vex_index = get_vex_xop_index(hex_bytes);
+			for (std::uint32_t i = 0; i < 32; i++) {
+				if (i >= 8 && i <= 10)
+					continue;
+				hex_bytes[vex_index + 1] = static_cast<std::uint8_t>((hex_bytes[vex_index + 1] & 0xE0) | i);
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options());
+					if (i < 8)
+						CHECK(instruction.code() != info.code());
+					else {
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+				}
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), hex_bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+					if (i < 8)
+						CHECK(instruction.code() != info.code());
+					else {
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+				}
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW) {
+		}
+		else
+			FAIL("unreachable");
+	}
+}
+
+TEST_CASE("encoder/verify_invalid_pp_field") {
+	for (const auto& info : decoder_tests(false, false)) {
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX) {
+			auto hex_bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t evex_index = get_evex_index(hex_bytes);
+			const std::uint8_t b = hex_bytes[evex_index + 2];
+			for (std::uint32_t i = 1; i < 4; i++) {
+				hex_bytes[evex_index + 2] = static_cast<std::uint8_t>(b ^ i);
+				{
+					const Instruction instruction = decode_one(info.bitness(), hex_bytes, info.decoder_options());
+					CHECK(instruction.code() != info.code());
+				}
+				{
+					const Instruction instruction = decode_one(info.bitness(), hex_bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+					CHECK(instruction.code() != info.code());
+				}
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::VEX || op_code.encoding() == EncodingKind::XOP) {
+			auto hex_bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t vex_index = get_vex_xop_index(hex_bytes);
+			const std::size_t pp_index = hex_bytes[vex_index] == 0xC5 ? vex_index + 1 : vex_index + 2;
+			const std::uint8_t b = hex_bytes[pp_index];
+			for (std::uint32_t i = 1; i < 4; i++) {
+				hex_bytes[pp_index] = static_cast<std::uint8_t>(b ^ i);
+				{
+					const Instruction instruction = decode_one(info.bitness(), hex_bytes, info.decoder_options());
+					CHECK(instruction.code() != info.code());
+				}
+				{
+					const Instruction instruction = decode_one(info.bitness(), hex_bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+					CHECK(instruction.code() != info.code());
+				}
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW) {
+		}
+		else
+			FAIL("unreachable");
+	}
+}
+
+TEST_CASE("encoder/verify_regonly_or_regmemonly_mod_bits") {
+	const auto is_reg_only_or_reg_mem_only_mod_rm = [](const OpCodeInfo& op_code) {
+		for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+			switch (op_kind) {
+			case OpCodeOperandKind::mem:
+			case OpCodeOperandKind::sibmem:
+			case OpCodeOperandKind::mem_mpx:
+			case OpCodeOperandKind::mem_mib:
+			case OpCodeOperandKind::mem_vsib32x:
+			case OpCodeOperandKind::mem_vsib64x:
+			case OpCodeOperandKind::mem_vsib32y:
+			case OpCodeOperandKind::mem_vsib64y:
+			case OpCodeOperandKind::mem_vsib32z:
+			case OpCodeOperandKind::mem_vsib64z:
+			case OpCodeOperandKind::r16_rm:
+			case OpCodeOperandKind::r32_rm:
+			case OpCodeOperandKind::r64_rm:
+			case OpCodeOperandKind::k_rm:
+			case OpCodeOperandKind::mm_rm:
+			case OpCodeOperandKind::xmm_rm:
+			case OpCodeOperandKind::ymm_rm:
+			case OpCodeOperandKind::zmm_rm:
+			case OpCodeOperandKind::tmm_rm:
+				return true;
+			default:
+				break;
+			}
+		}
+		return false;
+	};
+
+	const std::string extra_bytes((IcedConstants::MAX_INSTRUCTION_LENGTH - 1) * 2, '0');
+	for (const auto& info : decoder_tests(false, false)) {
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (!is_reg_only_or_reg_mem_only_mod_rm(op_code))
+			continue;
+		// There are a few instructions that ignore the mod bits...
+		if (op_code.ignores_mod_bits())
+			continue;
+
+		auto bytes = to_vec_u8(info.hex_bytes() + extra_bytes);
+		std::size_t m_index;
+		if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX)
+			m_index = get_evex_index(bytes) + 5;
+		else if (op_code.encoding() == EncodingKind::VEX || op_code.encoding() == EncodingKind::XOP) {
+			const std::size_t vex_index = get_vex_xop_index(bytes);
+			m_index = bytes[vex_index] == 0xC5 ? vex_index + 3 : vex_index + 4;
+		}
+		else if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW) {
+			m_index = skip_prefixes(bytes, info.bitness()).first;
+			switch (op_code.table()) {
+			case OpCodeTableKind::Normal:
+				break;
+			case OpCodeTableKind::T0F:
+				REQUIRE(bytes[m_index] == 0x0F);
+				m_index++;
+				break;
+			case OpCodeTableKind::T0F38:
+				REQUIRE(bytes[m_index] == 0x0F);
+				m_index++;
+				REQUIRE(bytes[m_index] == 0x38);
+				m_index++;
+				break;
+			case OpCodeTableKind::T0F3A:
+				REQUIRE(bytes[m_index] == 0x0F);
+				m_index++;
+				REQUIRE(bytes[m_index] == 0x3A);
+				m_index++;
+				break;
+			default:
+				FAIL("unreachable");
+			}
+			m_index++;
+		}
+		else
+			FAIL("unreachable");
+
+		if (bytes[m_index] >= 0xC0)
+			bytes[m_index] &= 0x3F;
+		else
+			bytes[m_index] |= 0xC0;
+		{
+			const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+			CHECK(instruction.code() != info.code());
+		}
+		{
+			const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() ^ DecoderOptions::NO_INVALID_CHECK);
+			CHECK(instruction.code() != info.code());
+		}
+	}
+}
+
+TEST_CASE("encoder/disable_decoder_option_disables_instruction") {
+	const std::string extra_bytes((IcedConstants::MAX_INSTRUCTION_LENGTH - 1) * 2, '0');
+	for (const auto& info : decoder_tests(false, false)) {
+		if (info.decoder_options() == DecoderOptions::NONE)
+			continue;
+		constexpr std::uint32_t NO_OPTIONS = DecoderOptions::NO_INVALID_CHECK | DecoderOptions::NO_PAUSE | DecoderOptions::NO_WBNOINVD |
+			DecoderOptions::NO_MPFX_0FBC | DecoderOptions::NO_MPFX_0FBD | DecoderOptions::NO_LAHF_SAHF_64;
+		if ((info.decoder_options() & NO_OPTIONS) != 0)
+			continue;
+		// is_power_of_two()
+		if ((info.decoder_options() & (info.decoder_options() - 1)) != 0)
+			continue;
+		if (info.decoder_options() == DecoderOptions::FORCE_RESERVED_NOP)
+			continue;
+		if ((info.decoder_test_options() & DecoderTestOptions::NO_OPT_DISABLE_TEST) != 0)
+			continue;
+
+		{
+			const auto bytes = to_vec_u8(info.hex_bytes());
+			const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+			CHECK_EQ(instruction.code(), info.code());
+		}
+		{
+			const auto bytes = to_vec_u8(info.hex_bytes() + extra_bytes);
+			const Instruction instruction = decode_one(info.bitness(), bytes, DecoderOptions::NONE);
+			CHECK(instruction.code() != info.code());
+		}
+	}
+}
 
 } // namespace iced_x86::tests
