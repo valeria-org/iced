@@ -120,6 +120,23 @@ std::vector<std::string_view> split(std::string_view s, char separator) {
 	return result;
 }
 
+std::vector<std::string_view> splitn(std::string_view s, std::size_t n, char separator) {
+	std::vector<std::string_view> result;
+	if (n == 0)
+		return result;
+	std::size_t start = 0;
+	for (;;) {
+		const auto index = result.size() + 1 == n ? std::string_view::npos : s.find(separator, start);
+		if (index == std::string_view::npos) {
+			result.push_back(s.substr(start));
+			break;
+		}
+		result.push_back(s.substr(start, index - start));
+		start = index + 1;
+	}
+	return result;
+}
+
 std::vector<std::string_view> split(std::string_view s, std::string_view separator) {
 	if (separator.empty())
 		throw std::invalid_argument("split(): empty separator");
