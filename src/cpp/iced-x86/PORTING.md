@@ -110,6 +110,15 @@ bit packing in `flags1`, etc.). Its data members are private; internal code that
 `iced_x86::internal::InstructionInternal` (a `friend` struct with static functions, the equivalent of Rust's
 `instruction_internal.rs`, in `src/internal/instruction_internal.hpp`). Hot getters/setters are inline in the header.
 
+## Decoder
+
+`Decoder` (include/iced_x86/decoder.hpp): `Decoder(bitness, data, size, options)` (Rust `new`), `Decoder::with_ip(bitness, data, size, ip, options)`,
+`Decoder::try_new(...)`/`try_with_ip(...)` return `Result<Decoder>`; `std::vector<std::uint8_t>` overloads exist (the decoder never
+owns/copies the data). `decode()`, `decode_out(Instruction&)`, `for (const Instruction& instr : decoder)` (range-for, decodes into the
+iterator's instruction). Decoder test cases (used by the encoder/formatter/instr info tests): `tests/test_utils/decoder_test_utils.hpp`
+(`decoder_tests(include_other_tests, include_invalid)`, `encoder_tests(...)`, `get_test_cases(bitness)`, `create_decoder(...)`, ...).
+Rust `#[should_panic]` tests: `aborts([] { ... })` in `tests/test_utils/abort_utils.hpp`.
+
 ## Tests
 
 - Framework: `tests/test_framework.hpp` (`TEST_CASE("decoder/xxx")`, `CHECK`, `CHECK_EQ`, `REQUIRE`, ...). Tests

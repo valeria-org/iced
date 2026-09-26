@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -23,6 +24,8 @@ std::string_view trim_end(std::string_view s) noexcept;
 std::vector<std::string_view> split(std::string_view s, char separator);
 /// Same as Rust's `str::split(&str)`: always returns at least one element (empty elements are kept). `separator` must not be empty.
 std::vector<std::string_view> split(std::string_view s, std::string_view separator);
+/// Same as Rust's `str::splitn()`: returns at most `n` elements, the last one contains the rest of the string
+std::vector<std::string_view> splitn(std::string_view s, std::size_t n, char separator);
 /// Same as Rust's `str::split_whitespace()`: never returns empty elements
 std::vector<std::string_view> split_whitespace(std::string_view s);
 
