@@ -3,352 +3,37 @@
 
 #include "iced_x86/op_code_info.hpp"
 #include "iced_x86/code_ext.hpp"
-#include "iced_x86/code_size.hpp"
 #include "iced_x86/instruction.hpp"
 #include "internal/encoder/dec_option_value.hpp"
-#include "internal/encoder/enc_flags1.hpp"
 #include "internal/encoder/enc_flags2.hpp"
 #include "internal/encoder/enc_flags3.hpp"
-#include "internal/encoder/encoder_data.hpp"
-#include "internal/encoder/evex_op_code_table.hpp"
-#include "internal/encoder/instruction_fmt.hpp"
-#include "internal/encoder/l_bit.hpp"
-#include "internal/encoder/l_kind.hpp"
-#include "internal/encoder/legacy_op_code_table.hpp"
-#include "internal/encoder/mvex_op_code_table.hpp"
-#include "internal/encoder/op_code_data.hpp"
-#include "internal/encoder/op_code_fmt.hpp"
 #include "internal/encoder/op_code_info_flags1.hpp"
 #include "internal/encoder/op_code_info_flags2.hpp"
-#include "internal/encoder/op_kind_tables.hpp"
+#include "internal/encoder/op_code_info_internal.hpp"
 #include "internal/encoder/to_decoder_options.hpp"
-#include "internal/encoder/vex_op_code_table.hpp"
-#include "internal/encoder/w_bit.hpp"
-#include "internal/encoder/xop_op_code_table.hpp"
 #include "internal/iced_assert.hpp"
-#include "internal/mandatory_prefix_byte.hpp"
 #include "internal/mvex/mvex.hpp"
-#include <memory>
 
 namespace iced_x86 {
 
-using internal::EncFlags1;
 using internal::EncFlags2;
 using internal::EncFlags3;
 using internal::OpCodeInfoFlags1;
 using internal::OpCodeInfoFlags2;
 
-namespace internal {
-
-struct OpCodeInfoInternal {
-	static void init(OpCodeInfo& result, Code code, std::uint32_t enc_flags1, std::uint32_t enc_flags2, std::uint32_t enc_flags3,
-		std::uint32_t opc_flags1, std::uint32_t opc_flags2, std::string& sb) {
-		using Flags = OpCodeInfo::Flags;
-		std::uint16_t flags = Flags::NONE;
-		const std::uint16_t op_code = static_cast<std::uint16_t>(enc_flags2 >> EncFlags2::OP_CODE_SHIFT);
-
-		if ((enc_flags1 & EncFlags1::IGNORES_ROUNDING_CONTROL) != 0)
-			flags |= Flags::IGNORES_ROUNDING_CONTROL;
-		if ((enc_flags1 & EncFlags1::AMD_LOCK_REG_BIT) != 0)
-			flags |= Flags::AMD_LOCK_REG_BIT;
-		switch (opc_flags1 & (OpCodeInfoFlags1::CPL0_ONLY | OpCodeInfoFlags1::CPL3_ONLY)) {
-		case OpCodeInfoFlags1::CPL0_ONLY:
-			flags |= Flags::CPL0;
-			break;
-		case OpCodeInfoFlags1::CPL3_ONLY:
-			flags |= Flags::CPL3;
-			break;
-		default:
-			flags |= Flags::CPL0 | Flags::CPL1 | Flags::CPL2 | Flags::CPL3;
-			break;
-		}
-
-		OpCodeOperandKind op0_kind;
-		OpCodeOperandKind op1_kind;
-		OpCodeOperandKind op2_kind;
-		OpCodeOperandKind op3_kind;
-		OpCodeOperandKind op4_kind;
-		std::uint8_t l;
-		MandatoryPrefix mandatory_prefix;
-		OpCodeTableKind table;
-		LKind lkind;
-
-		const EncodingKind encoding = static_cast<EncodingKind>((enc_flags3 >> EncFlags3::ENCODING_SHIFT) & EncFlags3::ENCODING_MASK);
-		switch (static_cast<MandatoryPrefixByte>((enc_flags2 >> EncFlags2::MANDATORY_PREFIX_SHIFT) & EncFlags2::MANDATORY_PREFIX_MASK)) {
-		case MandatoryPrefixByte::None:
-			mandatory_prefix = (enc_flags2 & EncFlags2::HAS_MANDATORY_PREFIX) != 0 ? MandatoryPrefix::PNP : MandatoryPrefix::None;
-			break;
-		case MandatoryPrefixByte::P66:
-			mandatory_prefix = MandatoryPrefix::P66;
-			break;
-		case MandatoryPrefixByte::PF3:
-			mandatory_prefix = MandatoryPrefix::PF3;
-			break;
-		case MandatoryPrefixByte::PF2:
-			mandatory_prefix = MandatoryPrefix::PF2;
-			break;
-		default:
-			ICED_UNREACHABLE();
-		}
-		const std::uint8_t operand_size = code_size_to_bits(static_cast<CodeSize>((enc_flags3 >> EncFlags3::OPERAND_SIZE_SHIFT) & EncFlags3::OPERAND_SIZE_MASK));
-		const std::uint8_t address_size = code_size_to_bits(static_cast<CodeSize>((enc_flags3 >> EncFlags3::ADDRESS_SIZE_SHIFT) & EncFlags3::ADDRESS_SIZE_MASK));
-		const std::int8_t group_index =
-			(enc_flags2 & EncFlags2::HAS_GROUP_INDEX) == 0 ? -1 : static_cast<std::int8_t>((enc_flags2 >> EncFlags2::GROUP_INDEX_SHIFT) & 7);
-		const std::int8_t rm_group_index =
-			(enc_flags3 & EncFlags3::HAS_RM_GROUP_INDEX) == 0 ? -1 : static_cast<std::int8_t>((enc_flags2 >> EncFlags2::GROUP_INDEX_SHIFT) & 7);
-		const TupleType tuple_type = static_cast<TupleType>((enc_flags3 >> EncFlags3::TUPLE_TYPE_SHIFT) & EncFlags3::TUPLE_TYPE_MASK);
-
-		switch (static_cast<LBit>((enc_flags2 >> EncFlags2::LBIT_SHIFT) & EncFlags2::LBIT_MASK)) {
-		case LBit::LZ:
-			lkind = LKind::LZ;
-			l = 0;
-			break;
-		case LBit::L0:
-			lkind = LKind::L0;
-			l = 0;
-			break;
-		case LBit::L1:
-			lkind = LKind::L0;
-			l = 1;
-			break;
-		case LBit::L128:
-			lkind = LKind::L128;
-			l = 0;
-			break;
-		case LBit::L256:
-			lkind = LKind::L128;
-			l = 1;
-			break;
-		case LBit::L512:
-			lkind = LKind::L128;
-			l = 2;
-			break;
-		case LBit::LIG:
-			lkind = LKind::None;
-			l = 0;
-			flags |= Flags::LIG;
-			break;
-		default:
-			ICED_UNREACHABLE();
-		}
-
-		switch (static_cast<WBit>((enc_flags2 >> EncFlags2::WBIT_SHIFT) & EncFlags2::WBIT_MASK)) {
-		case WBit::W0:
-			break;
-		case WBit::W1:
-			flags |= Flags::W;
-			break;
-		case WBit::WIG:
-			flags |= Flags::WIG;
-			break;
-		case WBit::WIG32:
-			flags |= Flags::WIG32;
-			break;
-		default:
-			ICED_UNREACHABLE();
-		}
-
-		const std::uint32_t table_index = (enc_flags2 >> EncFlags2::TABLE_SHIFT) & EncFlags2::TABLE_MASK;
-		switch (encoding) {
-		case EncodingKind::Legacy:
-			op0_kind = LEGACY_OP_KINDS[(enc_flags1 >> EncFlags1::LEGACY_OP0_SHIFT) & EncFlags1::LEGACY_OP_MASK];
-			op1_kind = LEGACY_OP_KINDS[(enc_flags1 >> EncFlags1::LEGACY_OP1_SHIFT) & EncFlags1::LEGACY_OP_MASK];
-			op2_kind = LEGACY_OP_KINDS[(enc_flags1 >> EncFlags1::LEGACY_OP2_SHIFT) & EncFlags1::LEGACY_OP_MASK];
-			op3_kind = LEGACY_OP_KINDS[(enc_flags1 >> EncFlags1::LEGACY_OP3_SHIFT) & EncFlags1::LEGACY_OP_MASK];
-			op4_kind = OpCodeOperandKind::None;
-
-			switch (static_cast<LegacyOpCodeTable>(table_index)) {
-			case LegacyOpCodeTable::MAP0:
-				table = OpCodeTableKind::Normal;
-				break;
-			case LegacyOpCodeTable::MAP0F:
-				table = OpCodeTableKind::T0F;
-				break;
-			case LegacyOpCodeTable::MAP0F38:
-				table = OpCodeTableKind::T0F38;
-				break;
-			case LegacyOpCodeTable::MAP0F3A:
-				table = OpCodeTableKind::T0F3A;
-				break;
-			default:
-				ICED_UNREACHABLE();
-			}
-			break;
-
-		case EncodingKind::VEX:
-			op0_kind = VEX_OP_KINDS[(enc_flags1 >> EncFlags1::VEX_OP0_SHIFT) & EncFlags1::VEX_OP_MASK];
-			op1_kind = VEX_OP_KINDS[(enc_flags1 >> EncFlags1::VEX_OP1_SHIFT) & EncFlags1::VEX_OP_MASK];
-			op2_kind = VEX_OP_KINDS[(enc_flags1 >> EncFlags1::VEX_OP2_SHIFT) & EncFlags1::VEX_OP_MASK];
-			op3_kind = VEX_OP_KINDS[(enc_flags1 >> EncFlags1::VEX_OP3_SHIFT) & EncFlags1::VEX_OP_MASK];
-			op4_kind = VEX_OP_KINDS[(enc_flags1 >> EncFlags1::VEX_OP4_SHIFT) & EncFlags1::VEX_OP_MASK];
-
-			switch (static_cast<VexOpCodeTable>(table_index)) {
-			case VexOpCodeTable::MAP0:
-				table = OpCodeTableKind::Normal;
-				break;
-			case VexOpCodeTable::MAP0F:
-				table = OpCodeTableKind::T0F;
-				break;
-			case VexOpCodeTable::MAP0F38:
-				table = OpCodeTableKind::T0F38;
-				break;
-			case VexOpCodeTable::MAP0F3A:
-				table = OpCodeTableKind::T0F3A;
-				break;
-			default:
-				ICED_UNREACHABLE();
-			}
-			break;
-
-		case EncodingKind::EVEX:
-			op0_kind = EVEX_OP_KINDS[(enc_flags1 >> EncFlags1::EVEX_OP0_SHIFT) & EncFlags1::EVEX_OP_MASK];
-			op1_kind = EVEX_OP_KINDS[(enc_flags1 >> EncFlags1::EVEX_OP1_SHIFT) & EncFlags1::EVEX_OP_MASK];
-			op2_kind = EVEX_OP_KINDS[(enc_flags1 >> EncFlags1::EVEX_OP2_SHIFT) & EncFlags1::EVEX_OP_MASK];
-			op3_kind = EVEX_OP_KINDS[(enc_flags1 >> EncFlags1::EVEX_OP3_SHIFT) & EncFlags1::EVEX_OP_MASK];
-			op4_kind = OpCodeOperandKind::None;
-
-			switch (static_cast<EvexOpCodeTable>(table_index)) {
-			case EvexOpCodeTable::MAP0F:
-				table = OpCodeTableKind::T0F;
-				break;
-			case EvexOpCodeTable::MAP0F38:
-				table = OpCodeTableKind::T0F38;
-				break;
-			case EvexOpCodeTable::MAP0F3A:
-				table = OpCodeTableKind::T0F3A;
-				break;
-			case EvexOpCodeTable::MAP5:
-				table = OpCodeTableKind::MAP5;
-				break;
-			case EvexOpCodeTable::MAP6:
-				table = OpCodeTableKind::MAP6;
-				break;
-			default:
-				ICED_UNREACHABLE();
-			}
-			break;
-
-		case EncodingKind::XOP:
-			op0_kind = XOP_OP_KINDS[(enc_flags1 >> EncFlags1::XOP_OP0_SHIFT) & EncFlags1::XOP_OP_MASK];
-			op1_kind = XOP_OP_KINDS[(enc_flags1 >> EncFlags1::XOP_OP1_SHIFT) & EncFlags1::XOP_OP_MASK];
-			op2_kind = XOP_OP_KINDS[(enc_flags1 >> EncFlags1::XOP_OP2_SHIFT) & EncFlags1::XOP_OP_MASK];
-			op3_kind = XOP_OP_KINDS[(enc_flags1 >> EncFlags1::XOP_OP3_SHIFT) & EncFlags1::XOP_OP_MASK];
-			op4_kind = OpCodeOperandKind::None;
-
-			switch (static_cast<XopOpCodeTable>(table_index)) {
-			case XopOpCodeTable::MAP8:
-				table = OpCodeTableKind::MAP8;
-				break;
-			case XopOpCodeTable::MAP9:
-				table = OpCodeTableKind::MAP9;
-				break;
-			case XopOpCodeTable::MAP10:
-				table = OpCodeTableKind::MAP10;
-				break;
-			default:
-				ICED_UNREACHABLE();
-			}
-			break;
-
-		case EncodingKind::D3NOW:
-			op0_kind = OpCodeOperandKind::mm_reg;
-			op1_kind = OpCodeOperandKind::mm_or_mem;
-			op2_kind = OpCodeOperandKind::None;
-			op3_kind = OpCodeOperandKind::None;
-			op4_kind = OpCodeOperandKind::None;
-			table = OpCodeTableKind::T0F;
-			break;
-
-		case EncodingKind::MVEX:
-			op0_kind = MVEX_OP_KINDS[(enc_flags1 >> EncFlags1::MVEX_OP0_SHIFT) & EncFlags1::MVEX_OP_MASK];
-			op1_kind = MVEX_OP_KINDS[(enc_flags1 >> EncFlags1::MVEX_OP1_SHIFT) & EncFlags1::MVEX_OP_MASK];
-			op2_kind = MVEX_OP_KINDS[(enc_flags1 >> EncFlags1::MVEX_OP2_SHIFT) & EncFlags1::MVEX_OP_MASK];
-			op3_kind = MVEX_OP_KINDS[(enc_flags1 >> EncFlags1::MVEX_OP3_SHIFT) & EncFlags1::MVEX_OP_MASK];
-			op4_kind = OpCodeOperandKind::None;
-
-			switch (static_cast<MvexOpCodeTable>(table_index)) {
-			case MvexOpCodeTable::MAP0F:
-				table = OpCodeTableKind::T0F;
-				break;
-			case MvexOpCodeTable::MAP0F38:
-				table = OpCodeTableKind::T0F38;
-				break;
-			case MvexOpCodeTable::MAP0F3A:
-				table = OpCodeTableKind::T0F3A;
-				break;
-			default:
-				ICED_UNREACHABLE();
-			}
-			break;
-
-		default:
-			ICED_UNREACHABLE();
-		}
-
-		result.enc_flags2_ = enc_flags2;
-		result.enc_flags3_ = enc_flags3;
-		result.opc_flags1_ = opc_flags1;
-		result.opc_flags2_ = opc_flags2;
-		result.code_ = code;
-		result.op_code_ = op_code;
-		result.flags_ = flags;
-		result.encoding_ = encoding;
-		result.operand_size_ = operand_size;
-		result.address_size_ = address_size;
-		result.l_ = l;
-		result.tuple_type_ = tuple_type;
-		result.table_ = table;
-		result.mandatory_prefix_ = mandatory_prefix;
-		result.group_index_ = group_index;
-		result.rm_group_index_ = rm_group_index;
-		result.op_kinds_[0] = op0_kind;
-		result.op_kinds_[1] = op1_kind;
-		result.op_kinds_[2] = op2_kind;
-		result.op_kinds_[3] = op3_kind;
-		result.op_kinds_[4] = op4_kind;
-
-		result.op_code_string_ = OpCodeFormatter(result, sb, lkind, (opc_flags1 & OpCodeInfoFlags1::MOD_REG_RM_STRING) != 0).format();
-		const InstrStrFmtOption fmt_opt =
-			static_cast<InstrStrFmtOption>((opc_flags2 >> OpCodeInfoFlags2::INSTR_STR_FMT_OPTION_SHIFT) & OpCodeInfoFlags2::INSTR_STR_FMT_OPTION_MASK);
-		result.instruction_string_ = InstructionFormatter(result, fmt_opt, sb).format();
-	}
-
-	static std::uint8_t code_size_to_bits(CodeSize code_size) noexcept {
-		switch (code_size) {
-		case CodeSize::Unknown:
-			return 0;
-		case CodeSize::Code16:
-			return 16;
-		case CodeSize::Code32:
-			return 32;
-		case CodeSize::Code64:
-			return 64;
-		default:
-			ICED_UNREACHABLE();
-		}
-	}
-
-	struct Table {
-		std::unique_ptr<OpCodeInfo[]> infos;
-
-		Table() : infos(new OpCodeInfo[IcedConstants::CODE_ENUM_COUNT]) {
-			std::string sb;
-			for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++)
-				init(infos[i], static_cast<Code>(i), ENC_FLAGS1[i], ENC_FLAGS2[i], ENC_FLAGS3[i], OPC_FLAGS1[i], OPC_FLAGS2[i], sb);
-		}
-	};
-
-	static const OpCodeInfo* get_table() noexcept {
-		static const Table table;
-		return table.infos.get();
-	}
-};
-
-} // namespace internal
+static_assert(IcedConstants::MAX_OP_COUNT == 5, "The OpCodeInfo constructor assumes there are 5 operands");
 
 OpCodeOperandKind OpCodeInfo::invalid_operand_op_kind() noexcept {
 	ICED_DEBUG_ASSERT(false); // Invalid operand
 	return OpCodeOperandKind::None;
+}
+
+std::string_view OpCodeInfo::op_code_string() const noexcept {
+	return std::string_view(internal::OpCodeInfoInternal::get_strings(*this), op_code_string_len_);
+}
+
+std::string_view OpCodeInfo::instruction_string() const noexcept {
+	return std::string_view(internal::OpCodeInfoInternal::get_strings(*this) + op_code_string_len_, instruction_string_len_);
 }
 
 Mnemonic OpCodeInfo::mnemonic() const noexcept { return code_ext::mnemonic(code_); }
@@ -513,7 +198,7 @@ bool OpCodeInfo::amd_decoder32() const noexcept { return (opc_flags2_ & OpCodeIn
 bool OpCodeInfo::amd_decoder64() const noexcept { return (opc_flags2_ & OpCodeInfoFlags2::AMD_DECODER64) != 0; }
 
 namespace code_ext {
-const OpCodeInfo& op_code(Code code) noexcept { return internal::OpCodeInfoInternal::get_table()[static_cast<std::size_t>(code)]; }
+const OpCodeInfo& op_code(Code code) noexcept { return internal::OpCodeInfoInternal::TABLE[static_cast<std::size_t>(code)]; }
 } // namespace code_ext
 
 } // namespace iced_x86

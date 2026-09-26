@@ -95,7 +95,7 @@ ICED_NOINLINE void set_invalid_16bit_regs_error(Encoder& e, std::uint32_t operan
 } // namespace
 
 Encoder::Encoder(PrivateTag, std::uint32_t bitness, std::size_t capacity)
-	: current_rip_(0), buffer_(), handlers_(internal::get_handlers_table()), handler_(handlers_), error_message_(), bitness_(bitness), eip_(0),
+	: current_rip_(0), buffer_(), handler_(&internal::OP_CODE_HANDLERS[0]), error_message_(), bitness_(bitness), eip_(0),
 	  displ_addr_(0), imm_addr_(0), immediate_(0), immediate_hi_(0), displ_(0), displ_hi_(0), op_code_(0), internal_vex_wig_lig_(0),
 	  internal_vex_lig_(0), internal_evex_wig_(0), internal_evex_lig_(0), internal_mvex_wig_(0), prevent_vex2_(0),
 	  opsize16_flags_(bitness != 16 ? EncoderFlags::P66 : 0), opsize32_flags_(bitness == 16 ? EncoderFlags::P66 : 0),
@@ -130,7 +130,7 @@ Result<std::size_t> Encoder::encode(const Instruction& instruction, std::uint64_
 	// requires 3 instructions.
 	sib_ = 0;
 
-	const internal::OpCodeHandler* handler = &handlers_[static_cast<std::size_t>(instruction.code())];
+	const internal::OpCodeHandler* handler = &internal::OP_CODE_HANDLERS[static_cast<std::size_t>(instruction.code())];
 	handler_ = handler;
 	op_code_ = handler->op_code;
 	const std::int32_t group_index = handler->group_index;
@@ -189,12 +189,12 @@ Result<std::size_t> Encoder::encode(const Instruction& instruction, std::uint64_
 	if (!handler->is_special_instr) {
 		const std::uint32_t operands_len = handler->operands_len;
 		for (std::uint32_t i = 0; i < operands_len; i++)
-			handler->operands[i]->encode(*this, instruction, i);
+			handler->operand(i)->encode(*this, instruction, i);
 
 		if ((handler->enc_flags3 & EncFlags3::FWAIT) != 0)
 			EncoderInternal::write_byte_internal(*this, 0x9B);
 
-		handler->encode(handler, *this, instruction);
+		internal::OP_CODE_HANDLER_ENCODE_FNS[static_cast<std::size_t>(handler->kind)](handler, *this, instruction);
 
 		const std::uint32_t op_code = op_code_;
 		if (!handler->is_2byte_opcode)
@@ -211,7 +211,7 @@ Result<std::size_t> Encoder::encode(const Instruction& instruction, std::uint64_
 			EncoderInternal::write_immediate(*this);
 	}
 	else
-		handler->encode(handler, *this, instruction);
+		internal::OP_CODE_HANDLER_ENCODE_FNS[static_cast<std::size_t>(handler->kind)](handler, *this, instruction);
 
 	const std::size_t instr_len = static_cast<std::size_t>(current_rip_) - static_cast<std::size_t>(rip);
 	static_assert(IcedConstants::MAX_INSTRUCTION_LENGTH == 15, "");
@@ -737,8 +737,14 @@ std::uint32_t EncoderInternal::get_register_op_size(const Instruction& instructi
 
 std::optional<std::int8_t> EncoderInternal::try_convert_to_disp8n(Encoder& e, const Instruction& instruction, std::int32_t displ) {
 	const OpCodeHandler* handler = e.handler_;
-	if (handler->try_convert_to_disp8n != nullptr)
-		return handler->try_convert_to_disp8n(handler, e, instruction, displ);
+	switch (handler->kind) {
+	case OpCodeHandlerKind::EVEX:
+		return evex_try_convert_to_disp8n(handler, e, instruction, displ);
+	case OpCodeHandlerKind::MVEX:
+		return mvex_try_convert_to_disp8n(handler, e, instruction, displ);
+	default:
+		break;
+	}
 	if (std::numeric_limits<std::int8_t>::min() <= displ && displ <= std::numeric_limits<std::int8_t>::max())
 		return static_cast<std::int8_t>(displ);
 	return std::nullopt;
