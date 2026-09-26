@@ -44,6 +44,17 @@ namespace Generator {
 			writer.WriteLine($"}} // namespace {ns}");
 		}
 
+		/// <summary>
+		/// Gets an enum value, eg. <c>Register::EAX</c>. Deprecated values (they have a <c>[[deprecated]]</c> attribute) are
+		/// written as <c>static_cast&lt;Register&gt;(249)</c> to prevent deprecation warnings.
+		/// </summary>
+		public static string ToEnumValue(IdentifierConverter idConverter, Enums.EnumValue value) {
+			var enumType = value.DeclaringType;
+			if (value.DeprecatedInfo.IsDeprecated)
+				return $"static_cast<{enumType.Name(idConverter)}>({value.Value})";
+			return idConverter.ToDeclTypeAndValue(value);
+		}
+
 		public static string EscapeString(string s) =>
 			s.Replace("\\", "\\\\").Replace("\"", "\\\"");
 	}

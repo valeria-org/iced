@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: MIT
+// Copyright (C) 2018-present iced project and contributors
+
+// Port of the encoder dependent test in src/rust/iced-x86/src/test/instr_misc.rs
+// PENDING: needs `Instruction::with5()` and `MemoryOperand` (encoder). Rename to tests/core/instr_misc_encoder_tests.cpp
+// once they exist (and adapt the MemoryOperand constructor / with5() error handling if the API differs).
+
+#include "test_framework.hpp"
+#include "iced_x86/instruction.hpp"
+#include "iced_x86/memory_operand.hpp"
+
+#include <functional>
+
+using namespace iced_x86;
+
+TEST_CASE("core/instr_misc/eq_and_hash_ignore_some_fields") {
+	auto result = Instruction::with5(Code::VEX_Vpermil2ps_xmm_xmm_xmmm128_xmm_imm4, Register::XMM1, Register::XMM2,
+		MemoryOperand(Register::RCX, Register::R14, 8, 0x1234'5678, 8, false, Register::FS), Register::XMM10, 0xA5);
+	REQUIRE(result.is_ok());
+	Instruction instr1 = result.value();
+	Instruction instr2 = instr1;
+	CHECK(instr1.eq_all_bits(instr2));
+	instr1.set_code_size(CodeSize::Code32);
+	instr2.set_code_size(CodeSize::Code64);
+	CHECK(!instr1.eq_all_bits(instr2));
+	instr1.set_len(10);
+	instr2.set_len(5);
+	instr1.set_ip(0x9733'3795'FA7C'EAABULL);
+	instr2.set_ip(0x9BE5'A3A0'7A66'FC05ULL);
+	CHECK(instr1 == instr2);
+	CHECK_EQ(std::hash<Instruction>()(instr1), std::hash<Instruction>()(instr2));
+}
