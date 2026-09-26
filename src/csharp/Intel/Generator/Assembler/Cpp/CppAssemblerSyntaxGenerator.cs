@@ -108,6 +108,7 @@ namespace Generator.Assembler.Cpp {
 				CppConstants.WriteHeaderFileHeader(writer);
 				writer.WriteLine("#include \"iced_x86/code_asm/reg.hpp\"");
 				writer.WriteLine("#include \"iced_x86/register.hpp\"");
+				writer.WriteLine("#include \"iced_x86/register_ext.hpp\"");
 				writer.WriteLine();
 				writer.WriteLine("#include <optional>");
 				writer.WriteLine();
@@ -143,7 +144,14 @@ namespace Generator.Assembler.Cpp {
 					writer.WriteLine($"/// Gets {GetAOrAn(kind)} `{asmInfo.NamespaceName.ToUpperInvariant()}` register or `std::nullopt` if input is invalid.");
 					writer.WriteLine("///");
 					writer.WriteLine("/// @param register_ Register");
-					writer.WriteLine($"[[nodiscard]] std::optional<{asmInfo.ClassName}> get_{asmInfo.NamespaceName}({registerTypeName} register_) noexcept;");
+					writer.WriteLine($"[[nodiscard]] constexpr std::optional<{asmInfo.ClassName}> get_{asmInfo.NamespaceName}({registerTypeName} register_) noexcept {{");
+					using (writer.Indent()) {
+						writer.WriteLine($"if (register_ext::{asmInfo.FnIsRegName}(register_))");
+						using (writer.Indent())
+							writer.WriteLine($"return {asmInfo.ClassName}(register_);");
+						writer.WriteLine("return std::nullopt;");
+					}
+					writer.WriteLine("}");
 					writer.WriteLine();
 					WriteNamespaceEnd(writer, asmInfo.NamespaceName);
 				}
@@ -169,29 +177,6 @@ namespace Generator.Assembler.Cpp {
 				}
 				writer.WriteLine();
 				WriteNamespaceEnd(writer, CodeAsmNamespace);
-			}
-
-			filename = CppConstants.GetSrcFilename(genTypes, "code_asm", "registers.cpp");
-			using (var writer = new FileWriter(TargetLanguage.Cpp, FileUtils.OpenWrite(filename))) {
-				writer.WriteFileHeader();
-				writer.WriteLine("#include \"iced_x86/code_asm/registers.hpp\"");
-				writer.WriteLine("#include \"iced_x86/register_ext.hpp\"");
-				writer.WriteLine();
-				WriteNamespaceBegin(writer, CodeAsmNamespace + "::registers");
-				foreach (var (kind, _) in regGroups) {
-					var asmInfo = GetAsmRegisterInfo(kind);
-					writer.WriteLine();
-					writer.WriteLine($"std::optional<{asmInfo.ClassName}> {asmInfo.NamespaceName}::get_{asmInfo.NamespaceName}({registerTypeName} register_) noexcept {{");
-					using (writer.Indent()) {
-						writer.WriteLine($"if (register_ext::{asmInfo.FnIsRegName}(register_))");
-						using (writer.Indent())
-							writer.WriteLine($"return {asmInfo.ClassName}(register_);");
-						writer.WriteLine("return std::nullopt;");
-					}
-					writer.WriteLine("}");
-				}
-				writer.WriteLine();
-				WriteNamespaceEnd(writer, CodeAsmNamespace + "::registers");
 			}
 		}
 

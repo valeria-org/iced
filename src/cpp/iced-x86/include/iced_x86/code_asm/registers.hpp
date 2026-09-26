@@ -7,6 +7,7 @@
 
 #include "iced_x86/code_asm/reg.hpp"
 #include "iced_x86/register.hpp"
+#include "iced_x86/register_ext.hpp"
 
 #include <optional>
 
@@ -75,7 +76,11 @@ inline constexpr AsmRegister8 r15b{Register::R15L};
 /// Gets a `GPR8` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegister8> get_gpr8(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegister8> get_gpr8(Register register_) noexcept {
+	if (register_ext::is_gpr8(register_))
+		return AsmRegister8(register_);
+	return std::nullopt;
+}
 
 } // namespace gpr8
 
@@ -118,7 +123,11 @@ inline constexpr AsmRegister16 r15w{Register::R15W};
 /// Gets a `GPR16` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegister16> get_gpr16(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegister16> get_gpr16(Register register_) noexcept {
+	if (register_ext::is_gpr16(register_))
+		return AsmRegister16(register_);
+	return std::nullopt;
+}
 
 } // namespace gpr16
 
@@ -161,7 +170,11 @@ inline constexpr AsmRegister32 r15d{Register::R15D};
 /// Gets a `GPR32` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegister32> get_gpr32(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegister32> get_gpr32(Register register_) noexcept {
+	if (register_ext::is_gpr32(register_))
+		return AsmRegister32(register_);
+	return std::nullopt;
+}
 
 } // namespace gpr32
 
@@ -204,7 +217,11 @@ inline constexpr AsmRegister64 r15{Register::R15};
 /// Gets a `GPR64` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegister64> get_gpr64(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegister64> get_gpr64(Register register_) noexcept {
+	if (register_ext::is_gpr64(register_))
+		return AsmRegister64(register_);
+	return std::nullopt;
+}
 
 } // namespace gpr64
 
@@ -227,7 +244,11 @@ inline constexpr AsmRegisterSegment gs{Register::GS};
 /// Gets a `SEGMENT` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterSegment> get_segment(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterSegment> get_segment(Register register_) noexcept {
+	if (register_ext::is_segment_register(register_))
+		return AsmRegisterSegment(register_);
+	return std::nullopt;
+}
 
 } // namespace segment
 
@@ -254,7 +275,11 @@ inline constexpr AsmRegisterSt st7{Register::ST7};
 /// Gets an `ST` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterSt> get_st(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterSt> get_st(Register register_) noexcept {
+	if (register_ext::is_st(register_))
+		return AsmRegisterSt(register_);
+	return std::nullopt;
+}
 
 } // namespace st
 
@@ -297,7 +322,11 @@ inline constexpr AsmRegisterCr cr15{Register::CR15};
 /// Gets a `CR` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterCr> get_cr(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterCr> get_cr(Register register_) noexcept {
+	if (register_ext::is_cr(register_))
+		return AsmRegisterCr(register_);
+	return std::nullopt;
+}
 
 } // namespace cr
 
@@ -340,7 +369,11 @@ inline constexpr AsmRegisterDr dr15{Register::DR15};
 /// Gets a `DR` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterDr> get_dr(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterDr> get_dr(Register register_) noexcept {
+	if (register_ext::is_dr(register_))
+		return AsmRegisterDr(register_);
+	return std::nullopt;
+}
 
 } // namespace dr
 
@@ -367,7 +400,11 @@ inline constexpr AsmRegisterTr tr7{Register::TR7};
 /// Gets a `TR` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterTr> get_tr(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterTr> get_tr(Register register_) noexcept {
+	if (register_ext::is_tr(register_))
+		return AsmRegisterTr(register_);
+	return std::nullopt;
+}
 
 } // namespace tr
 
@@ -386,7 +423,11 @@ inline constexpr AsmRegisterBnd bnd3{Register::BND3};
 /// Gets a `BND` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterBnd> get_bnd(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterBnd> get_bnd(Register register_) noexcept {
+	if (register_ext::is_bnd(register_))
+		return AsmRegisterBnd(register_);
+	return std::nullopt;
+}
 
 } // namespace bnd
 
@@ -413,7 +454,11 @@ inline constexpr AsmRegisterK k7{Register::K7};
 /// Gets a `K` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterK> get_k(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterK> get_k(Register register_) noexcept {
+	if (register_ext::is_k(register_))
+		return AsmRegisterK(register_);
+	return std::nullopt;
+}
 
 } // namespace k
 
@@ -440,7 +485,11 @@ inline constexpr AsmRegisterMm mm7{Register::MM7};
 /// Gets an `MM` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterMm> get_mm(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterMm> get_mm(Register register_) noexcept {
+	if (register_ext::is_mm(register_))
+		return AsmRegisterMm(register_);
+	return std::nullopt;
+}
 
 } // namespace mm
 
@@ -515,7 +564,11 @@ inline constexpr AsmRegisterXmm xmm31{Register::XMM31};
 /// Gets an `XMM` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterXmm> get_xmm(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterXmm> get_xmm(Register register_) noexcept {
+	if (register_ext::is_xmm(register_))
+		return AsmRegisterXmm(register_);
+	return std::nullopt;
+}
 
 } // namespace xmm
 
@@ -590,7 +643,11 @@ inline constexpr AsmRegisterYmm ymm31{Register::YMM31};
 /// Gets a `YMM` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterYmm> get_ymm(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterYmm> get_ymm(Register register_) noexcept {
+	if (register_ext::is_ymm(register_))
+		return AsmRegisterYmm(register_);
+	return std::nullopt;
+}
 
 } // namespace ymm
 
@@ -665,7 +722,11 @@ inline constexpr AsmRegisterZmm zmm31{Register::ZMM31};
 /// Gets a `ZMM` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterZmm> get_zmm(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterZmm> get_zmm(Register register_) noexcept {
+	if (register_ext::is_zmm(register_))
+		return AsmRegisterZmm(register_);
+	return std::nullopt;
+}
 
 } // namespace zmm
 
@@ -692,7 +753,11 @@ inline constexpr AsmRegisterTmm tmm7{Register::TMM7};
 /// Gets a `TMM` register or `std::nullopt` if input is invalid.
 ///
 /// @param register_ Register
-[[nodiscard]] std::optional<AsmRegisterTmm> get_tmm(Register register_) noexcept;
+[[nodiscard]] constexpr std::optional<AsmRegisterTmm> get_tmm(Register register_) noexcept {
+	if (register_ext::is_tmm(register_))
+		return AsmRegisterTmm(register_);
+	return std::nullopt;
+}
 
 } // namespace tmm
 
