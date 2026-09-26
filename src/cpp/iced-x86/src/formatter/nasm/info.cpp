@@ -73,7 +73,7 @@ private:
 
 class SimpleInstrInfo_cc final : public InstrInfo {
 public:
-	SimpleInstrInfo_cc(std::uint32_t cc_index, std::vector<std::string> mnemonics)
+	SimpleInstrInfo_cc(std::uint32_t cc_index, std::vector<std::string>&& mnemonics)
 		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), cc_index_(cc_index) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
@@ -694,9 +694,9 @@ private:
 
 class SimpleInstrInfo_os_jcc final : public InstrInfo {
 public:
-	SimpleInstrInfo_os_jcc(std::uint32_t bitness, std::uint32_t cc_index, std::vector<std::string> mnemonics)
+	SimpleInstrInfo_os_jcc(std::uint32_t bitness, std::uint32_t cc_index, std::vector<std::string>&& mnemonics)
 		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), bitness_(bitness), cc_index_(cc_index), flags_(InstrOpInfoFlags::NONE) {}
-	SimpleInstrInfo_os_jcc(std::uint32_t bitness, std::uint32_t cc_index, std::vector<std::string> mnemonics, std::uint32_t flags)
+	SimpleInstrInfo_os_jcc(std::uint32_t bitness, std::uint32_t cc_index, std::vector<std::string>&& mnemonics, std::uint32_t flags)
 		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), bitness_(bitness), cc_index_(cc_index), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
@@ -742,7 +742,7 @@ private:
 
 class SimpleInstrInfo_os_loop final : public InstrInfo {
 public:
-	SimpleInstrInfo_os_loop(std::uint32_t bitness, std::uint32_t cc_index, Register register_, std::vector<std::string> mnemonics)
+	SimpleInstrInfo_os_loop(std::uint32_t bitness, std::uint32_t cc_index, Register register_, std::vector<std::string>&& mnemonics)
 		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), bitness_(bitness), cc_index_(cc_index), register_(register_) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
@@ -1264,27 +1264,41 @@ private:
 	InstrOpKind op_kind_;
 };
 
-std::string add_suffix(const std::string& s, char c) {
-	std::string res;
-	res.reserve(s.size() + 1);
-	res += s;
-	res += c;
-	return res;
+void add_suffix(std::string& result, const std::string& s, char c) {
+	result.clear();
+	result.reserve(s.size() + 1);
+	result += s;
+	result += c;
+}
+
+template <typename... Args>
+std::vector<std::string>&& make_vec(std::vector<std::string>& vec, Args&&... args) {
+	vec.clear();
+	vec.reserve(sizeof...(Args));
+	(vec.push_back(std::move(args)), ...);
+	return std::move(vec);
 }
 
 struct AllInfosHolder {
 	std::vector<std::unique_ptr<InstrInfo>> infos_storage;
 	std::array<const InstrInfo*, IcedConstants::CODE_ENUM_COUNT> infos;
 
+	// Creates an instruction info and stores it in `infos_storage` (a function so its temporaries aren't in the caller's stack frame)
+	template <typename T, typename... Args>
+	ICED_NOINLINE InstrInfo* add(Args&&... args) {
+		infos_storage.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+		return infos_storage.back().get();
+	}
+
 	AllInfosHolder() {
 		infos_storage.reserve(IcedConstants::CODE_ENUM_COUNT);
 		DataReader reader(FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE);
 		const auto strings = get_strings_table_ref();
 		const MemSizeInfo* mem_size_tbl = get_mem_size_tbl();
-		const auto read_string = [&strings, &reader]() -> std::string {
+		const auto read_string = [&strings, &reader](std::string& result) {
 			const std::size_t index = reader.read_compressed_u32();
 			ICED_ASSERT(index < strings.size());
-			return std::string(strings[index]);
+			result = strings[index];
 		};
 		const auto read_code_size = [&reader]() -> CodeSize {
 			const std::size_t v = reader.read_u8();
@@ -1318,7 +1332,13 @@ struct AllInfosHolder {
 				prev_index = reader.index() - 1;
 				has_prev_index = true;
 			}
+			// The strings are declared here so the (debug build) stack frame doesn't contain a temporary per `case`
 			std::string s;
+			std::string s2;
+			std::string s3;
+			std::string s4;
+			std::vector<std::string> mnemonics;
+			std::vector<std::string> mnemonics_other;
 			if ((f & 0x80) != 0) {
 				const std::size_t index = reader.read_compressed_u32();
 				ICED_ASSERT(index < strings.size());
@@ -1328,173 +1348,173 @@ struct AllInfosHolder {
 				s += s0;
 			}
 			else
-				s = read_string();
+				read_string(s);
 
 			std::uint32_t v;
 			std::uint32_t v2;
 			std::uint32_t v3;
-			std::unique_ptr<InstrInfo> info;
+			InstrInfo* info = nullptr;
 			switch (ctor_kind) {
 			case CtorKind::Normal_1:
-				info = std::make_unique<SimpleInstrInfo>(std::move(s));
+				info = add<SimpleInstrInfo>(std::move(s));
 				break;
 
 			case CtorKind::Normal_2:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo>(std::move(s), v);
+				info = add<SimpleInstrInfo>(std::move(s), v);
 				break;
 
 			case CtorKind::AamAad:
-				info = std::make_unique<SimpleInstrInfo_AamAad>(std::move(s));
+				info = add<SimpleInstrInfo_AamAad>(std::move(s));
 				break;
 
 			case CtorKind::asz:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_as>(v, std::move(s));
+				info = add<SimpleInstrInfo_as>(v, std::move(s));
 				break;
 
 			case CtorKind::String:
-				info = std::make_unique<SimpleInstrInfo_String>(std::move(s));
+				info = add<SimpleInstrInfo_String>(std::move(s));
 				break;
 
 			case CtorKind::bcst:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_bcst>(std::move(s), v, mem_size_tbl);
+				info = add<SimpleInstrInfo_bcst>(std::move(s), v, mem_size_tbl);
 				break;
 
 			case CtorKind::bnd:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_bnd>(std::move(s), v);
+				info = add<SimpleInstrInfo_bnd>(std::move(s), v);
 				break;
 
 			case CtorKind::DeclareData:
-				info = std::make_unique<SimpleInstrInfo_DeclareData>(static_cast<Code>(i), std::move(s));
+				info = add<SimpleInstrInfo_DeclareData>(static_cast<Code>(i), std::move(s));
 				break;
 
 			case CtorKind::er_2:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_er>(v, std::move(s));
+				info = add<SimpleInstrInfo_er>(v, std::move(s));
 				break;
 
 			case CtorKind::er_3:
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_er>(v, std::move(s), v2);
+				info = add<SimpleInstrInfo_er>(v, std::move(s), v2);
 				break;
 
 			case CtorKind::far:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_far>(v, std::move(s));
+				info = add<SimpleInstrInfo_far>(v, std::move(s));
 				break;
 
 			case CtorKind::far_mem:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_far_mem>(v, std::move(s));
+				info = add<SimpleInstrInfo_far_mem>(v, std::move(s));
 				break;
 
 			case CtorKind::invlpga:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_invlpga>(v, std::move(s));
+				info = add<SimpleInstrInfo_invlpga>(v, std::move(s));
 				break;
 
 			case CtorKind::maskmovq:
-				info = std::make_unique<SimpleInstrInfo_maskmovq>(std::move(s));
+				info = add<SimpleInstrInfo_maskmovq>(std::move(s));
 				break;
 
 			case CtorKind::movabs:
-				info = std::make_unique<SimpleInstrInfo_movabs>(std::move(s));
+				info = add<SimpleInstrInfo_movabs>(std::move(s));
 				break;
 
 			case CtorKind::nop: {
 				v = reader.read_compressed_u32();
 				const Register r = read_register();
-				info = std::make_unique<SimpleInstrInfo_nop>(v, std::move(s), r);
+				info = add<SimpleInstrInfo_nop>(v, std::move(s), r);
 				break;
 			}
 
 			case CtorKind::OpSize: {
 				const CodeSize code_size = read_code_size();
-				auto s2 = add_suffix(s, 'w');
-				auto s3 = add_suffix(s, 'd');
-				auto s4 = add_suffix(s, 'q');
-				info = std::make_unique<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
+				add_suffix(s2, s, 'w');
+				add_suffix(s3, s, 'd');
+				add_suffix(s4, s, 'q');
+				info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
 				break;
 			}
 
 			case CtorKind::OpSize2_bnd: {
-				auto s2 = read_string();
-				auto s3 = read_string();
-				auto s4 = read_string();
-				info = std::make_unique<SimpleInstrInfo_OpSize2_bnd>(std::move(s), std::move(s2), std::move(s3), std::move(s4));
+				read_string(s2);
+				read_string(s3);
+				read_string(s4);
+				info = add<SimpleInstrInfo_OpSize2_bnd>(std::move(s), std::move(s2), std::move(s3), std::move(s4));
 				break;
 			}
 
 			case CtorKind::OpSize3: {
 				const char c = static_cast<char>(reader.read_u8());
-				auto s2 = add_suffix(s, c);
+				add_suffix(s2, s, c);
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_OpSize3>(v, std::move(s), std::move(s2));
+				info = add<SimpleInstrInfo_OpSize3>(v, std::move(s), std::move(s2));
 				break;
 			}
 
 			case CtorKind::os_2:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os>(v, std::move(s));
+				info = add<SimpleInstrInfo_os>(v, std::move(s));
 				break;
 
 			case CtorKind::os_3:
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os>(v, std::move(s), v2);
+				info = add<SimpleInstrInfo_os>(v, std::move(s), v2);
 				break;
 
 			case CtorKind::os_call:
 				v = reader.read_compressed_u32();
 				v2 = static_cast<std::uint32_t>(reader.read_u8());
 				ICED_DEBUG_ASSERT(v2 <= 1);
-				info = std::make_unique<SimpleInstrInfo_os_call>(v, std::move(s), v2 != 0);
+				info = add<SimpleInstrInfo_os_call>(v, std::move(s), v2 != 0);
 				break;
 
 			case CtorKind::CC_1:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_cc>(v, std::vector<std::string>{std::move(s)});
+				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s)));
 				break;
 
 			case CtorKind::CC_2: {
-				auto s2 = read_string();
+				read_string(s2);
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_cc>(v, std::vector<std::string>{std::move(s), std::move(s2)});
+				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
 				break;
 			}
 
 			case CtorKind::CC_3: {
-				auto s2 = read_string();
-				auto s3 = read_string();
+				read_string(s2);
+				read_string(s3);
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_cc>(v, std::vector<std::string>{std::move(s), std::move(s2), std::move(s3)});
+				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
 				break;
 			}
 
 			case CtorKind::os_jcc_a_1:
 				v2 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v2, std::vector<std::string>{std::move(s)});
+				info = add<SimpleInstrInfo_os_jcc>(v, v2, make_vec(mnemonics, std::move(s)));
 				break;
 
 			case CtorKind::os_jcc_a_2: {
-				auto s2 = read_string();
+				read_string(s2);
 				v2 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v2, std::vector<std::string>{std::move(s), std::move(s2)});
+				info = add<SimpleInstrInfo_os_jcc>(v, v2, make_vec(mnemonics, std::move(s), std::move(s2)));
 				break;
 			}
 
 			case CtorKind::os_jcc_a_3: {
-				auto s2 = read_string();
-				auto s3 = read_string();
+				read_string(s2);
+				read_string(s3);
 				v2 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v2, std::vector<std::string>{std::move(s), std::move(s2), std::move(s3)});
+				info = add<SimpleInstrInfo_os_jcc>(v, v2, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
 				break;
 			}
 
@@ -1502,110 +1522,110 @@ struct AllInfosHolder {
 				v3 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v3, std::vector<std::string>{std::move(s)}, v2);
+				info = add<SimpleInstrInfo_os_jcc>(v, v3, make_vec(mnemonics, std::move(s)), v2);
 				break;
 
 			case CtorKind::os_jcc_b_2: {
-				auto s2 = read_string();
+				read_string(s2);
 				v3 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v3, std::vector<std::string>{std::move(s), std::move(s2)}, v2);
+				info = add<SimpleInstrInfo_os_jcc>(v, v3, make_vec(mnemonics, std::move(s), std::move(s2)), v2);
 				break;
 			}
 
 			case CtorKind::os_jcc_b_3: {
-				auto s2 = read_string();
-				auto s3 = read_string();
+				read_string(s2);
+				read_string(s3);
 				v3 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_jcc>(v, v3, std::vector<std::string>{std::move(s), std::move(s2), std::move(s3)}, v2);
+				info = add<SimpleInstrInfo_os_jcc>(v, v3, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)), v2);
 				break;
 			}
 
 			case CtorKind::os_loopcc: {
-				auto s2 = read_string();
+				read_string(s2);
 				v3 = reader.read_compressed_u32();
 				v = reader.read_compressed_u32();
 				const Register r = read_register();
-				info = std::make_unique<SimpleInstrInfo_os_loop>(v, v3, r, std::vector<std::string>{std::move(s), std::move(s2)});
+				info = add<SimpleInstrInfo_os_loop>(v, v3, r, make_vec(mnemonics, std::move(s), std::move(s2)));
 				break;
 			}
 
 			case CtorKind::os_loop: {
 				v = reader.read_compressed_u32();
 				const Register r = read_register();
-				info = std::make_unique<SimpleInstrInfo_os_loop>(v, 0xFFFF'FFFF, r, std::vector<std::string>{std::move(s)});
+				info = add<SimpleInstrInfo_os_loop>(v, 0xFFFF'FFFF, r, make_vec(mnemonics, std::move(s)));
 				break;
 			}
 
 			case CtorKind::os_mem:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_mem>(v, std::move(s));
+				info = add<SimpleInstrInfo_os_mem>(v, std::move(s));
 				break;
 
 			case CtorKind::os_mem_reg16:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_mem_reg16>(v, std::move(s));
+				info = add<SimpleInstrInfo_os_mem_reg16>(v, std::move(s));
 				break;
 
 			case CtorKind::os_mem2:
 				v = reader.read_compressed_u32();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_os_mem2>(v, std::move(s), v2);
+				info = add<SimpleInstrInfo_os_mem2>(v, std::move(s), v2);
 				break;
 
 			case CtorKind::pblendvb: {
 				const std::size_t mem_size = reader.read_u8();
 				ICED_ASSERT(mem_size < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
-				info = std::make_unique<SimpleInstrInfo_pblendvb>(std::move(s), static_cast<MemorySize>(mem_size));
+				info = add<SimpleInstrInfo_pblendvb>(std::move(s), static_cast<MemorySize>(mem_size));
 				break;
 			}
 
 			case CtorKind::pclmulqdq:
-				info = std::make_unique<SimpleInstrInfo_pclmulqdq>(std::move(s), read_pseudo_ops());
+				info = add<SimpleInstrInfo_pclmulqdq>(std::move(s), read_pseudo_ops());
 				break;
 
 			case CtorKind::pops:
-				info = std::make_unique<SimpleInstrInfo_pops>(std::move(s), read_pseudo_ops());
+				info = add<SimpleInstrInfo_pops>(std::move(s), read_pseudo_ops());
 				break;
 
 			case CtorKind::Reg16:
-				info = std::make_unique<SimpleInstrInfo_Reg16>(std::move(s));
+				info = add<SimpleInstrInfo_Reg16>(std::move(s));
 				break;
 
 			case CtorKind::Reg32:
-				info = std::make_unique<SimpleInstrInfo_Reg32>(std::move(s));
+				info = add<SimpleInstrInfo_Reg32>(std::move(s));
 				break;
 
 			case CtorKind::reverse:
-				info = std::make_unique<SimpleInstrInfo_reverse>(std::move(s));
+				info = add<SimpleInstrInfo_reverse>(std::move(s));
 				break;
 
 			case CtorKind::sae:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_sae>(v, std::move(s));
+				info = add<SimpleInstrInfo_sae>(v, std::move(s));
 				break;
 
 			case CtorKind::push_imm8: {
 				v = reader.read_compressed_u32();
 				const SignExtendInfo sex_info = read_sign_extend_info();
-				info = std::make_unique<SimpleInstrInfo_push_imm8>(v, sex_info, std::move(s));
+				info = add<SimpleInstrInfo_push_imm8>(v, sex_info, std::move(s));
 				break;
 			}
 
 			case CtorKind::push_imm: {
 				v = reader.read_compressed_u32();
 				const SignExtendInfo sex_info = read_sign_extend_info();
-				info = std::make_unique<SimpleInstrInfo_push_imm>(v, sex_info, std::move(s));
+				info = add<SimpleInstrInfo_push_imm>(v, sex_info, std::move(s));
 				break;
 			}
 
 			case CtorKind::SignExt_3: {
 				const SignExtendInfo sex_info = read_sign_extend_info();
 				v2 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_SignExt>(sex_info, sex_info, std::move(s), v2);
+				info = add<SimpleInstrInfo_SignExt>(sex_info, sex_info, std::move(s), v2);
 				break;
 			}
 
@@ -1613,33 +1633,33 @@ struct AllInfosHolder {
 				const SignExtendInfo sex_info_reg = read_sign_extend_info();
 				const SignExtendInfo sex_info_mem = read_sign_extend_info();
 				v3 = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_SignExt>(sex_info_reg, sex_info_mem, std::move(s), v3);
+				info = add<SimpleInstrInfo_SignExt>(sex_info_reg, sex_info_mem, std::move(s), v3);
 				break;
 			}
 
 			case CtorKind::imul:
-				info = std::make_unique<SimpleInstrInfo_imul>(read_sign_extend_info(), std::move(s));
+				info = add<SimpleInstrInfo_imul>(read_sign_extend_info(), std::move(s));
 				break;
 
 			case CtorKind::STIG1:
 				v = static_cast<std::uint32_t>(reader.read_u8());
 				ICED_DEBUG_ASSERT(v <= 1);
-				info = std::make_unique<SimpleInstrInfo_STIG1>(std::move(s), v != 0);
+				info = add<SimpleInstrInfo_STIG1>(std::move(s), v != 0);
 				break;
 
 			case CtorKind::STIG2_2a:
 				v = static_cast<std::uint32_t>(reader.read_u8());
 				ICED_DEBUG_ASSERT(v <= 1);
-				info = std::make_unique<SimpleInstrInfo_STIG2>(std::move(s), v != 0);
+				info = add<SimpleInstrInfo_STIG2>(std::move(s), v != 0);
 				break;
 
 			case CtorKind::STIG2_2b:
 				v = reader.read_compressed_u32();
-				info = std::make_unique<SimpleInstrInfo_STIG2>(std::move(s), v);
+				info = add<SimpleInstrInfo_STIG2>(std::move(s), v);
 				break;
 
 			case CtorKind::XLAT:
-				info = std::make_unique<SimpleInstrInfo_XLAT>(std::move(s));
+				info = add<SimpleInstrInfo_XLAT>(std::move(s));
 				break;
 
 			case CtorKind::Previous:
@@ -1647,8 +1667,7 @@ struct AllInfosHolder {
 				ICED_UNREACHABLE();
 			}
 
-			infos[i] = info.get();
-			infos_storage.push_back(std::move(info));
+			infos[i] = info;
 			if (restore_index)
 				reader.set_index(current_index);
 		}

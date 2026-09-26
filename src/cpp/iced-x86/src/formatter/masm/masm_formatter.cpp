@@ -207,22 +207,21 @@ struct MasmFormatterImpl {
 		return true;
 	}
 
-	ICED_NOINLINE static bool format_far_branch_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
-													   std::optional<std::uint32_t> instruction_operand, std::uint64_t imm64, std::uint32_t imm_size) {
+	// Calls the symbol resolver and returns an owned copy of the result (Rust: `to_owned(symbol_resolver.symbol(..), &mut vec)`)
+	ICED_NOINLINE static std::optional<SymbolResult> get_owned_symbol(MasmFormatter& self, const Instruction& instruction, std::uint32_t operand,
+																	  std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+																	  std::uint32_t address_size, std::vector<SymResTextPart>& vec) {
+		std::optional<SymbolResult> symbol = self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, address_size);
+		if (symbol)
+			*symbol = symbol->to_owned(vec);
+		return symbol;
+	}
+
+	ICED_NOINLINE static void format_far_branch_selector_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output,
+																std::uint32_t operand, std::optional<std::uint32_t> instruction_operand,
+																const NumberFormattingOptions& number_options) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
-		std::vector<SymResTextPart> vec;
-		const std::optional<SymbolResult> symbol =
-			to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size), vec);
-		if (!symbol)
-			return false;
-		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
-																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
-		format_flow_control(self, output, get_flow_control(instruction), operand_options);
-		ICED_DEBUG_ASSERT(operand + 1 == 1);
-		NumberFormattingOptions number_options = NumberFormattingOptions::with_branch(options);
-		if (self.options_provider_)
-			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
 		const std::optional<SymbolResult> selector_symbol =
 			self.symbol_resolver_->symbol(instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
 		if (selector_symbol) {
@@ -234,6 +233,25 @@ struct MasmFormatterImpl {
 			output.write_number(instruction, operand, instruction_operand, s, instruction.far_branch_selector(), NumberKind::UInt16,
 								FormatterTextKind::SelectorValue);
 		}
+	}
+
+	ICED_NOINLINE static bool format_far_branch_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+													   std::optional<std::uint32_t> instruction_operand, std::uint64_t imm64, std::uint32_t imm_size) {
+		const auto& options = self.options_;
+		auto& number_formatter = *self.number_formatter_;
+		std::vector<SymResTextPart> vec;
+		const std::optional<SymbolResult> symbol = get_owned_symbol(self, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64),
+																	imm_size, vec);
+		if (!symbol)
+			return false;
+		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
+																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
+		format_flow_control(self, output, get_flow_control(instruction), operand_options);
+		ICED_DEBUG_ASSERT(operand + 1 == 1);
+		NumberFormattingOptions number_options = NumberFormattingOptions::with_branch(options);
+		if (self.options_provider_)
+			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
+		format_far_branch_selector_symbol(self, instruction, output, operand, instruction_operand, number_options);
 		output.write(":", FormatterTextKind::Punctuation);
 		FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, number_formatter, number_options, imm64, *symbol,
 									   options.show_symbol_address());

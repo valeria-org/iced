@@ -4,6 +4,8 @@
 // Rust: formatter/nasm/tests/misc.rs, number.rs, options.rs, registers.rs, symres.rs
 
 #include <cstdint>
+#include <memory>
+#include <optional>
 #include <string>
 
 #include "formatter/formatter_test_utils.hpp"
@@ -12,6 +14,7 @@
 #include "iced_x86/decoder_options.hpp"
 #include "iced_x86/formatter_options.hpp"
 #include "iced_x86/instruction.hpp"
+#include "iced_x86/symbol_resolver.hpp"
 #include "iced_x86/nasm_formatter.hpp"
 #include "test_framework.hpp"
 
@@ -127,3 +130,35 @@ TEST_CASE("formatter/nasm/options/test_options2") { test_format_file("Nasm", "Op
 TEST_CASE("formatter/nasm/registers/test_regs") { register_tests("Nasm", "RegisterTests", nasm::create_registers); }
 
 TEST_CASE("formatter/nasm/symres/symres") { symbol_resolver_test("Nasm", "SymbolResolverTests", nasm::create_resolver); }
+
+// Rust: the doc examples in formatter/nasm.rs
+TEST_CASE("formatter/nasm/doc_examples") {
+	{
+		const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
+		Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+		const auto instr = decoder.decode();
+		std::string output;
+		NasmFormatter formatter;
+		formatter.options_mut().set_uppercase_mnemonics(true);
+		formatter.format(instr, output);
+		CHECK(output == "VCVTNE2PS2BF16 zmm2{k5}{z},zmm6,[rax+4]{1to16}");
+	}
+	{
+		class MySymbolResolver final : public SymbolResolver {
+		public:
+			std::optional<SymbolResult> symbol(const Instruction&, std::uint32_t, std::optional<std::uint32_t>, std::uint64_t address,
+											   std::uint32_t) override {
+				if (address == 0x5AA55AA5)
+					return SymbolResult::with_str(address, "my_data");
+				return std::nullopt;
+			}
+		};
+		const std::uint8_t bytes[] = {0x48, 0x8B, 0x8A, 0xA5, 0x5A, 0xA5, 0x5A};
+		Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+		const auto instr = decoder.decode();
+		std::string output;
+		NasmFormatter formatter(std::make_unique<MySymbolResolver>(), nullptr);
+		formatter.format(instr, output);
+		CHECK(output == "mov rcx,[rdx+my_data]");
+	}
+}

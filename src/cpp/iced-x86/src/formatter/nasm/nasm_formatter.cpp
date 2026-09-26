@@ -244,23 +244,21 @@ struct NasmFormatterImpl {
 		return true;
 	}
 
-	ICED_NOINLINE static bool format_far_branch_symbol(NasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
-													   std::optional<std::uint32_t> instruction_operand, std::uint32_t flags, std::uint64_t imm64,
-													   std::uint32_t imm_size) {
+	// Calls the symbol resolver and returns an owned copy of the result (Rust: `to_owned(symbol_resolver.symbol(..), &mut vec)`)
+	ICED_NOINLINE static std::optional<SymbolResult> get_owned_symbol(NasmFormatter& self, const Instruction& instruction, std::uint32_t operand,
+																	  std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+																	  std::uint32_t address_size, std::vector<SymResTextPart>& vec) {
+		std::optional<SymbolResult> symbol = self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, address_size);
+		if (symbol)
+			*symbol = symbol->to_owned(vec);
+		return symbol;
+	}
+
+	ICED_NOINLINE static void format_far_branch_selector_symbol(NasmFormatter& self, const Instruction& instruction, FormatterOutput& output,
+																std::uint32_t operand, std::optional<std::uint32_t> instruction_operand,
+																const NumberFormattingOptions& number_options) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
-		std::vector<SymResTextPart> vec;
-		const std::optional<SymbolResult> symbol =
-			to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size), vec);
-		if (!symbol)
-			return false;
-		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
-																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
-		format_flow_control(self, output, flags, operand_options);
-		ICED_DEBUG_ASSERT(operand + 1 == 1);
-		NumberFormattingOptions number_options = NumberFormattingOptions::with_branch(options);
-		if (self.options_provider_)
-			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
 		const std::optional<SymbolResult> selector_symbol =
 			self.symbol_resolver_->symbol(instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
 		if (selector_symbol) {
@@ -272,6 +270,26 @@ struct NasmFormatterImpl {
 			output.write_number(instruction, operand, instruction_operand, s, instruction.far_branch_selector(), NumberKind::UInt16,
 								FormatterTextKind::SelectorValue);
 		}
+	}
+
+	ICED_NOINLINE static bool format_far_branch_symbol(NasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+													   std::optional<std::uint32_t> instruction_operand, std::uint32_t flags, std::uint64_t imm64,
+													   std::uint32_t imm_size) {
+		const auto& options = self.options_;
+		auto& number_formatter = *self.number_formatter_;
+		std::vector<SymResTextPart> vec;
+		const std::optional<SymbolResult> symbol = get_owned_symbol(self, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64),
+																	imm_size, vec);
+		if (!symbol)
+			return false;
+		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
+																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
+		format_flow_control(self, output, flags, operand_options);
+		ICED_DEBUG_ASSERT(operand + 1 == 1);
+		NumberFormattingOptions number_options = NumberFormattingOptions::with_branch(options);
+		if (self.options_provider_)
+			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
+		format_far_branch_selector_symbol(self, instruction, output, operand, instruction_operand, number_options);
 		output.write(":", FormatterTextKind::Punctuation);
 		FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, number_formatter, number_options, imm64, *symbol,
 									   options.show_symbol_address());
@@ -750,7 +768,6 @@ struct NasmFormatterImpl {
 		ICED_DEBUG_ASSERT(InstructionInternal::get_address_size_in_bytes(base_reg, index_reg, displ_size, instruction.code_size()) == addr_size);
 
 		const auto& options = self.options_;
-		auto& number_formatter = *self.number_formatter_;
 		auto operand_options = FormatterOperandOptions::with_memory_size_options(options.memory_size_options());
 		operand_options.set_rip_relative_addresses(options.rip_relative_addresses());
 		NumberFormattingOptions number_options = NumberFormattingOptions::with_displacement(options);
@@ -870,6 +887,27 @@ struct NasmFormatterImpl {
 			}
 		}
 
+		format_memory_displ(self, number_options, output, instruction, operand, instruction_operand, symbol, abs_addr, displ, displ_size, addr_size,
+							need_plus);
+
+		if (options.space_after_memory_bracket())
+			output.write(" ", FormatterTextKind::Text);
+		output.write("]", FormatterTextKind::Punctuation);
+
+		ICED_DEBUG_ASSERT(static_cast<std::size_t>(mem_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
+		const FormatterString* bcst_to = self.all_memory_sizes_[static_cast<std::size_t>(mem_size)].bcst_to;
+		if (!bcst_to->is_default())
+			format_decorator(options, output, instruction, operand, instruction_operand, *bcst_to, DecoratorKind::Broadcast);
+		if (instruction.is_mvex_eviction_hint())
+			format_decorator(options, output, instruction, operand, instruction_operand, self.str_->mvex.eh, DecoratorKind::EvictionHint);
+	}
+
+	static void format_memory_displ(NasmFormatter& self, const NumberFormattingOptions& number_options, FormatterOutput& output,
+									const Instruction& instruction, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand,
+									const std::optional<SymbolResult>& symbol, std::uint64_t abs_addr, std::int64_t displ, std::uint32_t displ_size,
+									std::uint32_t addr_size, bool need_plus) {
+		const auto& options = self.options_;
+		auto& number_formatter = *self.number_formatter_;
 		if (symbol) {
 			if (need_plus) {
 				if (options.space_between_memory_add_operators())
@@ -961,17 +999,6 @@ struct NasmFormatterImpl {
 				ICED_UNREACHABLE();
 			output.write_number(instruction, operand, instruction_operand, s, orig_displ, displ_kind, FormatterTextKind::Number);
 		}
-
-		if (options.space_after_memory_bracket())
-			output.write(" ", FormatterTextKind::Text);
-		output.write("]", FormatterTextKind::Punctuation);
-
-		ICED_DEBUG_ASSERT(static_cast<std::size_t>(mem_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
-		const FormatterString* bcst_to = self.all_memory_sizes_[static_cast<std::size_t>(mem_size)].bcst_to;
-		if (!bcst_to->is_default())
-			format_decorator(options, output, instruction, operand, instruction_operand, *bcst_to, DecoratorKind::Broadcast);
-		if (instruction.is_mvex_eviction_hint())
-			format_decorator(options, output, instruction, operand, instruction_operand, self.str_->mvex.eh, DecoratorKind::EvictionHint);
 	}
 
 	static void format_memory_size(const NasmFormatter& self, FormatterOutput& output, MemorySize mem_size, std::uint32_t flags,
