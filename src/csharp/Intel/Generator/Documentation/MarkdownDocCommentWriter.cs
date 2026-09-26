@@ -59,8 +59,10 @@ namespace Generator.Documentation {
 			var s = GetStringAndReset();
 			if (s.Length == 0 && !writeEmpty)
 				return;
-			writer.WriteLine(s.Length == 0 ? emptyLineComment : lineComment + s);
+			writer.WriteLine(FixLine(s.Length == 0 ? emptyLineComment : lineComment + s));
 		}
+
+		protected virtual string FixLine(string line) => line;
 
 		public void BeginWrite(FileWriter writer) {
 			if (sb.Length != 0)

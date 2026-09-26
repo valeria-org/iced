@@ -53,6 +53,7 @@ namespace Generator {
 		public string? Python { get; set; }
 		public string? Lua { get; set; }
 		public string? Java { get; set; }
+		public string? Cpp { get; set; }
 		public CommentAttribute(string comment) => Comment = comment ?? throw new InvalidOperationException();
 
 		public static LanguageDocumentation GetDocumentation(MemberInfo member) {
@@ -71,6 +72,8 @@ namespace Generator {
 				langComments.Add((TargetLanguage.Lua, luaComment));
 			if (attr.Java is string javaComment)
 				langComments.Add((TargetLanguage.Java, javaComment));
+			if (attr.Cpp is string cppComment)
+				langComments.Add((TargetLanguage.Cpp, cppComment));
 			return new(attr.Comment, langComments.Count == 0 ? Array.Empty<(TargetLanguage language, string comment)>() : langComments.ToArray());
 		}
 	}

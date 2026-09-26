@@ -24,6 +24,7 @@ namespace Generator.IO {
 			case TargetLanguage.CSharp:
 			case TargetLanguage.Rust:
 			case TargetLanguage.RustJS:
+			case TargetLanguage.Cpp:
 				numberByteFormat = "0x{0:X2}";
 				singleLineCommentPrefix = "// ";
 				multiLineComment = ("", "// ", "");
