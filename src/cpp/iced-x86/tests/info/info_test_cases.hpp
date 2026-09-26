@@ -51,37 +51,10 @@ struct InstrInfoTestCase {
 	bool fpu_writes_top = false;
 };
 
-struct MemorySizeInfoTestCase {
-	std::uint32_t line_number = 0;
-	MemorySize memory_size = MemorySize::Unknown;
-	std::size_t size = 0;
-	std::size_t element_size = 0;
-	MemorySize element_type = MemorySize::Unknown;
-	std::size_t element_count = 0;
-	std::uint32_t flags = 0; // MemorySizeFlags
-};
-
-struct RegisterInfoTestCase {
-	std::uint32_t line_number = 0;
-	Register register_ = Register::None;
-	std::size_t number = 0;
-	Register base = Register::None;
-	Register full_register = Register::None;
-	Register full_register32 = Register::None;
-	std::size_t size = 0;
-	std::uint32_t flags = 0; // RegisterFlags
-};
-
 // instr_info_test_parser.cpp
 std::vector<InstrInfoTestCase> read_instr_info_test_cases(std::uint32_t bitness);
 // Cached test cases (bitness = 16, 32 or 64)
 const std::vector<InstrInfoTestCase>& get_instr_info_test_cases(std::uint32_t bitness);
-
-// mem_size_test_parser.cpp
-std::vector<MemorySizeInfoTestCase> read_memory_size_info_test_cases(const std::string& filename);
-
-// reg_test_parser.cpp
-std::vector<RegisterInfoTestCase> read_register_info_test_cases(const std::string& filename);
 
 // Same as Rust's `str::splitn(max_parts, sep)`: returns at most `max_parts` parts (the last one contains the rest of the string)
 std::vector<std::string_view> splitn(std::string_view s, std::size_t max_parts, char sep);
