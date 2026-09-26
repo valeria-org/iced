@@ -2,8 +2,6 @@
 // Copyright (C) 2018-present iced project and contributors
 
 // Port of the encoder dependent test in src/rust/iced-x86/src/test/instr_misc.rs
-// PENDING: needs `Instruction::with5()` and `MemoryOperand` (encoder). Rename to tests/core/instr_misc_encoder_tests.cpp
-// once they exist (and adapt the MemoryOperand constructor / with5() error handling if the API differs).
 
 #include "test_framework.hpp"
 #include "iced_x86/instruction.hpp"
