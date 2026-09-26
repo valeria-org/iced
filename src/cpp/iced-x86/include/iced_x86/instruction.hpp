@@ -8,10 +8,12 @@
 #include <cstdint>
 #include <cstring>
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "iced_x86/code.hpp"
 #include "iced_x86/code_ext.hpp"
@@ -22,6 +24,7 @@
 #include "iced_x86/flow_control.hpp"
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/iced_error.hpp"
+#include "iced_x86/internal/int_arg.hpp"
 #include "iced_x86/memory_size.hpp"
 #include "iced_x86/mnemonic.hpp"
 #include "iced_x86/mvex_reg_mem_conv.hpp"
@@ -3457,6 +3460,16 @@ public:
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_byte(const std::uint8_t* data, std::size_t size);
 
+	/// Same as `with_declare_byte(data, size)`
+	static Result<Instruction> with_declare_byte(std::initializer_list<std::uint8_t> data) { return with_declare_byte(data.begin(), data.size()); }
+
+	/// Same as `with_declare_byte(data, size)`
+	static Result<Instruction> with_declare_byte(const std::vector<std::uint8_t>& data) { return with_declare_byte(data.data(), data.size()); }
+
+	/// Same as `with_declare_byte(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_byte(const std::uint8_t (&data)[N]) { return with_declare_byte(data, N); }
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Arguments
@@ -3637,6 +3650,16 @@ public:
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_word_slice_u8(const std::uint8_t* data, std::size_t size);
 
+	/// Same as `with_declare_word_slice_u8(data, size)`
+	static Result<Instruction> with_declare_word_slice_u8(std::initializer_list<std::uint8_t> data) { return with_declare_word_slice_u8(data.begin(), data.size()); }
+
+	/// Same as `with_declare_word_slice_u8(data, size)`
+	static Result<Instruction> with_declare_word_slice_u8(const std::vector<std::uint8_t>& data) { return with_declare_word_slice_u8(data.data(), data.size()); }
+
+	/// Same as `with_declare_word_slice_u8(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_word_slice_u8(const std::uint8_t (&data)[N]) { return with_declare_word_slice_u8(data, N); }
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Errors
@@ -3648,6 +3671,16 @@ public:
 	/// * `data`: Data
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_word(const std::uint16_t* data, std::size_t size);
+
+	/// Same as `with_declare_word(data, size)`
+	static Result<Instruction> with_declare_word(std::initializer_list<std::uint16_t> data) { return with_declare_word(data.begin(), data.size()); }
+
+	/// Same as `with_declare_word(data, size)`
+	static Result<Instruction> with_declare_word(const std::vector<std::uint16_t>& data) { return with_declare_word(data.data(), data.size()); }
+
+	/// Same as `with_declare_word(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_word(const std::uint16_t (&data)[N]) { return with_declare_word(data, N); }
 
 	/// Creates a `dd`/`.int` asm directive
 	///
@@ -3729,6 +3762,16 @@ public:
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_dword_slice_u8(const std::uint8_t* data, std::size_t size);
 
+	/// Same as `with_declare_dword_slice_u8(data, size)`
+	static Result<Instruction> with_declare_dword_slice_u8(std::initializer_list<std::uint8_t> data) { return with_declare_dword_slice_u8(data.begin(), data.size()); }
+
+	/// Same as `with_declare_dword_slice_u8(data, size)`
+	static Result<Instruction> with_declare_dword_slice_u8(const std::vector<std::uint8_t>& data) { return with_declare_dword_slice_u8(data.data(), data.size()); }
+
+	/// Same as `with_declare_dword_slice_u8(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_dword_slice_u8(const std::uint8_t (&data)[N]) { return with_declare_dword_slice_u8(data, N); }
+
 	/// Creates a `dd`/`.int` asm directive
 	///
 	/// # Errors
@@ -3740,6 +3783,16 @@ public:
 	/// * `data`: Data
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_dword(const std::uint32_t* data, std::size_t size);
+
+	/// Same as `with_declare_dword(data, size)`
+	static Result<Instruction> with_declare_dword(std::initializer_list<std::uint32_t> data) { return with_declare_dword(data.begin(), data.size()); }
+
+	/// Same as `with_declare_dword(data, size)`
+	static Result<Instruction> with_declare_dword(const std::vector<std::uint32_t>& data) { return with_declare_dword(data.data(), data.size()); }
+
+	/// Same as `with_declare_dword(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_dword(const std::uint32_t (&data)[N]) { return with_declare_dword(data, N); }
 
 	/// Creates a `dq`/`.quad` asm directive
 	///
@@ -3783,6 +3836,16 @@ public:
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_qword_slice_u8(const std::uint8_t* data, std::size_t size);
 
+	/// Same as `with_declare_qword_slice_u8(data, size)`
+	static Result<Instruction> with_declare_qword_slice_u8(std::initializer_list<std::uint8_t> data) { return with_declare_qword_slice_u8(data.begin(), data.size()); }
+
+	/// Same as `with_declare_qword_slice_u8(data, size)`
+	static Result<Instruction> with_declare_qword_slice_u8(const std::vector<std::uint8_t>& data) { return with_declare_qword_slice_u8(data.data(), data.size()); }
+
+	/// Same as `with_declare_qword_slice_u8(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_qword_slice_u8(const std::uint8_t (&data)[N]) { return with_declare_qword_slice_u8(data, N); }
+
 	/// Creates a `dq`/`.quad` asm directive
 	///
 	/// # Errors
@@ -3794,7 +3857,60 @@ public:
 	/// * `data`: Data
 	/// * `size`: Number of elements in `data`
 	static Result<Instruction> with_declare_qword(const std::uint64_t* data, std::size_t size);
+
+	/// Same as `with_declare_qword(data, size)`
+	static Result<Instruction> with_declare_qword(std::initializer_list<std::uint64_t> data) { return with_declare_qword(data.begin(), data.size()); }
+
+	/// Same as `with_declare_qword(data, size)`
+	static Result<Instruction> with_declare_qword(const std::vector<std::uint64_t>& data) { return with_declare_qword(data.data(), data.size()); }
+
+	/// Same as `with_declare_qword(data, size)`
+	template <std::size_t N>
+	static Result<Instruction> with_declare_qword(const std::uint64_t (&data)[N]) { return with_declare_qword(data, N); }
 	// GENERATOR-END: Create
+
+	// `with1()`..`with5()` overloads for integer types that aren't `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t`
+	// (eg. `long long`, `unsigned long`, `std::size_t` on some platforms). They would be ambiguous without these templates.
+
+	/// Same as the other `with1()` overloads but it also accepts other integer types (eg. `long long`, `unsigned long`):
+	/// each integer arg is converted to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness.
+	template <typename... Args, internal::EnableIfOtherIntArgs<Args...> = 0>
+	static Result<Instruction> with1(Code code, const Args&... args) {
+		return with1(code, internal::int_arg(args)...);
+	}
+
+	/// Same as the other `with2()` overloads but it also accepts other integer types (eg. `long long`, `unsigned long`):
+	/// each integer arg is converted to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness.
+	template <typename... Args, internal::EnableIfOtherIntArgs<Args...> = 0>
+	static Result<Instruction> with2(Code code, const Args&... args) {
+		return with2(code, internal::int_arg(args)...);
+	}
+
+	/// Same as the other `with3()` overloads but it also accepts other integer types (eg. `long long`, `unsigned long`):
+	/// each integer arg is converted to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness.
+	template <typename... Args, internal::EnableIfOtherIntArgs<Args...> = 0>
+	static Result<Instruction> with3(Code code, const Args&... args) {
+		return with3(code, internal::int_arg(args)...);
+	}
+
+	/// Same as the other `with4()` overloads but it also accepts other integer types (eg. `long long`, `unsigned long`):
+	/// each integer arg is converted to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness.
+	template <typename... Args, internal::EnableIfOtherIntArgs<Args...> = 0>
+	static Result<Instruction> with4(Code code, const Args&... args) {
+		return with4(code, internal::int_arg(args)...);
+	}
+
+	/// Same as the other `with5()` overloads but it also accepts other integer types (eg. `long long`, `unsigned long`):
+	/// each integer arg is converted to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness.
+	template <typename... Args, internal::EnableIfOtherIntArgs<Args...> = 0>
+	static Result<Instruction> with5(Code code, const Args&... args) {
+		return with5(code, internal::int_arg(args)...);
+	}
 
 private:
 	// Copies of the internal::InstrFlags1 and internal::MvexInstrFlags constants (verified in instruction.cpp)

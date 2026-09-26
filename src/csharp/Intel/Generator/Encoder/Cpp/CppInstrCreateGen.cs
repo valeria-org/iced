@@ -415,11 +415,31 @@ namespace Generator.Encoder.Cpp {
 			}
 		}
 
+		// Declarations only: std::initializer_list, std::vector and C array overloads of a slice (ptr + size) method
+		void WriteSliceOverloads(FileWriter writer, CreateMethod method, string methodName) {
+			if (!declarations)
+				return;
+			var elemType = GetSliceElemType(method.Args[0].Type) ?? throw new InvalidOperationException();
+			var dataName = ArgName(method.Args[0]);
+			writer.WriteLine();
+			writer.WriteLine($"/// Same as `{methodName}(data, size)`");
+			writer.WriteLine($"static Result<Instruction> {methodName}(std::initializer_list<{elemType}> {dataName}) {{ return {methodName}({dataName}.begin(), {dataName}.size()); }}");
+			writer.WriteLine();
+			writer.WriteLine($"/// Same as `{methodName}(data, size)`");
+			writer.WriteLine($"static Result<Instruction> {methodName}(const std::vector<{elemType}>& {dataName}) {{ return {methodName}({dataName}.data(), {dataName}.size()); }}");
+			writer.WriteLine();
+			writer.WriteLine($"/// Same as `{methodName}(data, size)`");
+			writer.WriteLine("template <std::size_t N>");
+			writer.WriteLine($"static Result<Instruction> {methodName}(const {elemType} (&{dataName})[N]) {{ return {methodName}({dataName}, N); }}");
+		}
+
 		void GenCreateDeclareDataSlice(FileWriter writer, CreateMethod method, int elemSize, EnumValue code, string methodName, string setDeclValueName) {
 			WriteItemSeparator(writer);
 			var dataName = ArgName(method.Args[0]);
-			if (!WriteMethod(writer, method, methodName, true, $"Fails if `size` is not 1-{16 / elemSize}"))
+			if (!WriteMethod(writer, method, methodName, true, $"Fails if `size` is not 1-{16 / elemSize}")) {
+				WriteSliceOverloads(writer, method, methodName);
 				return;
+			}
 			using (writer.Indent()) {
 				writer.WriteLine($"if (size - 1 > {16 / elemSize} - 1)");
 				using (writer.Indent())
@@ -439,8 +459,10 @@ namespace Generator.Encoder.Cpp {
 		void GenCreateDeclareDataSliceU8(FileWriter writer, CreateMethod method, int elemSize, EnumValue code, string methodName, string setDeclValueName, string elemType) {
 			WriteItemSeparator(writer);
 			var dataName = ArgName(method.Args[0]);
-			if (!WriteMethod(writer, method, methodName, true, $"Fails if `size` is not {elemSize}-16 or not a multiple of {elemSize}"))
+			if (!WriteMethod(writer, method, methodName, true, $"Fails if `size` is not {elemSize}-16 or not a multiple of {elemSize}")) {
+				WriteSliceOverloads(writer, method, methodName);
 				return;
+			}
 			using (writer.Indent()) {
 				writer.WriteLine($"if (size - 1 > 16 - 1 || (size & {elemSize - 1}) != 0)");
 				using (writer.Indent())

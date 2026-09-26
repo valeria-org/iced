@@ -429,11 +429,25 @@ namespace Generator.Assembler.Cpp {
 				_ => throw new InvalidOperationException($"Invalid arg kind: {argKind}"),
 			};
 
-		static void WriteParams(FileWriter writer, OpCodeInfoGroup group) {
+		static bool Is64BitImmediate(OpCodeInfoGroup group, int argIndex) =>
+			group.Signature.GetArgKind(argIndex) is ArgKind.Immediate or ArgKind.ImmediateUnsigned && group.MaxArgSizes[argIndex] == 8;
+
+		static bool Has64BitImmediate(OpCodeInfoGroup group) {
+			for (int i = 0; i < group.Signature.ArgCount; i++) {
+				if (Is64BitImmediate(group, i))
+					return true;
+			}
+			return false;
+		}
+
+		// immSize: 0 = use the immediate's size, else use this size for the immediate args
+		static void WriteParams(FileWriter writer, OpCodeInfoGroup group, int immSize = 0) {
 			for (int i = 0; i < group.Signature.ArgCount; i++) {
 				if (i != 0)
 					writer.Write(", ");
-				writer.Write(ToTypeString(group.Signature.GetArgKind(i), group.MaxArgSizes[i]));
+				var kind = group.Signature.GetArgKind(i);
+				int argSize = immSize != 0 && kind is ArgKind.Immediate or ArgKind.ImmediateUnsigned ? immSize : group.MaxArgSizes[i];
+				writer.Write(ToTypeString(kind, argSize));
 				writer.Write(" ");
 				writer.Write(GetFnArgName(i));
 			}
@@ -527,6 +541,7 @@ namespace Generator.Assembler.Cpp {
 				writer.WriteLine("#include \"iced_x86/code_asm/code_label.hpp\"");
 				writer.WriteLine("#include \"iced_x86/code_asm/mem.hpp\"");
 				writer.WriteLine("#include \"iced_x86/code_asm/reg.hpp\"");
+				writer.WriteLine("#include \"iced_x86/internal/int_arg.hpp\"");
 				writer.WriteLine();
 				writer.WriteLine("#include <cstdint>");
 				writer.WriteLine();
@@ -566,6 +581,42 @@ namespace Generator.Assembler.Cpp {
 								writer.Write($"{CodeAssembler}& {GetFnName(group)}(");
 								WriteParams(writer, group);
 								writer.WriteLine(");");
+								if (Has64BitImmediate(group)) {
+									// Only 64-bit overloads (`mov(AsmRegister64, std::int64_t)` and `std::uint64_t`) so an `int` arg
+									// would be ambiguous. Add a 32-bit overload that sign/zero extends the immediate.
+									var fnName = GetFnName(group);
+									bool signed = false;
+									for (int i = 0; i < group.Signature.ArgCount; i++) {
+										if (group.Signature.GetArgKind(i) == ArgKind.Immediate)
+											signed = true;
+									}
+									writer.WriteLine();
+									writer.WriteLine($"/// `{traitGroup.Name.ToUpperInvariant()}` instruction (the {(signed ? "sign" : "zero")} extended 32-bit immediate is passed to the overload above)");
+									writer.Write($"{CodeAssembler}& {fnName}(");
+									WriteParams(writer, group, 4);
+									writer.Write($") {{ return {fnName}(");
+									for (int i = 0; i < group.Signature.ArgCount; i++) {
+										if (i != 0)
+											writer.Write(", ");
+										if (Is64BitImmediate(group, i))
+											writer.Write($"static_cast<{ToTypeString(group.Signature.GetArgKind(i), 8)}>({GetFnArgName(i)})");
+										else
+											writer.Write(GetFnArgName(i));
+									}
+									writer.WriteLine("); }");
+								}
+							}
+							if (HasIntegerArg(traitGroup)) {
+								// Other integer types (eg. `long long`, `unsigned long`) are ambiguous since they're not one of
+								// the exact types, see iced_x86/internal/int_arg.hpp
+								var fnName = GetFnName(traitGroup.Groups[0]);
+								writer.WriteLine();
+								writer.WriteLine($"/// `{traitGroup.Name.ToUpperInvariant()}` instruction (other integer types, eg. `long long`, `unsigned long`)");
+								writer.WriteLine("///");
+								writer.WriteLine("/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size");
+								writer.WriteLine("/// and signedness and calls one of the overloads above.");
+								writer.WriteLine("template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>");
+								writer.WriteLine($"{CodeAssembler}& {fnName}(const Args&... args) {{ return {fnName}(iced_x86::internal::int_arg(args)...); }}");
 							}
 						}
 					}
@@ -579,6 +630,20 @@ namespace Generator.Assembler.Cpp {
 				writer.WriteLine();
 				WriteNamespaceEnd(writer, CodeAsmNamespace);
 			}
+		}
+
+		static bool HasIntegerArg(TraitGroup traitGroup) {
+			foreach (var group in traitGroup.Groups) {
+				for (int i = 0; i < group.Signature.ArgCount; i++) {
+					switch (group.Signature.GetArgKind(i)) {
+					case ArgKind.Immediate:
+					case ArgKind.ImmediateUnsigned:
+					case ArgKind.LabelU64:
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		static bool SpecialInstructionHasSegmentArg(string mnemonicName) =>

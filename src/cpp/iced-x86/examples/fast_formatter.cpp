@@ -20,7 +20,7 @@ using MyFormatter = SpecializedFormatter<MyTraitOptions>;
 static void how_to_disassemble_really_fast() {
 	// Assume this is a big array and not just one instruction
 	static const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 
 	std::string output;
 	Instruction instruction;

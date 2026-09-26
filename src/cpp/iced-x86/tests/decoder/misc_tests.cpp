@@ -13,8 +13,10 @@
 #include "iced_x86/iced_constants.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <map>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -317,6 +319,92 @@ TEST_CASE("decoder/decode_vs_decode_out") {
 	CHECK(!decoder2.can_decode());
 	CHECK(!decoder3.value().can_decode());
 	CHECK(!decoder4.value().can_decode());
+}
+
+// C++ only: C array / std::array overloads. The decoder doesn't copy the data so temporaries are rejected (deleted overloads).
+static_assert(std::is_constructible_v<Decoder, std::uint32_t, const std::uint8_t (&)[4], std::uint32_t>, "");
+static_assert(std::is_constructible_v<Decoder, std::uint32_t, std::uint8_t (&)[4], std::uint32_t>, "");
+static_assert(!std::is_constructible_v<Decoder, std::uint32_t, std::uint8_t (&&)[4], std::uint32_t>, "");
+static_assert(!std::is_constructible_v<Decoder, std::uint32_t, const std::uint8_t (&&)[4], std::uint32_t>, "");
+static_assert(std::is_constructible_v<Decoder, std::uint32_t, const std::array<std::uint8_t, 4>&, std::uint32_t>, "");
+static_assert(std::is_constructible_v<Decoder, std::uint32_t, std::array<std::uint8_t, 4>&, std::uint32_t>, "");
+static_assert(!std::is_constructible_v<Decoder, std::uint32_t, std::array<std::uint8_t, 4>, std::uint32_t>, "");
+static_assert(!std::is_constructible_v<Decoder, std::uint32_t, const std::array<std::uint8_t, 4>, std::uint32_t>, "");
+static_assert(!std::is_constructible_v<Decoder, std::uint32_t, std::vector<std::uint8_t>, std::uint32_t>, "");
+
+namespace {
+// `true` if `Decoder::xxx(64, {0x90, 0x90}, ...)` (a temporary array) compiles
+template <typename D, typename = void>
+struct CanCreateFromBracedList : std::false_type {};
+template <typename D>
+struct CanCreateFromBracedList<D, std::void_t<decltype(D(64, {std::uint8_t{0x90}, std::uint8_t{0x90}}, 0))>> : std::true_type {};
+template <typename D, typename = void>
+struct CanWithIpFromBracedList : std::false_type {};
+template <typename D>
+struct CanWithIpFromBracedList<D, std::void_t<decltype(D::with_ip(64, {std::uint8_t{0x90}, std::uint8_t{0x90}}, 0, 0))>> : std::true_type {};
+template <typename D, typename = void>
+struct CanTryNewFromBracedList : std::false_type {};
+template <typename D>
+struct CanTryNewFromBracedList<D, std::void_t<decltype(D::try_new(64, {std::uint8_t{0x90}, std::uint8_t{0x90}}, 0))>> : std::true_type {};
+template <typename D, typename = void>
+struct CanTryWithIpFromBracedList : std::false_type {};
+template <typename D>
+struct CanTryWithIpFromBracedList<D, std::void_t<decltype(D::try_with_ip(64, {std::uint8_t{0x90}, std::uint8_t{0x90}}, 0, 0))>> : std::true_type {};
+template <typename D, typename = void>
+struct CanWithIpFromTempArray : std::false_type {};
+template <typename D>
+struct CanWithIpFromTempArray<D, std::void_t<decltype(D::with_ip(64, std::array<std::uint8_t, 2>{}, 0, 0))>> : std::true_type {};
+template <typename D, typename = void>
+struct CanWithIpFromArray : std::false_type {};
+template <typename D>
+struct CanWithIpFromArray<D, std::void_t<decltype(D::with_ip(64, std::declval<const std::array<std::uint8_t, 2>&>(), 0, 0))>> : std::true_type {};
+} // namespace
+static_assert(!CanCreateFromBracedList<Decoder>::value, "");
+static_assert(!CanWithIpFromBracedList<Decoder>::value, "");
+static_assert(!CanTryNewFromBracedList<Decoder>::value, "");
+static_assert(!CanTryWithIpFromBracedList<Decoder>::value, "");
+static_assert(!CanWithIpFromTempArray<Decoder>::value, "");
+static_assert(CanWithIpFromArray<Decoder>::value, "");
+
+TEST_CASE("decoder/c_array_and_std_array_overloads") {
+	static const std::uint8_t bytes[] = {0x48, 0x89, 0x5C, 0x24, 0x10, 0x55, 0x90, 0xF0, 0x01, 0xCE};
+	std::array<std::uint8_t, sizeof(bytes)> std_array{};
+	std::copy(std::begin(bytes), std::end(bytes), std_array.begin());
+	const std::uint64_t ip = 0x1234'5678'9ABC'DEF0;
+
+	std::vector<Decoder> decoders;
+	decoders.push_back(Decoder::with_ip(64, bytes, sizeof(bytes), ip, DecoderOptions::NO_INVALID_CHECK));
+	decoders.push_back(Decoder(64, bytes, DecoderOptions::NO_INVALID_CHECK));
+	decoders.back().set_ip(ip);
+	decoders.push_back(Decoder(64, std_array, DecoderOptions::NO_INVALID_CHECK));
+	decoders.back().set_ip(ip);
+	decoders.push_back(Decoder::with_ip(64, bytes, ip, DecoderOptions::NO_INVALID_CHECK));
+	decoders.push_back(Decoder::with_ip(64, std_array, ip, DecoderOptions::NO_INVALID_CHECK));
+	decoders.push_back(*Decoder::try_new(64, bytes, DecoderOptions::NO_INVALID_CHECK));
+	decoders.back().set_ip(ip);
+	decoders.push_back(*Decoder::try_new(64, std_array, DecoderOptions::NO_INVALID_CHECK));
+	decoders.back().set_ip(ip);
+	decoders.push_back(*Decoder::try_with_ip(64, bytes, ip, DecoderOptions::NO_INVALID_CHECK));
+	decoders.push_back(*Decoder::try_with_ip(64, std_array, ip, DecoderOptions::NO_INVALID_CHECK));
+	CHECK(Decoder::try_new(128, bytes, DecoderOptions::NONE).is_err());
+	CHECK(Decoder::try_with_ip(128, std_array, ip, DecoderOptions::NONE).is_err());
+
+	for (Decoder& decoder : decoders) {
+		CHECK_EQ(decoder.max_position(), sizeof(bytes));
+		CHECK_EQ(decoder.ip(), ip);
+	}
+	std::size_t count = 0;
+	while (decoders[0].can_decode()) {
+		const Instruction expected = decoders[0].decode();
+		count++;
+		for (std::size_t i = 1; i < decoders.size(); i++) {
+			REQUIRE(decoders[i].can_decode());
+			CHECK(decoders[i].decode().eq_all_bits(expected));
+		}
+	}
+	CHECK_EQ(count, static_cast<std::size_t>(4));
+	for (Decoder& decoder : decoders)
+		CHECK(!decoder.can_decode());
 }
 
 } // namespace iced_x86::tests

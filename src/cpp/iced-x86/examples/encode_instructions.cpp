@@ -43,7 +43,7 @@ static Result<void> how_to_encode_instructions() {
 	auto create_label = [&label_id]() { return label_id++; };
 	auto add_label = [](std::uint64_t id, Result<Instruction> instruction) {
 		if (instruction)
-			instruction.value().set_ip(id);
+			instruction->set_ip(id);
 		return instruction;
 	};
 
@@ -75,13 +75,13 @@ static Result<void> how_to_encode_instructions() {
 	results.push_back(Instruction::with2(Code::Lea_r64_m, Register::R14, MemoryOperand::with_base_displ(Register::RIP, static_cast<std::int64_t>(data1))));
 	results.push_back(Instruction::with(Code::Nopd));
 	static const std::uint8_t raw_data[] = {0x12, 0x34, 0x56, 0x78};
-	results.push_back(add_label(data1, Instruction::with_declare_byte(raw_data, sizeof(raw_data))));
+	results.push_back(add_label(data1, Instruction::with_declare_byte(raw_data)));
 
 	std::vector<Instruction> instructions;
 	for (const Result<Instruction>& result : results) {
 		if (!result)
 			return result.error();
-		instructions.push_back(result.value());
+		instructions.push_back(*result);
 	}
 
 	// Use BlockEncoder to encode a block of instructions. This block can contain any
@@ -101,7 +101,7 @@ static Result<void> how_to_encode_instructions() {
 	// Now disassemble the encoded instructions. Note that the 'jmp near'
 	// instruction was turned into a 'jmp short' instruction because we
 	// didn't disable branch optimizations.
-	const std::vector<std::uint8_t>& bytes = result.value().code_buffer;
+	const std::vector<std::uint8_t>& bytes = result->code_buffer;
 	std::string output;
 	const std::uint8_t* bytes_code = bytes.data();
 	const std::size_t bytes_code_len = bytes.size() - sizeof(raw_data);
@@ -118,7 +118,7 @@ static Result<void> how_to_encode_instructions() {
 	if (!db)
 		return db.error();
 	output.clear();
-	formatter.format(db.value(), output);
+	formatter.format(*db, output);
 	std::printf("%016" PRIX64 " %s\n", decoder.ip(), output.c_str());
 	return {};
 }

@@ -88,9 +88,9 @@ generators create a `CppEnumsGenerator` and call `Generate(enumType)`). `GetIncl
 | associated fn `Decoder::with_ip(..)`, `Instruction::with2(..)` | `static` member function with the same name |
 | methods on enums: `reg.size()`, `code.mnemonic()`, `mem_size.info()`, `cc.xxx()` | free functions in a `<snake_type>_ext` namespace: `register_ext::size(reg)`, `code_ext::mnemonic(code)`, `memory_size_ext::info(ms)` (header: `include/iced_x86/<snake_type>_ext.hpp`) |
 | `pub(crate)` items | `iced_x86::internal` (in `src/internal/**`) |
-| `Result<T, IcedError>` | `iced_x86::Result<T>` |
+| `Result<T, IcedError>` | `iced_x86::Result<T>` (`is_ok()`, `value()`, `*result`, `result->x`, `error()`) |
 | `Option<T>` | `std::optional<T>` (or a pointer for optional references) |
-| `&[u8]` | `const std::uint8_t* data, std::size_t size` (+ convenience overloads, eg. `std::vector<std::uint8_t>`) |
+| `&[u8]` | `const std::uint8_t* data, std::size_t size` (+ convenience overloads: `std::vector<std::uint8_t>`, `std::initializer_list` if the data is copied, C arrays (`template <std::size_t N>`), ...; if the data isn't copied (`Decoder`), temporaries must be rejected with deleted overloads) |
 | returned `&'static [T]` (eg. `cpuid_features()`) | `iced_x86::Slice<T>` (`include/iced_x86/slice.hpp`) |
 | `&str` / `String` | `std::string_view` / `std::string` |
 | trait objects (`Box<dyn SymbolResolver>`, `dyn FormatterOutput`) | abstract classes with virtual functions |
@@ -99,6 +99,14 @@ generators create a `CppEnumsGenerator` and call `Generate(enumType)`). `GetIncl
 
 Where Rust uses generic `with2<T, U>(code, op0: T, op1: U)` taking `Register`/`i32`/`u32`/`i64`/`u64`/`MemoryOperand`,
 C++ uses overloads with the same name.
+
+**Integer overloads**: an overload set taking `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` is ambiguous for
+other integer types, eg. `0x1234ULL`/`-1LL` (`long long`) if `std::int64_t` is `long` (Linux 64-bit) or `long`/`std::size_t` if
+it's `long long` (Windows, macOS). Such overload sets (`Instruction::with1()`..`with5()`, the `CodeAssembler` instruction methods)
+also get one forwarding template, constrained with `internal::EnableIfOtherIntArgs<Args...>` (`iced_x86/internal/int_arg.hpp`),
+that converts each such arg with `internal::int_arg()` to the exact type with the same size and signedness and calls the
+non-template overload. It's only enabled if at least one arg isn't an exact type (and isn't promoted to `int`), so it never
+changes which overload normal calls pick.
 
 ## Public headers
 
@@ -116,8 +124,8 @@ bit packing in `flags1`, etc.). Its data members are private; internal code that
 ## Decoder
 
 `Decoder` (include/iced_x86/decoder.hpp): `Decoder(bitness, data, size, options)` (Rust `new`), `Decoder::with_ip(bitness, data, size, ip, options)`,
-`Decoder::try_new(...)`/`try_with_ip(...)` return `Result<Decoder>`; `std::vector<std::uint8_t>` overloads exist (the decoder never
-owns/copies the data). `decode()`, `decode_out(Instruction&)`, `for (const Instruction& instr : decoder)` (range-for, decodes into the
+`Decoder::try_new(...)`/`try_with_ip(...)` return `Result<Decoder>`; `std::vector<std::uint8_t>`, C array and `std::array` overloads
+exist, eg. `Decoder(64, bytes, options)` (the decoder never owns/copies the data so rvalues/braced lists are rejected by deleted overloads). `decode()`, `decode_out(Instruction&)`, `for (const Instruction& instr : decoder)` (range-for, decodes into the
 iterator's instruction). Decoder test cases (used by the encoder/formatter/instr info tests): `tests/test_utils/decoder_test_utils.hpp`
 (`decoder_tests(include_other_tests, include_invalid)`, `encoder_tests(...)`, `get_test_cases(bitness)`, `create_decoder(...)`, ...).
 Rust `#[should_panic]` tests: `aborts([] { ... })` in `tests/test_utils/abort_utils.hpp`.
@@ -131,7 +139,8 @@ Instruction/prefix/label/data methods return `CodeAssembler&` and errors are *st
 Methods that return a value in Rust return `Result<T>` (`bwd()`, `fwd()`, `CodeAssemblerResult::label_ip()`).
 Registers are `constexpr` constants (`rax`, `xmm0.k1().z()`), memory operands: `dword_ptr(rax + rcx * 4 + 8).fs()`.
 The generated instruction methods are declared in several base classes (`code_assembler_fns.hpp`, GCC is quadratic in the
-number of class members) and implemented in `src/code_asm/fn_asm_impl_N.cpp`.
+number of class members) and implemented in `src/code_asm/fn_asm_impl_N.cpp`. Integer args: see *Integer overloads* above; there's
+also a generated inline `mov(AsmRegister64, std::int32_t/std::uint32_t)` overload (only 64-bit immediates exist) so `a.mov(rax, 5)` compiles.
 
 ## Formatters
 

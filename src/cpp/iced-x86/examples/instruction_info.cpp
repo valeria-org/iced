@@ -263,7 +263,7 @@ This function produces the following output:
     Used reg: RDI:Write
 */
 static void how_to_get_instruction_info() {
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	// Use a factory to create the instruction info if you need register and
 	// memory usage. If it's something else, eg. encoding, flags, etc, there

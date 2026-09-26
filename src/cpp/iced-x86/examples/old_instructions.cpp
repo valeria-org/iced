@@ -53,7 +53,7 @@ static void how_to_disassemble_old_instrs() {
 	// some of these old instructions.
 	constexpr std::uint32_t DECODER_OPTIONS =
 		DecoderOptions::MPX | DecoderOptions::MOV_TR | DecoderOptions::CYRIX | DecoderOptions::CYRIX_DMI | DecoderOptions::ALTINST;
-	auto decoder = Decoder::with_ip(32, bytes, sizeof(bytes), 0x731E'0A03, DECODER_OPTIONS);
+	auto decoder = Decoder::with_ip(32, bytes, 0x731E'0A03, DECODER_OPTIONS);
 
 	NasmFormatter formatter;
 	formatter.options_mut().set_space_after_operand_separator(true);

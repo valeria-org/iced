@@ -12,9 +12,11 @@
 #include "iced_x86/register.hpp"
 #include "iced_x86/tuple_type.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 namespace iced_x86 {
@@ -204,11 +206,29 @@ protected:
 							std::uint32_t options) noexcept;
 };
 
+// Used by the `Decoder` C array (`std::uint8_t[N]`) and `std::array<std::uint8_t, N>` overloads
+template <typename T>
+struct IsByteArray : std::false_type {};
+template <std::size_t N>
+struct IsByteArray<std::uint8_t[N]> : std::true_type {};
+template <std::size_t N>
+struct IsByteArray<std::array<std::uint8_t, N>> : std::true_type {};
+// `A` is the deduced type of a forwarding reference (`A&&`): an lvalue `std::uint8_t[N]` or `std::array<std::uint8_t, N>`
+// (braced lists can't be deduced so they don't match either)
+template <typename A>
+using EnableIfByteArrayLvalue =
+	std::enable_if_t<std::is_lvalue_reference_v<A> && IsByteArray<std::remove_cv_t<std::remove_reference_t<A>>>::value, int>;
+template <typename A>
+using EnableIfByteArrayRvalue =
+	std::enable_if_t<!std::is_lvalue_reference_v<A> && IsByteArray<std::remove_cv_t<std::remove_reference_t<A>>>::value, int>;
+
 } // namespace internal
 
 /// Decodes 16/32/64-bit x86 instructions
 ///
 /// The decoder doesn't own the data, it must be valid (and not modified) until the decoder isn't used anymore.
+/// The data can be passed as a pointer and a size, a C array (`std::uint8_t[N]`), a `std::array<std::uint8_t, N>` or
+/// a `std::vector<std::uint8_t>`. Temporary arrays/vectors are rejected at compile time (deleted overloads).
 ///
 /// # Examples
 ///
@@ -217,7 +237,7 @@ protected:
 /// // xacquire lock add dword ptr [rax],5Ah
 /// // vmovdqu64 zmm18{k3}{z},zmm11
 /// static const std::uint8_t bytes[] = {0x86, 0x64, 0x32, 0x16, 0xF0, 0xF2, 0x83, 0x00, 0x5A, 0x62, 0xC1, 0xFE, 0xCB, 0x6F, 0xD3};
-/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 /// for (const Instruction& instr : decoder) {
 ///     // ...
 /// }
@@ -301,6 +321,15 @@ public:
 		: Decoder(bitness, data.data(), data.size(), options) {}
 	// The decoder doesn't own the data so it can't be a temporary
 	Decoder(std::uint32_t bitness, std::vector<std::uint8_t>&& data, std::uint32_t options) = delete;
+	/// Creates a decoder, see `Decoder(bitness, data, size, options)`.
+	/// `data` is a C array (`std::uint8_t[N]`) or a `std::array<std::uint8_t, N>`. It must stay alive until the decoder isn't
+	/// used anymore.
+	template <typename A, internal::EnableIfByteArrayLvalue<A> = 0>
+	Decoder(std::uint32_t bitness, A&& data, std::uint32_t options) noexcept
+		: Decoder(bitness, std::data(data), std::size(data), options) {}
+	// The decoder doesn't own the data so it can't be a temporary
+	template <typename A, internal::EnableIfByteArrayRvalue<A> = 0>
+	Decoder(std::uint32_t bitness, A&& data, std::uint32_t options) = delete;
 
 	/// Creates a decoder
 	///
@@ -345,6 +374,16 @@ public:
 	}
 	// The decoder doesn't own the data so it can't be a temporary
 	static Decoder with_ip(std::uint32_t bitness, std::vector<std::uint8_t>&& data, std::uint64_t ip, std::uint32_t options) = delete;
+	/// Creates a decoder, see `with_ip(bitness, data, size, ip, options)`.
+	/// `data` is a C array (`std::uint8_t[N]`) or a `std::array<std::uint8_t, N>`. It must stay alive until the decoder isn't
+	/// used anymore.
+	template <typename A, internal::EnableIfByteArrayLvalue<A> = 0>
+	static Decoder with_ip(std::uint32_t bitness, A&& data, std::uint64_t ip, std::uint32_t options) noexcept {
+		return with_ip(bitness, std::data(data), std::size(data), ip, options);
+	}
+	// The decoder doesn't own the data so it can't be a temporary
+	template <typename A, internal::EnableIfByteArrayRvalue<A> = 0>
+	static Decoder with_ip(std::uint32_t bitness, A&& data, std::uint64_t ip, std::uint32_t options) = delete;
 
 	/// Creates a decoder
 	///
@@ -378,6 +417,16 @@ public:
 	}
 	// The decoder doesn't own the data so it can't be a temporary
 	static Result<Decoder> try_new(std::uint32_t bitness, std::vector<std::uint8_t>&& data, std::uint32_t options) = delete;
+	/// Creates a decoder, see `try_new(bitness, data, size, options)`.
+	/// `data` is a C array (`std::uint8_t[N]`) or a `std::array<std::uint8_t, N>`. It must stay alive until the decoder isn't
+	/// used anymore.
+	template <typename A, internal::EnableIfByteArrayLvalue<A> = 0>
+	static Result<Decoder> try_new(std::uint32_t bitness, A&& data, std::uint32_t options) noexcept {
+		return try_new(bitness, std::data(data), std::size(data), options);
+	}
+	// The decoder doesn't own the data so it can't be a temporary
+	template <typename A, internal::EnableIfByteArrayRvalue<A> = 0>
+	static Result<Decoder> try_new(std::uint32_t bitness, A&& data, std::uint32_t options) = delete;
 
 	/// Creates a decoder
 	///
@@ -401,6 +450,16 @@ public:
 	}
 	// The decoder doesn't own the data so it can't be a temporary
 	static Result<Decoder> try_with_ip(std::uint32_t bitness, std::vector<std::uint8_t>&& data, std::uint64_t ip, std::uint32_t options) = delete;
+	/// Creates a decoder, see `try_with_ip(bitness, data, size, ip, options)`.
+	/// `data` is a C array (`std::uint8_t[N]`) or a `std::array<std::uint8_t, N>`. It must stay alive until the decoder isn't
+	/// used anymore.
+	template <typename A, internal::EnableIfByteArrayLvalue<A> = 0>
+	static Result<Decoder> try_with_ip(std::uint32_t bitness, A&& data, std::uint64_t ip, std::uint32_t options) noexcept {
+		return try_with_ip(bitness, std::data(data), std::size(data), ip, options);
+	}
+	// The decoder doesn't own the data so it can't be a temporary
+	template <typename A, internal::EnableIfByteArrayRvalue<A> = 0>
+	static Result<Decoder> try_with_ip(std::uint32_t bitness, A&& data, std::uint64_t ip, std::uint32_t options) = delete;
 
 	/// Gets the current `IP`/`EIP`/`RIP` value, see also `position()`
 	std::uint64_t ip() const noexcept { return DecoderCore::ip; }
@@ -442,7 +501,7 @@ public:
 	/// ```cpp
 	/// // nop and pause
 	/// static const std::uint8_t bytes[] = {0x90, 0xF3, 0x90};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	///
 	/// assert(decoder.position() == 0);
 	/// assert(decoder.max_position() == 3);
@@ -486,7 +545,7 @@ public:
 	/// ```cpp
 	/// // nop and an incomplete instruction
 	/// static const std::uint8_t bytes[] = {0x90, 0xF3, 0x0F};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	///
 	/// // 3 bytes left to read
 	/// assert(decoder.can_decode());
@@ -517,7 +576,7 @@ public:
 	/// ```cpp
 	/// // xrelease lock add [rax],ebx
 	/// static const std::uint8_t bytes[] = {0xF0, 0xF3, 0x01, 0x18};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	/// Instruction instr = decoder.decode();
 	///
 	/// assert(instr.code() == Code::Add_rm32_r32);
@@ -559,7 +618,7 @@ public:
 	/// ```cpp
 	/// // xrelease lock add [rax],ebx
 	/// static const std::uint8_t bytes[] = {0xF0, 0xF3, 0x01, 0x18};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	/// Instruction instr;
 	/// decoder.decode_out(instr);
 	///
@@ -585,7 +644,7 @@ public:
 	/// //                  00  01  02  03  04  05  06
 	/// //                \opc\mrm\displacement___\imm
 	/// static const std::uint8_t bytes[] = {0x90, 0x83, 0xB3, 0x34, 0x12, 0x5A, 0xA5, 0x5A};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	/// assert(decoder.decode().code() == Code::Nopd);
 	/// Instruction instr = decoder.decode();
 	/// ConstantOffsets co = decoder.get_constant_offsets(instr);
@@ -614,7 +673,7 @@ public:
 	/// ```cpp
 	/// // nop and pause
 	/// static const std::uint8_t bytes[] = {0x90, 0xF3, 0x90};
-	/// auto decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678, DecoderOptions::NONE);
+	/// auto decoder = Decoder::with_ip(64, bytes, 0x1234'5678, DecoderOptions::NONE);
 	///
 	/// for (const Instruction& instr : decoder) {
 	///     // Nopd, Pause

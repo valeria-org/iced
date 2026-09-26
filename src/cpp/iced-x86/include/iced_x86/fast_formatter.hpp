@@ -58,7 +58,7 @@ namespace iced_x86 {
 ///
 /// // Assume this is a big array and not just one instruction
 /// const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-/// iced_x86::Decoder decoder(64, bytes, sizeof(bytes), iced_x86::DecoderOptions::NONE);
+/// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 ///
 /// std::string output;
 /// iced_x86::Instruction instruction;
@@ -350,7 +350,7 @@ struct DefaultFastFormatterTraitOptions : SpecializedFormatterTraitOptions {
 ///
 /// ```cpp
 /// const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-/// iced_x86::Decoder decoder(64, bytes, sizeof(bytes), iced_x86::DecoderOptions::NONE);
+/// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 /// auto instr = decoder.decode();
 ///
 /// // If you like the default options, you can also use DefaultSpecializedFormatterTraitOptions
@@ -759,7 +759,7 @@ private:
 ///
 /// ```cpp
 /// const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-/// iced_x86::Decoder decoder(64, bytes, sizeof(bytes), iced_x86::DecoderOptions::NONE);
+/// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 /// auto instr = decoder.decode();
 ///
 /// std::string output;

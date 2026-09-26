@@ -9,6 +9,7 @@
 #include "iced_x86/code_asm/code_label.hpp"
 #include "iced_x86/code_asm/mem.hpp"
 #include "iced_x86/code_asm/reg.hpp"
+#include "iced_x86/internal/int_arg.hpp"
 
 #include <cstdint>
 
@@ -47,6 +48,13 @@ public:
 	/// `AAD imm8` | `D5 ib` | `8086+`
 	CodeAssembler& aad(std::uint32_t op0);
 
+	/// `AAD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& aad(const Args&... args) { return aad(iced_x86::internal::int_arg(args)...); }
+
 	/// `AADD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -74,6 +82,13 @@ public:
 	/// ------------|--------|------
 	/// `AAM imm8` | `D4 ib` | `8086+`
 	CodeAssembler& aam(std::uint32_t op0);
+
+	/// `AAM` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& aam(const Args&... args) { return aam(iced_x86::internal::int_arg(args)...); }
 
 	/// `AAND` instruction
 	///
@@ -264,6 +279,13 @@ public:
 	/// `ADC r/m16, imm8` | `o16 83 /2 ib` | `8086+`
 	/// `ADC r/m32, imm8` | `o32 83 /2 ib` | `386+`
 	CodeAssembler& adc(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `ADC` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& adc(const Args&... args) { return adc(iced_x86::internal::int_arg(args)...); }
 
 	/// `ADCX` instruction
 	///
@@ -461,6 +483,13 @@ public:
 	/// `ADD r/m16, imm8` | `o16 83 /0 ib` | `8086+`
 	/// `ADD r/m32, imm8` | `o32 83 /0 ib` | `386+`
 	CodeAssembler& add(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `ADD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& add(const Args&... args) { return add(iced_x86::internal::int_arg(args)...); }
 
 	/// `ADDPD` instruction
 	///
@@ -728,6 +757,13 @@ public:
 	/// `AESKEYGENASSIST xmm1, xmm2/m128, imm8` | `66 0F 3A DF /r ib` | `AES`
 	CodeAssembler& aeskeygenassist(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `AESKEYGENASSIST` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& aeskeygenassist(const Args&... args) { return aeskeygenassist(iced_x86::internal::int_arg(args)...); }
+
 	/// `ALTINST` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -903,6 +939,13 @@ public:
 	/// `AND r/m16, imm8` | `o16 83 /4 ib` | `8086+`
 	/// `AND r/m32, imm8` | `o32 83 /4 ib` | `386+`
 	CodeAssembler& and_(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `AND` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& and_(const Args&... args) { return and_(iced_x86::internal::int_arg(args)...); }
 
 	/// `ANDN` instruction
 	///
@@ -1142,6 +1185,13 @@ public:
 	/// `BEXTR r64, r/m64, imm32` | `XOP.L0.XA.W1 10 /r id` | `TBM`
 	CodeAssembler& bextr(AsmRegister64 op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `BEXTR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& bextr(const Args&... args) { return bextr(iced_x86::internal::int_arg(args)...); }
+
 	/// `BLCFILL` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -1310,6 +1360,13 @@ public:
 	/// `BLENDPD xmm1, xmm2/m128, imm8` | `66 0F 3A 0D /r ib` | `SSE4.1`
 	CodeAssembler& blendpd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `BLENDPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& blendpd(const Args&... args) { return blendpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `BLENDPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -1337,6 +1394,13 @@ public:
 	/// ------------|--------|------
 	/// `BLENDPS xmm1, xmm2/m128, imm8` | `66 0F 3A 0C /r ib` | `SSE4.1`
 	CodeAssembler& blendps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `BLENDPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& blendps(const Args&... args) { return blendps(iced_x86::internal::int_arg(args)...); }
 
 	/// `BLENDVPD` instruction
 	///
@@ -1839,6 +1903,13 @@ public:
 	/// `BT r/m64, imm8` | `o64 0F BA /4 ib` | `X64`
 	CodeAssembler& bt(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `BT` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& bt(const Args&... args) { return bt(iced_x86::internal::int_arg(args)...); }
+
 	/// `BTC` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -1940,6 +2011,13 @@ public:
 	/// `BTC r/m32, imm8` | `o32 0F BA /7 ib` | `386+`
 	/// `BTC r/m64, imm8` | `o64 0F BA /7 ib` | `X64`
 	CodeAssembler& btc(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `BTC` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& btc(const Args&... args) { return btc(iced_x86::internal::int_arg(args)...); }
 
 	/// `BTR` instruction
 	///
@@ -2043,6 +2121,13 @@ public:
 	/// `BTR r/m64, imm8` | `o64 0F BA /6 ib` | `X64`
 	CodeAssembler& btr(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `BTR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& btr(const Args&... args) { return btr(iced_x86::internal::int_arg(args)...); }
+
 	/// `BTS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -2145,6 +2230,13 @@ public:
 	/// `BTS r/m64, imm8` | `o64 0F BA /5 ib` | `X64`
 	CodeAssembler& bts(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `BTS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& bts(const Args&... args) { return bts(iced_x86::internal::int_arg(args)...); }
+
 	/// `BZHI` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -2223,6 +2315,13 @@ public:
 	/// `CALL rel32` | `o32 E8 cd` | `386+`
 	/// `CALL rel32` | `o64 E8 cd` | `X64`
 	CodeAssembler& call(std::uint64_t op0);
+
+	/// `CALL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& call(const Args&... args) { return call(iced_x86::internal::int_arg(args)...); }
 
 	/// `CBW` instruction
 	///
@@ -3799,6 +3898,13 @@ public:
 	/// `CMP r/m32, imm8` | `o32 83 /7 ib` | `386+`
 	CodeAssembler& cmp(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `CMP` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& cmp(const Args&... args) { return cmp(iced_x86::internal::int_arg(args)...); }
+
 	/// `CMPBEXADD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -4485,6 +4591,13 @@ public:
 	/// `CMPPD xmm1, xmm2/m128, imm8` | `66 0F C2 /r ib` | `SSE2`
 	CodeAssembler& cmppd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `CMPPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& cmppd(const Args&... args) { return cmppd(iced_x86::internal::int_arg(args)...); }
+
 	/// `CMPPEXADD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -4540,6 +4653,13 @@ public:
 	/// ------------|--------|------
 	/// `CMPPS xmm1, xmm2/m128, imm8` | `NP 0F C2 /r ib` | `SSE`
 	CodeAssembler& cmpps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `CMPPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& cmpps(const Args&... args) { return cmpps(iced_x86::internal::int_arg(args)...); }
 
 	/// `CMPPXADD` instruction
 	///
@@ -4597,6 +4717,13 @@ public:
 	/// `CMPSD xmm1, xmm2/m64, imm8` | `F2 0F C2 /r ib` | `SSE2`
 	CodeAssembler& cmpsd_3(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `CMPSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& cmpsd_3(const Args&... args) { return cmpsd_3(iced_x86::internal::int_arg(args)...); }
+
 	/// `CMPSQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -4631,6 +4758,13 @@ public:
 	/// ------------|--------|------
 	/// `CMPSS xmm1, xmm2/m32, imm8` | `F3 0F C2 /r ib` | `SSE`
 	CodeAssembler& cmpss(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `CMPSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& cmpss(const Args&... args) { return cmpss(iced_x86::internal::int_arg(args)...); }
 
 	/// `CMPSW` instruction
 	///
@@ -5478,6 +5612,13 @@ public:
 	/// `DPPD xmm1, xmm2/m128, imm8` | `66 0F 3A 41 /r ib` | `SSE4.1`
 	CodeAssembler& dppd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `DPPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& dppd(const Args&... args) { return dppd(iced_x86::internal::int_arg(args)...); }
+
 	/// `DPPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -5505,6 +5646,13 @@ public:
 	/// ------------|--------|------
 	/// `DPPS xmm1, xmm2/m128, imm8` | `66 0F 3A 40 /r ib` | `SSE4.1`
 	CodeAssembler& dpps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `DPPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& dpps(const Args&... args) { return dpps(iced_x86::internal::int_arg(args)...); }
 
 	/// `EMMS` instruction
 	///
@@ -5622,6 +5770,13 @@ public:
 	/// `ENTER imm16, imm8` | `o64 C8 iw ib` | `X64`
 	CodeAssembler& enter(std::uint32_t op0, std::uint32_t op1);
 
+	/// `ENTER` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& enter(const Args&... args) { return enter(iced_x86::internal::int_arg(args)...); }
+
 	/// `ERETS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -5678,6 +5833,13 @@ public:
 	/// `EXTRACTPS r/m32, xmm1, imm8` | `66 0F 3A 17 /r ib` | `SSE4.1`
 	CodeAssembler& extractps(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
 
+	/// `EXTRACTPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& extractps(const Args&... args) { return extractps(iced_x86::internal::int_arg(args)...); }
+
 	/// `EXTRQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -5698,6 +5860,13 @@ public:
 	/// ------------|--------|------
 	/// `EXTRQ xmm1, imm8, imm8` | `66 0F 78 /0 ib ib` | `SSE4A`
 	CodeAssembler& extrq_3(AsmRegisterXmm op0, std::uint32_t op1, std::uint32_t op2);
+
+	/// `EXTRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& extrq_3(const Args&... args) { return extrq_3(iced_x86::internal::int_arg(args)...); }
 
 	/// `F2XM1` instruction
 	///
@@ -6651,6 +6820,13 @@ public:
 	/// `GF2P8AFFINEINVQB xmm1, xmm2/m128, imm8` | `66 0F 3A CF /r ib` | `GFNI`
 	CodeAssembler& gf2p8affineinvqb(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `GF2P8AFFINEINVQB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& gf2p8affineinvqb(const Args&... args) { return gf2p8affineinvqb(iced_x86::internal::int_arg(args)...); }
+
 	/// `GF2P8AFFINEQB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -6678,6 +6854,13 @@ public:
 	/// ------------|--------|------
 	/// `GF2P8AFFINEQB xmm1, xmm2/m128, imm8` | `66 0F 3A CE /r ib` | `GFNI`
 	CodeAssembler& gf2p8affineqb(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `GF2P8AFFINEQB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& gf2p8affineqb(const Args&... args) { return gf2p8affineqb(iced_x86::internal::int_arg(args)...); }
 
 	/// `GF2P8MULB` instruction
 	///
@@ -6741,6 +6924,13 @@ public:
 	/// ------------|--------|------
 	/// `HRESET imm8, <EAX>` | `F3 0F 3A F0 C0 ib` | `HRESET`
 	CodeAssembler& hreset(std::uint32_t op0);
+
+	/// `HRESET` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& hreset(const Args&... args) { return hreset(iced_x86::internal::int_arg(args)...); }
 
 	/// `HSUBPD` instruction
 	///
@@ -6996,6 +7186,13 @@ public:
 	/// `IMUL r32, r/m32, imm8` | `o32 6B /r ib` | `386+`
 	CodeAssembler& imul_3(AsmRegister32 op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `IMUL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& imul_3(const Args&... args) { return imul_3(iced_x86::internal::int_arg(args)...); }
+
 	/// `IN` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7058,6 +7255,13 @@ public:
 	/// ------------|--------|------
 	/// `IN EAX, imm8` | `o32 E5 ib` | `386+`
 	CodeAssembler& in(AsmRegister32 op0, std::uint32_t op1);
+
+	/// `IN` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& in(const Args&... args) { return in(iced_x86::internal::int_arg(args)...); }
 
 	/// `INC` instruction
 	///
@@ -7155,6 +7359,13 @@ public:
 	/// `INSERTPS xmm1, xmm2/m32, imm8` | `66 0F 3A 21 /r ib` | `SSE4.1`
 	CodeAssembler& insertps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `INSERTPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& insertps(const Args&... args) { return insertps(iced_x86::internal::int_arg(args)...); }
+
 	/// `INSERTQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7176,6 +7387,13 @@ public:
 	/// `INSERTQ xmm1, xmm2, imm8, imm8` | `F2 0F 78 /r ib ib` | `SSE4A`
 	CodeAssembler& insertq_4(AsmRegisterXmm op0, AsmRegisterXmm op1, std::uint32_t op2, std::uint32_t op3);
 
+	/// `INSERTQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& insertq_4(const Args&... args) { return insertq_4(iced_x86::internal::int_arg(args)...); }
+
 	/// `INSW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7196,6 +7414,13 @@ public:
 	/// ------------|--------|------
 	/// `INT imm8` | `CD ib` | `8086+`
 	CodeAssembler& int_(std::uint32_t op0);
+
+	/// `INT` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& int_(const Args&... args) { return int_(iced_x86::internal::int_arg(args)...); }
 
 	/// `INT1` instruction
 	///
@@ -7337,6 +7562,13 @@ public:
 	/// `JA rel32` | `o64 0F 87 cd` | `X64`
 	CodeAssembler& ja(std::uint64_t op0);
 
+	/// `JA` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& ja(const Args&... args) { return ja(iced_x86::internal::int_arg(args)...); }
+
 	/// `JAE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7360,6 +7592,13 @@ public:
 	/// `JAE rel32` | `o32 0F 83 cd` | `386+`
 	/// `JAE rel32` | `o64 0F 83 cd` | `X64`
 	CodeAssembler& jae(std::uint64_t op0);
+
+	/// `JAE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jae(const Args&... args) { return jae(iced_x86::internal::int_arg(args)...); }
 
 	/// `JB` instruction
 	///
@@ -7385,6 +7624,13 @@ public:
 	/// `JB rel32` | `o64 0F 82 cd` | `X64`
 	CodeAssembler& jb(std::uint64_t op0);
 
+	/// `JB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jb(const Args&... args) { return jb(iced_x86::internal::int_arg(args)...); }
+
 	/// `JBE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7408,6 +7654,13 @@ public:
 	/// `JBE rel32` | `o32 0F 86 cd` | `386+`
 	/// `JBE rel32` | `o64 0F 86 cd` | `X64`
 	CodeAssembler& jbe(std::uint64_t op0);
+
+	/// `JBE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jbe(const Args&... args) { return jbe(iced_x86::internal::int_arg(args)...); }
 
 	/// `JC` instruction
 	///
@@ -7433,6 +7686,13 @@ public:
 	/// `JB rel32` | `o64 0F 82 cd` | `X64`
 	CodeAssembler& jc(std::uint64_t op0);
 
+	/// `JC` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jc(const Args&... args) { return jc(iced_x86::internal::int_arg(args)...); }
+
 	/// `JCXZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7446,6 +7706,13 @@ public:
 	/// ------------|--------|------
 	/// `JCXZ rel8` | `a16 o16 E3 cb` | `8086+`
 	CodeAssembler& jcxz(std::uint64_t op0);
+
+	/// `JCXZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jcxz(const Args&... args) { return jcxz(iced_x86::internal::int_arg(args)...); }
 
 	/// `JE` instruction
 	///
@@ -7471,6 +7738,13 @@ public:
 	/// `JE rel32` | `o64 0F 84 cd` | `X64`
 	CodeAssembler& je(std::uint64_t op0);
 
+	/// `JE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& je(const Args&... args) { return je(iced_x86::internal::int_arg(args)...); }
+
 	/// `JECXZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7484,6 +7758,13 @@ public:
 	/// ------------|--------|------
 	/// `JECXZ rel8` | `a32 o32 E3 cb` | `386+`
 	CodeAssembler& jecxz(std::uint64_t op0);
+
+	/// `JECXZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jecxz(const Args&... args) { return jecxz(iced_x86::internal::int_arg(args)...); }
 
 	/// `JG` instruction
 	///
@@ -7509,6 +7790,13 @@ public:
 	/// `JG rel32` | `o64 0F 8F cd` | `X64`
 	CodeAssembler& jg(std::uint64_t op0);
 
+	/// `JG` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jg(const Args&... args) { return jg(iced_x86::internal::int_arg(args)...); }
+
 	/// `JGE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7532,6 +7820,13 @@ public:
 	/// `JGE rel32` | `o32 0F 8D cd` | `386+`
 	/// `JGE rel32` | `o64 0F 8D cd` | `X64`
 	CodeAssembler& jge(std::uint64_t op0);
+
+	/// `JGE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jge(const Args&... args) { return jge(iced_x86::internal::int_arg(args)...); }
 
 	/// `JL` instruction
 	///
@@ -7557,6 +7852,13 @@ public:
 	/// `JL rel32` | `o64 0F 8C cd` | `X64`
 	CodeAssembler& jl(std::uint64_t op0);
 
+	/// `JL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jl(const Args&... args) { return jl(iced_x86::internal::int_arg(args)...); }
+
 	/// `JLE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7580,6 +7882,13 @@ public:
 	/// `JLE rel32` | `o32 0F 8E cd` | `386+`
 	/// `JLE rel32` | `o64 0F 8E cd` | `X64`
 	CodeAssembler& jle(std::uint64_t op0);
+
+	/// `JLE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jle(const Args&... args) { return jle(iced_x86::internal::int_arg(args)...); }
 
 	/// `JMP` instruction
 	///
@@ -7638,6 +7947,13 @@ public:
 	/// `JMP rel8` | `o64 EB cb` | `X64`
 	CodeAssembler& jmp(std::uint64_t op0);
 
+	/// `JMP` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jmp(const Args&... args) { return jmp(iced_x86::internal::int_arg(args)...); }
+
 	/// `JMPE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7676,6 +7992,13 @@ public:
 	/// `JMPE disp32` | `o32 0F B8 cd` | `IA-64`
 	CodeAssembler& jmpe(std::uint64_t op0);
 
+	/// `JMPE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jmpe(const Args&... args) { return jmpe(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNA` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7699,6 +8022,13 @@ public:
 	/// `JBE rel32` | `o32 0F 86 cd` | `386+`
 	/// `JBE rel32` | `o64 0F 86 cd` | `X64`
 	CodeAssembler& jna(std::uint64_t op0);
+
+	/// `JNA` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jna(const Args&... args) { return jna(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNAE` instruction
 	///
@@ -7724,6 +8054,13 @@ public:
 	/// `JB rel32` | `o64 0F 82 cd` | `X64`
 	CodeAssembler& jnae(std::uint64_t op0);
 
+	/// `JNAE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnae(const Args&... args) { return jnae(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7747,6 +8084,13 @@ public:
 	/// `JAE rel32` | `o32 0F 83 cd` | `386+`
 	/// `JAE rel32` | `o64 0F 83 cd` | `X64`
 	CodeAssembler& jnb(std::uint64_t op0);
+
+	/// `JNB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnb(const Args&... args) { return jnb(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNBE` instruction
 	///
@@ -7772,6 +8116,13 @@ public:
 	/// `JA rel32` | `o64 0F 87 cd` | `X64`
 	CodeAssembler& jnbe(std::uint64_t op0);
 
+	/// `JNBE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnbe(const Args&... args) { return jnbe(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNC` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7795,6 +8146,13 @@ public:
 	/// `JAE rel32` | `o32 0F 83 cd` | `386+`
 	/// `JAE rel32` | `o64 0F 83 cd` | `X64`
 	CodeAssembler& jnc(std::uint64_t op0);
+
+	/// `JNC` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnc(const Args&... args) { return jnc(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNE` instruction
 	///
@@ -7820,6 +8178,13 @@ public:
 	/// `JNE rel32` | `o64 0F 85 cd` | `X64`
 	CodeAssembler& jne(std::uint64_t op0);
 
+	/// `JNE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jne(const Args&... args) { return jne(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNG` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7843,6 +8208,13 @@ public:
 	/// `JLE rel32` | `o32 0F 8E cd` | `386+`
 	/// `JLE rel32` | `o64 0F 8E cd` | `X64`
 	CodeAssembler& jng(std::uint64_t op0);
+
+	/// `JNG` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jng(const Args&... args) { return jng(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNGE` instruction
 	///
@@ -7868,6 +8240,13 @@ public:
 	/// `JL rel32` | `o64 0F 8C cd` | `X64`
 	CodeAssembler& jnge(std::uint64_t op0);
 
+	/// `JNGE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnge(const Args&... args) { return jnge(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNL` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7891,6 +8270,13 @@ public:
 	/// `JGE rel32` | `o32 0F 8D cd` | `386+`
 	/// `JGE rel32` | `o64 0F 8D cd` | `X64`
 	CodeAssembler& jnl(std::uint64_t op0);
+
+	/// `JNL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnl(const Args&... args) { return jnl(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNLE` instruction
 	///
@@ -7916,6 +8302,13 @@ public:
 	/// `JG rel32` | `o64 0F 8F cd` | `X64`
 	CodeAssembler& jnle(std::uint64_t op0);
 
+	/// `JNLE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnle(const Args&... args) { return jnle(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNO` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7939,6 +8332,13 @@ public:
 	/// `JNO rel32` | `o32 0F 81 cd` | `386+`
 	/// `JNO rel32` | `o64 0F 81 cd` | `X64`
 	CodeAssembler& jno(std::uint64_t op0);
+
+	/// `JNO` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jno(const Args&... args) { return jno(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNP` instruction
 	///
@@ -7964,6 +8364,13 @@ public:
 	/// `JNP rel32` | `o64 0F 8B cd` | `X64`
 	CodeAssembler& jnp(std::uint64_t op0);
 
+	/// `JNP` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnp(const Args&... args) { return jnp(iced_x86::internal::int_arg(args)...); }
+
 	/// `JNS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -7987,6 +8394,13 @@ public:
 	/// `JNS rel32` | `o32 0F 89 cd` | `386+`
 	/// `JNS rel32` | `o64 0F 89 cd` | `X64`
 	CodeAssembler& jns(std::uint64_t op0);
+
+	/// `JNS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jns(const Args&... args) { return jns(iced_x86::internal::int_arg(args)...); }
 
 	/// `JNZ` instruction
 	///
@@ -8012,6 +8426,13 @@ public:
 	/// `JNE rel32` | `o64 0F 85 cd` | `X64`
 	CodeAssembler& jnz(std::uint64_t op0);
 
+	/// `JNZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jnz(const Args&... args) { return jnz(iced_x86::internal::int_arg(args)...); }
+
 	/// `JO` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8035,6 +8456,13 @@ public:
 	/// `JO rel32` | `o32 0F 80 cd` | `386+`
 	/// `JO rel32` | `o64 0F 80 cd` | `X64`
 	CodeAssembler& jo(std::uint64_t op0);
+
+	/// `JO` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jo(const Args&... args) { return jo(iced_x86::internal::int_arg(args)...); }
 
 	/// `JP` instruction
 	///
@@ -8060,6 +8488,13 @@ public:
 	/// `JP rel32` | `o64 0F 8A cd` | `X64`
 	CodeAssembler& jp(std::uint64_t op0);
 
+	/// `JP` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jp(const Args&... args) { return jp(iced_x86::internal::int_arg(args)...); }
+
 	/// `JPE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8083,6 +8518,13 @@ public:
 	/// `JP rel32` | `o32 0F 8A cd` | `386+`
 	/// `JP rel32` | `o64 0F 8A cd` | `X64`
 	CodeAssembler& jpe(std::uint64_t op0);
+
+	/// `JPE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jpe(const Args&... args) { return jpe(iced_x86::internal::int_arg(args)...); }
 
 	/// `JPO` instruction
 	///
@@ -8108,6 +8550,13 @@ public:
 	/// `JNP rel32` | `o64 0F 8B cd` | `X64`
 	CodeAssembler& jpo(std::uint64_t op0);
 
+	/// `JPO` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jpo(const Args&... args) { return jpo(iced_x86::internal::int_arg(args)...); }
+
 	/// `JRCXZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8121,6 +8570,13 @@ public:
 	/// ------------|--------|------
 	/// `JRCXZ rel8` | `a64 o64 E3 cb` | `X64`
 	CodeAssembler& jrcxz(std::uint64_t op0);
+
+	/// `JRCXZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jrcxz(const Args&... args) { return jrcxz(iced_x86::internal::int_arg(args)...); }
 
 	/// `JS` instruction
 	///
@@ -8146,6 +8602,13 @@ public:
 	/// `JS rel32` | `o64 0F 88 cd` | `X64`
 	CodeAssembler& js(std::uint64_t op0);
 
+	/// `JS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& js(const Args&... args) { return js(iced_x86::internal::int_arg(args)...); }
+
 	/// `JZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8169,6 +8632,13 @@ public:
 	/// `JE rel32` | `o32 0F 84 cd` | `386+`
 	/// `JE rel32` | `o64 0F 84 cd` | `X64`
 	CodeAssembler& jz(std::uint64_t op0);
+
+	/// `JZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& jz(const Args&... args) { return jz(iced_x86::internal::int_arg(args)...); }
 
 	/// `KADDB` instruction
 	///
@@ -8492,6 +8962,13 @@ public:
 	/// `KSHIFTLB k1, k2, imm8` | `VEX.L0.66.0F3A.W0 32 /r ib` | `AVX512DQ`
 	CodeAssembler& kshiftlb(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
 
+	/// `KSHIFTLB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftlb(const Args&... args) { return kshiftlb(iced_x86::internal::int_arg(args)...); }
+
 	/// `KSHIFTLD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8505,6 +8982,13 @@ public:
 	/// ------------|--------|------
 	/// `KSHIFTLD k1, k2, imm8` | `VEX.L0.66.0F3A.W0 33 /r ib` | `AVX512BW`
 	CodeAssembler& kshiftld(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
+
+	/// `KSHIFTLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftld(const Args&... args) { return kshiftld(iced_x86::internal::int_arg(args)...); }
 
 	/// `KSHIFTLQ` instruction
 	///
@@ -8520,6 +9004,13 @@ public:
 	/// `KSHIFTLQ k1, k2, imm8` | `VEX.L0.66.0F3A.W1 33 /r ib` | `AVX512BW`
 	CodeAssembler& kshiftlq(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
 
+	/// `KSHIFTLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftlq(const Args&... args) { return kshiftlq(iced_x86::internal::int_arg(args)...); }
+
 	/// `KSHIFTLW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8533,6 +9024,13 @@ public:
 	/// ------------|--------|------
 	/// `KSHIFTLW k1, k2, imm8` | `VEX.L0.66.0F3A.W1 32 /r ib` | `AVX512F`
 	CodeAssembler& kshiftlw(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
+
+	/// `KSHIFTLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftlw(const Args&... args) { return kshiftlw(iced_x86::internal::int_arg(args)...); }
 
 	/// `KSHIFTRB` instruction
 	///
@@ -8548,6 +9046,13 @@ public:
 	/// `KSHIFTRB k1, k2, imm8` | `VEX.L0.66.0F3A.W0 30 /r ib` | `AVX512DQ`
 	CodeAssembler& kshiftrb(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
 
+	/// `KSHIFTRB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftrb(const Args&... args) { return kshiftrb(iced_x86::internal::int_arg(args)...); }
+
 	/// `KSHIFTRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8561,6 +9066,13 @@ public:
 	/// ------------|--------|------
 	/// `KSHIFTRD k1, k2, imm8` | `VEX.L0.66.0F3A.W0 31 /r ib` | `AVX512BW`
 	CodeAssembler& kshiftrd(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
+
+	/// `KSHIFTRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftrd(const Args&... args) { return kshiftrd(iced_x86::internal::int_arg(args)...); }
 
 	/// `KSHIFTRQ` instruction
 	///
@@ -8576,6 +9088,13 @@ public:
 	/// `KSHIFTRQ k1, k2, imm8` | `VEX.L0.66.0F3A.W1 31 /r ib` | `AVX512BW`
 	CodeAssembler& kshiftrq(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
 
+	/// `KSHIFTRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftrq(const Args&... args) { return kshiftrq(iced_x86::internal::int_arg(args)...); }
+
 	/// `KSHIFTRW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -8589,6 +9108,13 @@ public:
 	/// ------------|--------|------
 	/// `KSHIFTRW k1, k2, imm8` | `VEX.L0.66.0F3A.W1 30 /r ib` | `AVX512F`
 	CodeAssembler& kshiftrw(AsmRegisterK op0, AsmRegisterK op1, std::uint32_t op2);
+
+	/// `KSHIFTRW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& kshiftrw(const Args&... args) { return kshiftrw(iced_x86::internal::int_arg(args)...); }
 
 	/// `KTESTB` instruction
 	///
@@ -9044,6 +9570,13 @@ public:
 	/// `LOOP rel8` | `a64 o64 E2 cb` | `X64`
 	CodeAssembler& loop(std::uint64_t op0);
 
+	/// `LOOP` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& loop(const Args&... args) { return loop(iced_x86::internal::int_arg(args)...); }
+
 	/// `LOOPE` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9061,6 +9594,13 @@ public:
 	/// `LOOPE rel8` | `a32 o32 E1 cb` | `386+`
 	/// `LOOPE rel8` | `a64 o64 E1 cb` | `X64`
 	CodeAssembler& loope(std::uint64_t op0);
+
+	/// `LOOPE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& loope(const Args&... args) { return loope(iced_x86::internal::int_arg(args)...); }
 
 	/// `LOOPNE` instruction
 	///
@@ -9080,6 +9620,13 @@ public:
 	/// `LOOPNE rel8` | `a64 o64 E0 cb` | `X64`
 	CodeAssembler& loopne(std::uint64_t op0);
 
+	/// `LOOPNE` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& loopne(const Args&... args) { return loopne(iced_x86::internal::int_arg(args)...); }
+
 	/// `LOOPNZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9098,6 +9645,13 @@ public:
 	/// `LOOPNE rel8` | `a64 o64 E0 cb` | `X64`
 	CodeAssembler& loopnz(std::uint64_t op0);
 
+	/// `LOOPNZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& loopnz(const Args&... args) { return loopnz(iced_x86::internal::int_arg(args)...); }
+
 	/// `LOOPZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9115,6 +9669,13 @@ public:
 	/// `LOOPE rel8` | `a32 o32 E1 cb` | `386+`
 	/// `LOOPE rel8` | `a64 o64 E1 cb` | `X64`
 	CodeAssembler& loopz(std::uint64_t op0);
+
+	/// `LOOPZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& loopz(const Args&... args) { return loopz(iced_x86::internal::int_arg(args)...); }
 
 	/// `LSL` instruction
 	///
@@ -9257,6 +9818,13 @@ public:
 	/// `LWPINS r64, r/m32, imm32` | `XOP.L0.XA.W1 12 /0 id` | `LWP`
 	CodeAssembler& lwpins(AsmRegister64 op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `LWPINS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& lwpins(const Args&... args) { return lwpins(iced_x86::internal::int_arg(args)...); }
+
 	/// `LWPVAL` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9312,6 +9880,13 @@ public:
 	/// ------------|--------|------
 	/// `LWPVAL r64, r/m32, imm32` | `XOP.L0.XA.W1 12 /1 id` | `LWP`
 	CodeAssembler& lwpval(AsmRegister64 op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `LWPVAL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& lwpval(const Args&... args) { return lwpval(iced_x86::internal::int_arg(args)...); }
 
 	/// `LZCNT` instruction
 	///
@@ -9770,6 +10345,9 @@ public:
 	/// `MOV r64, imm64` | `o64 B8+ro io` | `X64`
 	CodeAssembler& mov(AsmRegister64 op0, std::int64_t op1);
 
+	/// `MOV` instruction (the sign extended 32-bit immediate is passed to the overload above)
+	CodeAssembler& mov(AsmRegister64 op0, std::int32_t op1) { return mov(op0, static_cast<std::int64_t>(op1)); }
+
 	/// `MOV` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9808,6 +10386,9 @@ public:
 	/// `MOV r64, imm64` | `o64 B8+ro io` | `X64`
 	CodeAssembler& mov(AsmRegister64 op0, std::uint64_t op1);
 
+	/// `MOV` instruction (the zero extended 32-bit immediate is passed to the overload above)
+	CodeAssembler& mov(AsmRegister64 op0, std::uint32_t op1) { return mov(op0, static_cast<std::uint64_t>(op1)); }
+
 	/// `MOV` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -9816,6 +10397,13 @@ public:
 	/// `MOV r/m16, imm16` | `o16 C7 /0 iw` | `8086+`
 	/// `MOV r/m32, imm32` | `o32 C7 /0 id` | `386+`
 	CodeAssembler& mov(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `MOV` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& mov(const Args&... args) { return mov(iced_x86::internal::int_arg(args)...); }
 
 	/// `MOVAPD` instruction
 	///
@@ -10635,6 +11223,13 @@ public:
 	/// `MPSADBW xmm1, xmm2/m128, imm8` | `66 0F 3A 42 /r ib` | `SSE4.1`
 	CodeAssembler& mpsadbw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `MPSADBW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& mpsadbw(const Args&... args) { return mpsadbw(iced_x86::internal::int_arg(args)...); }
+
 	/// `MUL` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -11054,6 +11649,13 @@ public:
 	/// `OR r/m32, imm8` | `o32 83 /1 ib` | `386+`
 	CodeAssembler& or_(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `OR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& or_(const Args&... args) { return or_(iced_x86::internal::int_arg(args)...); }
+
 	/// `ORPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -11144,6 +11746,13 @@ public:
 	/// ------------|--------|------
 	/// `OUT imm8, EAX` | `o32 E7 ib` | `386+`
 	CodeAssembler& out(std::uint32_t op0, AsmRegister32 op1);
+
+	/// `OUT` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& out(const Args&... args) { return out(iced_x86::internal::int_arg(args)...); }
 
 	/// `OUTSB` instruction
 	///
@@ -11642,6 +12251,13 @@ public:
 	/// `PALIGNR xmm1, xmm2/m128, imm8` | `66 0F 3A 0F /r ib` | `SSSE3`
 	CodeAssembler& palignr(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PALIGNR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& palignr(const Args&... args) { return palignr(iced_x86::internal::int_arg(args)...); }
+
 	/// `PAND` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -11831,6 +12447,13 @@ public:
 	/// `PBLENDW xmm1, xmm2/m128, imm8` | `66 0F 3A 0E /r ib` | `SSE4.1`
 	CodeAssembler& pblendw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PBLENDW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pblendw(const Args&... args) { return pblendw(iced_x86::internal::int_arg(args)...); }
+
 	/// `PBNDKB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -11921,6 +12544,13 @@ public:
 	/// ------------|--------|------
 	/// `PCLMULQDQ xmm1, xmm2/m128, imm8` | `66 0F 3A 44 /r ib` | `PCLMULQDQ`
 	CodeAssembler& pclmulqdq(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PCLMULQDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pclmulqdq(const Args&... args) { return pclmulqdq(iced_x86::internal::int_arg(args)...); }
 
 	/// `PCMPEQB` instruction
 	///
@@ -12048,6 +12678,13 @@ public:
 	/// `PCMPESTRI xmm1, xmm2/m128, imm8` | `66 0F 3A 61 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpestri(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PCMPESTRI` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpestri(const Args&... args) { return pcmpestri(iced_x86::internal::int_arg(args)...); }
+
 	/// `PCMPESTRI64` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -12076,6 +12713,13 @@ public:
 	/// `PCMPESTRI64 xmm1, xmm2/m128, imm8` | `66 o64 0F 3A 61 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpestri64(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PCMPESTRI64` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpestri64(const Args&... args) { return pcmpestri64(iced_x86::internal::int_arg(args)...); }
+
 	/// `PCMPESTRM` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -12103,6 +12747,13 @@ public:
 	/// ------------|--------|------
 	/// `PCMPESTRM xmm1, xmm2/m128, imm8` | `66 0F 3A 60 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpestrm(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PCMPESTRM` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpestrm(const Args&... args) { return pcmpestrm(iced_x86::internal::int_arg(args)...); }
 };
 
 /// `CodeAssembler` instruction methods (part 3/10), see `CodeAssembler`.
@@ -12140,6 +12791,13 @@ public:
 	/// ------------|--------|------
 	/// `PCMPESTRM64 xmm1, xmm2/m128, imm8` | `66 o64 0F 3A 60 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpestrm64(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PCMPESTRM64` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpestrm64(const Args&... args) { return pcmpestrm64(iced_x86::internal::int_arg(args)...); }
 
 	/// `PCMPGTB` instruction
 	///
@@ -12267,6 +12925,13 @@ public:
 	/// `PCMPISTRI xmm1, xmm2/m128, imm8` | `66 0F 3A 63 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpistri(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PCMPISTRI` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpistri(const Args&... args) { return pcmpistri(iced_x86::internal::int_arg(args)...); }
+
 	/// `PCMPISTRM` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -12294,6 +12959,13 @@ public:
 	/// ------------|--------|------
 	/// `PCMPISTRM xmm1, xmm2/m128, imm8` | `66 0F 3A 62 /r ib` | `SSE4.2`
 	CodeAssembler& pcmpistrm(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PCMPISTRM` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pcmpistrm(const Args&... args) { return pcmpistrm(iced_x86::internal::int_arg(args)...); }
 
 	/// `PCOMMIT` instruction
 	///
@@ -12414,6 +13086,13 @@ public:
 	/// `PEXTRB r32/m8, xmm2, imm8` | `66 0F 3A 14 /r ib` | `SSE4.1`
 	CodeAssembler& pextrb(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
 
+	/// `PEXTRB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pextrb(const Args&... args) { return pextrb(iced_x86::internal::int_arg(args)...); }
+
 	/// `PEXTRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -12442,6 +13121,13 @@ public:
 	/// `PEXTRD r/m32, xmm2, imm8` | `66 0F 3A 16 /r ib` | `SSE4.1`
 	CodeAssembler& pextrd(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
 
+	/// `PEXTRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pextrd(const Args&... args) { return pextrd(iced_x86::internal::int_arg(args)...); }
+
 	/// `PEXTRQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -12469,6 +13155,13 @@ public:
 	/// ------------|--------|------
 	/// `PEXTRQ r/m64, xmm2, imm8` | `66 o64 0F 3A 16 /r ib` | `SSE4.1`
 	CodeAssembler& pextrq(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
+
+	/// `PEXTRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pextrq(const Args&... args) { return pextrq(iced_x86::internal::int_arg(args)...); }
 
 	/// `PEXTRW` instruction
 	///
@@ -12539,6 +13232,13 @@ public:
 	/// ------------|--------|------
 	/// `PEXTRW r32/m16, xmm, imm8` | `66 0F 3A 15 /r ib` | `SSE4.1`
 	CodeAssembler& pextrw(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
+
+	/// `PEXTRW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pextrw(const Args&... args) { return pextrw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PF2ID` instruction
 	///
@@ -13086,6 +13786,13 @@ public:
 	/// `PINSRB xmm1, r32/m8, imm8` | `66 0F 3A 20 /r ib` | `SSE4.1`
 	CodeAssembler& pinsrb(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PINSRB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pinsrb(const Args&... args) { return pinsrb(iced_x86::internal::int_arg(args)...); }
+
 	/// `PINSRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -13114,6 +13821,13 @@ public:
 	/// `PINSRD xmm1, r/m32, imm8` | `66 0F 3A 22 /r ib` | `SSE4.1`
 	CodeAssembler& pinsrd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PINSRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pinsrd(const Args&... args) { return pinsrd(iced_x86::internal::int_arg(args)...); }
+
 	/// `PINSRQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -13141,6 +13855,13 @@ public:
 	/// ------------|--------|------
 	/// `PINSRQ xmm1, r/m64, imm8` | `66 o64 0F 3A 22 /r ib` | `SSE4.1`
 	CodeAssembler& pinsrq(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PINSRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pinsrq(const Args&... args) { return pinsrq(iced_x86::internal::int_arg(args)...); }
 
 	/// `PINSRW` instruction
 	///
@@ -13225,6 +13946,13 @@ public:
 	/// ------------|--------|------
 	/// `PINSRW xmm, r32/m16, imm8` | `66 0F C4 /r ib` | `SSE2`
 	CodeAssembler& pinsrw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PINSRW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pinsrw(const Args&... args) { return pinsrw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PMACHRIW` instruction
 	///
@@ -14261,6 +14989,13 @@ public:
 	/// `PSHUFD xmm1, xmm2/m128, imm8` | `66 0F 70 /r ib` | `SSE2`
 	CodeAssembler& pshufd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PSHUFD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pshufd(const Args&... args) { return pshufd(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSHUFHW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14288,6 +15023,13 @@ public:
 	/// ------------|--------|------
 	/// `PSHUFHW xmm1, xmm2/m128, imm8` | `F3 0F 70 /r ib` | `SSE2`
 	CodeAssembler& pshufhw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PSHUFHW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pshufhw(const Args&... args) { return pshufhw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSHUFLW` instruction
 	///
@@ -14317,6 +15059,13 @@ public:
 	/// `PSHUFLW xmm1, xmm2/m128, imm8` | `F2 0F 70 /r ib` | `SSE2`
 	CodeAssembler& pshuflw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `PSHUFLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pshuflw(const Args&... args) { return pshuflw(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSHUFW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14344,6 +15093,13 @@ public:
 	/// ------------|--------|------
 	/// `PSHUFW mm1, mm2/m64, imm8` | `NP 0F 70 /r ib` | `SSE`
 	CodeAssembler& pshufw(AsmRegisterMm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `PSHUFW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pshufw(const Args&... args) { return pshufw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSIGNB` instruction
 	///
@@ -14485,6 +15241,13 @@ public:
 	/// `PSLLD xmm1, imm8` | `66 0F 72 /6 ib` | `SSE2`
 	CodeAssembler& pslld(AsmRegisterXmm op0, std::uint32_t op1);
 
+	/// `PSLLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pslld(const Args&... args) { return pslld(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSLLDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14498,6 +15261,13 @@ public:
 	/// ------------|--------|------
 	/// `PSLLDQ xmm1, imm8` | `66 0F 73 /7 ib` | `SSE2`
 	CodeAssembler& pslldq(AsmRegisterXmm op0, std::uint32_t op1);
+
+	/// `PSLLDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& pslldq(const Args&... args) { return pslldq(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSLLQ` instruction
 	///
@@ -14555,6 +15325,13 @@ public:
 	/// `PSLLQ xmm1, imm8` | `66 0F 73 /6 ib` | `SSE2`
 	CodeAssembler& psllq(AsmRegisterXmm op0, std::uint32_t op1);
 
+	/// `PSLLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psllq(const Args&... args) { return psllq(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSLLW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14610,6 +15387,13 @@ public:
 	/// ------------|--------|------
 	/// `PSLLW xmm1, imm8` | `66 0F 71 /6 ib` | `SSE2`
 	CodeAssembler& psllw(AsmRegisterXmm op0, std::uint32_t op1);
+
+	/// `PSLLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psllw(const Args&... args) { return psllw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSMASH` instruction
 	///
@@ -14674,6 +15458,13 @@ public:
 	/// `PSRAD xmm1, imm8` | `66 0F 72 /4 ib` | `SSE2`
 	CodeAssembler& psrad(AsmRegisterXmm op0, std::uint32_t op1);
 
+	/// `PSRAD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psrad(const Args&... args) { return psrad(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSRAW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14729,6 +15520,13 @@ public:
 	/// ------------|--------|------
 	/// `PSRAW xmm1, imm8` | `66 0F 71 /4 ib` | `SSE2`
 	CodeAssembler& psraw(AsmRegisterXmm op0, std::uint32_t op1);
+
+	/// `PSRAW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psraw(const Args&... args) { return psraw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSRLD` instruction
 	///
@@ -14786,6 +15584,13 @@ public:
 	/// `PSRLD xmm1, imm8` | `66 0F 72 /2 ib` | `SSE2`
 	CodeAssembler& psrld(AsmRegisterXmm op0, std::uint32_t op1);
 
+	/// `PSRLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psrld(const Args&... args) { return psrld(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSRLDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14799,6 +15604,13 @@ public:
 	/// ------------|--------|------
 	/// `PSRLDQ xmm1, imm8` | `66 0F 73 /3 ib` | `SSE2`
 	CodeAssembler& psrldq(AsmRegisterXmm op0, std::uint32_t op1);
+
+	/// `PSRLDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psrldq(const Args&... args) { return psrldq(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSRLQ` instruction
 	///
@@ -14856,6 +15668,13 @@ public:
 	/// `PSRLQ xmm1, imm8` | `66 0F 73 /2 ib` | `SSE2`
 	CodeAssembler& psrlq(AsmRegisterXmm op0, std::uint32_t op1);
 
+	/// `PSRLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psrlq(const Args&... args) { return psrlq(iced_x86::internal::int_arg(args)...); }
+
 	/// `PSRLW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -14911,6 +15730,13 @@ public:
 	/// ------------|--------|------
 	/// `PSRLW xmm1, imm8` | `66 0F 71 /2 ib` | `SSE2`
 	CodeAssembler& psrlw(AsmRegisterXmm op0, std::uint32_t op1);
+
+	/// `PSRLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& psrlw(const Args&... args) { return psrlw(iced_x86::internal::int_arg(args)...); }
 
 	/// `PSUBB` instruction
 	///
@@ -15468,6 +16294,13 @@ public:
 	/// `PUSH imm8` | `o32 6A ib` | `386+`
 	CodeAssembler& push(std::uint32_t op0);
 
+	/// `PUSH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& push(const Args&... args) { return push(iced_x86::internal::int_arg(args)...); }
+
 	/// `PUSHA` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -15670,6 +16503,13 @@ public:
 	/// `RCL r/m64, 1` | `o64 D1 /2` | `X64`
 	CodeAssembler& rcl(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `RCL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& rcl(const Args&... args) { return rcl(iced_x86::internal::int_arg(args)...); }
+
 	/// `RCPPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -15827,6 +16667,13 @@ public:
 	/// `RCR r/m32, 1` | `o32 D1 /3` | `386+`
 	/// `RCR r/m64, 1` | `o64 D1 /3` | `X64`
 	CodeAssembler& rcr(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `RCR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& rcr(const Args&... args) { return rcr(iced_x86::internal::int_arg(args)...); }
 
 	/// `RDFSBASE` instruction
 	///
@@ -16408,6 +17255,13 @@ public:
 	/// `RET imm16` | `o64 C2 iw` | `X64`
 	CodeAssembler& ret_1(std::uint32_t op0);
 
+	/// `RET` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& ret_1(const Args&... args) { return ret_1(iced_x86::internal::int_arg(args)...); }
+
 	/// `RETF` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16434,6 +17288,13 @@ public:
 	/// `RETF imm16` | `o32 CA iw` | `386+`
 	/// `RETF imm16` | `o64 CA iw` | `X64`
 	CodeAssembler& retf_1(std::uint32_t op0);
+
+	/// `RETF` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& retf_1(const Args&... args) { return retf_1(iced_x86::internal::int_arg(args)...); }
 
 	/// `RMPADJUST` instruction
 	///
@@ -16586,6 +17447,13 @@ public:
 	/// `ROL r/m64, 1` | `o64 D1 /0` | `X64`
 	CodeAssembler& rol(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `ROL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& rol(const Args&... args) { return rol(iced_x86::internal::int_arg(args)...); }
+
 	/// `ROR` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16716,6 +17584,13 @@ public:
 	/// `ROR r/m64, 1` | `o64 D1 /1` | `X64`
 	CodeAssembler& ror(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `ROR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& ror(const Args&... args) { return ror(iced_x86::internal::int_arg(args)...); }
+
 	/// `RORX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16772,6 +17647,13 @@ public:
 	/// `RORX r64, r/m64, imm8` | `VEX.LZ.F2.0F3A.W1 F0 /r ib` | `BMI2`
 	CodeAssembler& rorx(AsmRegister64 op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `RORX` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& rorx(const Args&... args) { return rorx(iced_x86::internal::int_arg(args)...); }
+
 	/// `ROUNDPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16799,6 +17681,13 @@ public:
 	/// ------------|--------|------
 	/// `ROUNDPD xmm1, xmm2/m128, imm8` | `66 0F 3A 09 /r ib` | `SSE4.1`
 	CodeAssembler& roundpd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `ROUNDPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& roundpd(const Args&... args) { return roundpd(iced_x86::internal::int_arg(args)...); }
 
 	/// `ROUNDPS` instruction
 	///
@@ -16828,6 +17717,13 @@ public:
 	/// `ROUNDPS xmm1, xmm2/m128, imm8` | `66 0F 3A 08 /r ib` | `SSE4.1`
 	CodeAssembler& roundps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `ROUNDPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& roundps(const Args&... args) { return roundps(iced_x86::internal::int_arg(args)...); }
+
 	/// `ROUNDSD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16856,6 +17752,13 @@ public:
 	/// `ROUNDSD xmm1, xmm2/m64, imm8` | `66 0F 3A 0B /r ib` | `SSE4.1`
 	CodeAssembler& roundsd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `ROUNDSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& roundsd(const Args&... args) { return roundsd(iced_x86::internal::int_arg(args)...); }
+
 	/// `ROUNDSS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -16883,6 +17786,13 @@ public:
 	/// ------------|--------|------
 	/// `ROUNDSS xmm1, xmm2/m32, imm8` | `66 0F 3A 0A /r ib` | `SSE4.1`
 	CodeAssembler& roundss(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `ROUNDSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& roundss(const Args&... args) { return roundss(iced_x86::internal::int_arg(args)...); }
 
 	/// `RSDC` instruction
 	///
@@ -17084,6 +17994,13 @@ public:
 	/// `SAL r/m64, 1` | `o64 D1 /6` | `X64`
 	CodeAssembler& sal(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `SAL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& sal(const Args&... args) { return sal(iced_x86::internal::int_arg(args)...); }
+
 	/// `SALC` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -17220,6 +18137,13 @@ public:
 	/// `SAR r/m32, 1` | `o32 D1 /7` | `386+`
 	/// `SAR r/m64, 1` | `o64 D1 /7` | `X64`
 	CodeAssembler& sar(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `SAR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& sar(const Args&... args) { return sar(iced_x86::internal::int_arg(args)...); }
 
 	/// `SARX` instruction
 	///
@@ -17424,6 +18348,13 @@ public:
 	/// `SBB r/m16, imm8` | `o16 83 /3 ib` | `8086+`
 	/// `SBB r/m32, imm8` | `o32 83 /3 ib` | `386+`
 	CodeAssembler& sbb(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `SBB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& sbb(const Args&... args) { return sbb(iced_x86::internal::int_arg(args)...); }
 
 	/// `SCASB` instruction
 	///
@@ -18001,6 +18932,13 @@ public:
 	/// `SHA1RNDS4 xmm1, xmm2/m128, imm8` | `NP 0F 3A CC /r ib` | `SHA`
 	CodeAssembler& sha1rnds4(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `SHA1RNDS4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& sha1rnds4(const Args&... args) { return sha1rnds4(iced_x86::internal::int_arg(args)...); }
+
 	/// `SHA256MSG1` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -18173,6 +19111,13 @@ public:
 	/// `SHL r/m64, 1` | `o64 D1 /4` | `X64`
 	CodeAssembler& shl(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `SHL` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shl(const Args&... args) { return shl(iced_x86::internal::int_arg(args)...); }
+
 	/// `SHLD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -18298,6 +19243,13 @@ public:
 	/// ------------|--------|------
 	/// `SHLD r/m64, r64, imm8` | `o64 0F A4 /r ib` | `X64`
 	CodeAssembler& shld(AsmMemoryOperand op0, AsmRegister64 op1, std::uint32_t op2);
+
+	/// `SHLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shld(const Args&... args) { return shld(iced_x86::internal::int_arg(args)...); }
 };
 
 /// `CodeAssembler` instruction methods (part 4/10), see `CodeAssembler`.
@@ -18466,6 +19418,13 @@ public:
 	/// `SHR r/m64, 1` | `o64 D1 /5` | `X64`
 	CodeAssembler& shr(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `SHR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shr(const Args&... args) { return shr(iced_x86::internal::int_arg(args)...); }
+
 	/// `SHRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -18592,6 +19551,13 @@ public:
 	/// `SHRD r/m64, r64, imm8` | `o64 0F AC /r ib` | `X64`
 	CodeAssembler& shrd(AsmMemoryOperand op0, AsmRegister64 op1, std::uint32_t op2);
 
+	/// `SHRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shrd(const Args&... args) { return shrd(iced_x86::internal::int_arg(args)...); }
+
 	/// `SHRX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -18648,6 +19614,13 @@ public:
 	/// `SHUFPD xmm1, xmm2/m128, imm8` | `66 0F C6 /r ib` | `SSE2`
 	CodeAssembler& shufpd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `SHUFPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shufpd(const Args&... args) { return shufpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `SHUFPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -18675,6 +19648,13 @@ public:
 	/// ------------|--------|------
 	/// `SHUFPS xmm1, xmm2/m128, imm8` | `NP 0F C6 /r ib` | `SSE`
 	CodeAssembler& shufps(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `SHUFPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& shufps(const Args&... args) { return shufps(iced_x86::internal::int_arg(args)...); }
 
 	/// `SIDT` instruction
 	///
@@ -19116,6 +20096,13 @@ public:
 	/// `SUB r/m32, imm8` | `o32 83 /5 ib` | `386+`
 	CodeAssembler& sub(AsmMemoryOperand op0, std::uint32_t op1);
 
+	/// `SUB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& sub(const Args&... args) { return sub(iced_x86::internal::int_arg(args)...); }
+
 	/// `SUBPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -19463,6 +20450,13 @@ public:
 	/// `TEST r/m16, imm16` | `o16 F7 /0 iw` | `8086+`
 	/// `TEST r/m32, imm32` | `o32 F7 /0 id` | `386+`
 	CodeAssembler& test(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `TEST` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& test(const Args&... args) { return test(iced_x86::internal::int_arg(args)...); }
 
 	/// `TESTUI` instruction
 	///
@@ -20374,6 +21368,13 @@ public:
 	/// `VAESKEYGENASSIST xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.WIG DF /r ib` | `AES AVX`
 	CodeAssembler& vaeskeygenassist(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VAESKEYGENASSIST` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vaeskeygenassist(const Args&... args) { return vaeskeygenassist(iced_x86::internal::int_arg(args)...); }
+
 	/// `VALIGND` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -20458,6 +21459,13 @@ public:
 	/// `VALIGND zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 03 /r ib` | `AVX512F`
 	CodeAssembler& valignd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VALIGND` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& valignd(const Args&... args) { return valignd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VALIGNQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -20541,6 +21549,13 @@ public:
 	/// ------------|--------|------
 	/// `VALIGNQ zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 03 /r ib` | `AVX512F`
 	CodeAssembler& valignq(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VALIGNQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& valignq(const Args&... args) { return valignq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VANDNPD` instruction
 	///
@@ -20894,6 +21909,13 @@ public:
 	/// `VBLENDPD ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.WIG 0D /r ib` | `AVX`
 	CodeAssembler& vblendpd(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VBLENDPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vblendpd(const Args&... args) { return vblendpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VBLENDPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -20949,6 +21971,13 @@ public:
 	/// ------------|--------|------
 	/// `VBLENDPS ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.WIG 0C /r ib` | `AVX`
 	CodeAssembler& vblendps(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VBLENDPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vblendps(const Args&... args) { return vblendps(iced_x86::internal::int_arg(args)...); }
 
 	/// `VBLENDVPD` instruction
 	///
@@ -28455,6 +29484,13 @@ public:
 	/// `VCMPPD k1 {k2}, zmm2, zmm3/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F.W1 C2 /r ib` | `AVX512F`
 	CodeAssembler& vcmppd(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VCMPPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmppd(const Args&... args) { return vcmppd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VCMPPH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -28538,6 +29574,13 @@ public:
 	/// ------------|--------|------
 	/// `VCMPPH k1 {k2}, zmm2, zmm3/m512/m16bcst{sae}, imm8` | `EVEX.512.0F3A.W0 C2 /r ib` | `AVX512-FP16`
 	CodeAssembler& vcmpph(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VCMPPH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmpph(const Args&... args) { return vcmpph(iced_x86::internal::int_arg(args)...); }
 
 	/// `VCMPPS` instruction
 	///
@@ -28679,6 +29722,13 @@ public:
 	/// `VCMPPS k1 {k2}, zmm2, zmm3/m512/m32bcst{sae}, imm8` | `EVEX.512.0F.W0 C2 /r ib` | `AVX512F`
 	CodeAssembler& vcmpps(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VCMPPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmpps(const Args&... args) { return vcmpps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VCMPSD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -28735,6 +29785,13 @@ public:
 	/// `VCMPSD xmm1, xmm2, xmm3/m64, imm8` | `VEX.LIG.F2.0F.WIG C2 /r ib` | `AVX`
 	CodeAssembler& vcmpsd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VCMPSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmpsd(const Args&... args) { return vcmpsd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VCMPSH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -28762,6 +29819,13 @@ public:
 	/// ------------|--------|------
 	/// `VCMPSH k1 {k2}, xmm2, xmm3/m16{sae}, imm8` | `EVEX.LIG.F3.0F3A.W0 C2 /r ib` | `AVX512-FP16`
 	CodeAssembler& vcmpsh(AsmRegisterK op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VCMPSH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmpsh(const Args&... args) { return vcmpsh(iced_x86::internal::int_arg(args)...); }
 
 	/// `VCMPSS` instruction
 	///
@@ -28818,6 +29882,13 @@ public:
 	/// ------------|--------|------
 	/// `VCMPSS xmm1, xmm2, xmm3/m32, imm8` | `VEX.LIG.F3.0F.WIG C2 /r ib` | `AVX`
 	CodeAssembler& vcmpss(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VCMPSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcmpss(const Args&... args) { return vcmpss(iced_x86::internal::int_arg(args)...); }
 
 	/// `VCMPTRUE_USPD` instruction
 	///
@@ -31110,6 +32181,13 @@ public:
 	/// `VCVTPS2PH ymm1/m256 {k1}{z}, zmm2{sae}, imm8` | `EVEX.512.66.0F3A.W0 1D /r ib` | `AVX512F`
 	CodeAssembler& vcvtps2ph(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VCVTPS2PH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vcvtps2ph(const Args&... args) { return vcvtps2ph(iced_x86::internal::int_arg(args)...); }
+
 	/// `VCVTPS2PHX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33066,6 +34144,13 @@ public:
 	/// `VDBPSADBW zmm1 {k1}{z}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W0 42 /r ib` | `AVX512BW`
 	CodeAssembler& vdbpsadbw(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VDBPSADBW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vdbpsadbw(const Args&... args) { return vdbpsadbw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VDIVPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33325,6 +34410,13 @@ public:
 	/// `VDPPD xmm1, xmm2, xmm3/m128, imm8` | `VEX.128.66.0F3A.WIG 41 /r ib` | `AVX`
 	CodeAssembler& vdppd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VDPPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vdppd(const Args&... args) { return vdppd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VDPPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33380,6 +34472,13 @@ public:
 	/// ------------|--------|------
 	/// `VDPPS ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.WIG 40 /r ib` | `AVX`
 	CodeAssembler& vdpps(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VDPPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vdpps(const Args&... args) { return vdpps(iced_x86::internal::int_arg(args)...); }
 
 	/// `VERR` instruction
 	///
@@ -33579,6 +34678,13 @@ public:
 	/// `VEXTRACTF128 xmm1/m128, ymm2, imm8` | `VEX.256.66.0F3A.W0 19 /r ib` | `AVX`
 	CodeAssembler& vextractf128(AsmMemoryOperand op0, AsmRegisterYmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTF128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractf128(const Args&... args) { return vextractf128(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTF32X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33635,6 +34741,13 @@ public:
 	/// `VEXTRACTF32X4 xmm1/m128 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W0 19 /r ib` | `AVX512F`
 	CodeAssembler& vextractf32x4(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTF32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractf32x4(const Args&... args) { return vextractf32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTF32X8` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33662,6 +34775,13 @@ public:
 	/// ------------|--------|------
 	/// `VEXTRACTF32X8 ymm1/m256 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W0 1B /r ib` | `AVX512DQ`
 	CodeAssembler& vextractf32x8(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
+
+	/// `VEXTRACTF32X8` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractf32x8(const Args&... args) { return vextractf32x8(iced_x86::internal::int_arg(args)...); }
 
 	/// `VEXTRACTF64X2` instruction
 	///
@@ -33719,6 +34839,13 @@ public:
 	/// `VEXTRACTF64X2 xmm1/m128 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W1 19 /r ib` | `AVX512DQ`
 	CodeAssembler& vextractf64x2(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTF64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractf64x2(const Args&... args) { return vextractf64x2(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTF64X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33747,6 +34874,13 @@ public:
 	/// `VEXTRACTF64X4 ymm1/m256 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W1 1B /r ib` | `AVX512F`
 	CodeAssembler& vextractf64x4(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTF64X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractf64x4(const Args&... args) { return vextractf64x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTI128` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33774,6 +34908,13 @@ public:
 	/// ------------|--------|------
 	/// `VEXTRACTI128 xmm1/m128, ymm2, imm8` | `VEX.256.66.0F3A.W0 39 /r ib` | `AVX2`
 	CodeAssembler& vextracti128(AsmMemoryOperand op0, AsmRegisterYmm op1, std::uint32_t op2);
+
+	/// `VEXTRACTI128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextracti128(const Args&... args) { return vextracti128(iced_x86::internal::int_arg(args)...); }
 
 	/// `VEXTRACTI32X4` instruction
 	///
@@ -33831,6 +34972,13 @@ public:
 	/// `VEXTRACTI32X4 xmm1/m128 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W0 39 /r ib` | `AVX512F`
 	CodeAssembler& vextracti32x4(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTI32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextracti32x4(const Args&... args) { return vextracti32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTI32X8` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33858,6 +35006,13 @@ public:
 	/// ------------|--------|------
 	/// `VEXTRACTI32X8 ymm1/m256 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W0 3B /r ib` | `AVX512DQ`
 	CodeAssembler& vextracti32x8(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
+
+	/// `VEXTRACTI32X8` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextracti32x8(const Args&... args) { return vextracti32x8(iced_x86::internal::int_arg(args)...); }
 
 	/// `VEXTRACTI64X2` instruction
 	///
@@ -33915,6 +35070,13 @@ public:
 	/// `VEXTRACTI64X2 xmm1/m128 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W1 39 /r ib` | `AVX512DQ`
 	CodeAssembler& vextracti64x2(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
 
+	/// `VEXTRACTI64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextracti64x2(const Args&... args) { return vextracti64x2(iced_x86::internal::int_arg(args)...); }
+
 	/// `VEXTRACTI64X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -33942,6 +35104,13 @@ public:
 	/// ------------|--------|------
 	/// `VEXTRACTI64X4 ymm1/m256 {k1}{z}, zmm2, imm8` | `EVEX.512.66.0F3A.W1 3B /r ib` | `AVX512F`
 	CodeAssembler& vextracti64x4(AsmMemoryOperand op0, AsmRegisterZmm op1, std::uint32_t op2);
+
+	/// `VEXTRACTI64X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextracti64x4(const Args&... args) { return vextracti64x4(iced_x86::internal::int_arg(args)...); }
 
 	/// `VEXTRACTPS` instruction
 	///
@@ -33990,6 +35159,13 @@ public:
 	/// `VEXTRACTPS r/m32, xmm1, imm8` | `VEX.128.66.0F3A.W0 17 /r ib` | `AVX`
 	/// `VEXTRACTPS r/m32, xmm1, imm8` | `EVEX.128.66.0F3A.W0 17 /r ib` | `AVX512F`
 	CodeAssembler& vextractps(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
+
+	/// `VEXTRACTPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vextractps(const Args&... args) { return vextractps(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFCMADDCPH` instruction
 	///
@@ -34187,6 +35363,13 @@ public:
 	/// `VFIXUPIMMPD zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F3A.W1 54 /r ib` | `AVX512F`
 	CodeAssembler& vfixupimmpd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VFIXUPIMMPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfixupimmpd(const Args&... args) { return vfixupimmpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFIXUPIMMPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -34271,6 +35454,13 @@ public:
 	/// `VFIXUPIMMPS zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8` | `EVEX.512.66.0F3A.W0 54 /r ib` | `AVX512F`
 	CodeAssembler& vfixupimmps(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VFIXUPIMMPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfixupimmps(const Args&... args) { return vfixupimmps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFIXUPIMMSD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -34299,6 +35489,13 @@ public:
 	/// `VFIXUPIMMSD xmm1 {k1}{z}, xmm2, xmm3/m64{sae}, imm8` | `EVEX.LIG.66.0F3A.W1 55 /r ib` | `AVX512F`
 	CodeAssembler& vfixupimmsd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VFIXUPIMMSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfixupimmsd(const Args&... args) { return vfixupimmsd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFIXUPIMMSS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -34326,6 +35523,13 @@ public:
 	/// ------------|--------|------
 	/// `VFIXUPIMMSS xmm1 {k1}{z}, xmm2, xmm3/m32{sae}, imm8` | `EVEX.LIG.66.0F3A.W0 55 /r ib` | `AVX512F`
 	CodeAssembler& vfixupimmss(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VFIXUPIMMSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfixupimmss(const Args&... args) { return vfixupimmss(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFMADD132PD` instruction
 	///
@@ -38135,6 +39339,13 @@ public:
 	/// `VFPCLASSPD k2 {k1}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 66 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclasspd(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspd(const Args&... args) { return vfpclasspd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPDX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38148,6 +39359,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPD k2 {k1}, xmm2/m128/m64bcst, imm8` | `EVEX.128.66.0F3A.W1 66 /r ib` | `AVX512VL AVX512DQ`
 	CodeAssembler& vfpclasspdx(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPDX` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspdx(const Args&... args) { return vfpclasspdx(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSPDY` instruction
 	///
@@ -38163,6 +39381,13 @@ public:
 	/// `VFPCLASSPD k2 {k1}, ymm2/m256/m64bcst, imm8` | `EVEX.256.66.0F3A.W1 66 /r ib` | `AVX512VL AVX512DQ`
 	CodeAssembler& vfpclasspdy(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPDY` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspdy(const Args&... args) { return vfpclasspdy(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPDZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38176,6 +39401,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPD k2 {k1}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 66 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclasspdz(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPDZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspdz(const Args&... args) { return vfpclasspdz(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSPH` instruction
 	///
@@ -38237,6 +39469,13 @@ public:
 	/// `VFPCLASSPH k1 {k2}, zmm2/m512/m16bcst, imm8` | `EVEX.512.0F3A.W0 66 /r ib` | `AVX512-FP16`
 	CodeAssembler& vfpclassph(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassph(const Args&... args) { return vfpclassph(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPHX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38250,6 +39489,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPH k1 {k2}, xmm2/m128/m16bcst, imm8` | `EVEX.128.0F3A.W0 66 /r ib` | `AVX512VL AVX512-FP16`
 	CodeAssembler& vfpclassphx(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPHX` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassphx(const Args&... args) { return vfpclassphx(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSPHY` instruction
 	///
@@ -38265,6 +39511,13 @@ public:
 	/// `VFPCLASSPH k1 {k2}, ymm2/m256/m16bcst, imm8` | `EVEX.256.0F3A.W0 66 /r ib` | `AVX512VL AVX512-FP16`
 	CodeAssembler& vfpclassphy(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPHY` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassphy(const Args&... args) { return vfpclassphy(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPHZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38278,6 +39531,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPH k1 {k2}, zmm2/m512/m16bcst, imm8` | `EVEX.512.0F3A.W0 66 /r ib` | `AVX512-FP16`
 	CodeAssembler& vfpclassphz(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPHZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassphz(const Args&... args) { return vfpclassphz(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSPS` instruction
 	///
@@ -38339,6 +39599,13 @@ public:
 	/// `VFPCLASSPS k2 {k1}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 66 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclassps(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassps(const Args&... args) { return vfpclassps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPSX` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38352,6 +39619,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPS k2 {k1}, xmm2/m128/m32bcst, imm8` | `EVEX.128.66.0F3A.W0 66 /r ib` | `AVX512VL AVX512DQ`
 	CodeAssembler& vfpclasspsx(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPSX` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspsx(const Args&... args) { return vfpclasspsx(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSPSY` instruction
 	///
@@ -38367,6 +39641,13 @@ public:
 	/// `VFPCLASSPS k2 {k1}, ymm2/m256/m32bcst, imm8` | `EVEX.256.66.0F3A.W0 66 /r ib` | `AVX512VL AVX512DQ`
 	CodeAssembler& vfpclasspsy(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSPSY` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspsy(const Args&... args) { return vfpclasspsy(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSPSZ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38380,6 +39661,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSPS k2 {k1}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 66 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclasspsz(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSPSZ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasspsz(const Args&... args) { return vfpclasspsz(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFPCLASSSD` instruction
 	///
@@ -38409,6 +39697,13 @@ public:
 	/// `VFPCLASSSD k2 {k1}, xmm2/m64, imm8` | `EVEX.LIG.66.0F3A.W1 67 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclasssd(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasssd(const Args&... args) { return vfpclasssd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSSH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38437,6 +39732,13 @@ public:
 	/// `VFPCLASSSH k1 {k2}, xmm2/m16, imm8` | `EVEX.LIG.0F3A.W0 67 /r ib` | `AVX512-FP16`
 	CodeAssembler& vfpclasssh(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VFPCLASSSH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclasssh(const Args&... args) { return vfpclasssh(iced_x86::internal::int_arg(args)...); }
+
 	/// `VFPCLASSSS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -38464,6 +39766,13 @@ public:
 	/// ------------|--------|------
 	/// `VFPCLASSSS k2 {k1}, xmm2/m32, imm8` | `EVEX.LIG.66.0F3A.W0 67 /r ib` | `AVX512DQ`
 	CodeAssembler& vfpclassss(AsmRegisterK op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VFPCLASSSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vfpclassss(const Args&... args) { return vfpclassss(iced_x86::internal::int_arg(args)...); }
 
 	/// `VFRCZPD` instruction
 	///
@@ -38985,6 +40294,13 @@ public:
 	/// `VGETMANTPD zmm1 {k1}{z}, zmm2/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F3A.W1 26 /r ib` | `AVX512F`
 	CodeAssembler& vgetmantpd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VGETMANTPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantpd(const Args&... args) { return vgetmantpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VGETMANTPH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39069,6 +40385,13 @@ public:
 	/// `VGETMANTPH zmm1 {k1}{z}, zmm2/m512/m16bcst{sae}, imm8` | `EVEX.512.0F3A.W0 26 /r ib` | `AVX512-FP16`
 	CodeAssembler& vgetmantph(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VGETMANTPH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantph(const Args&... args) { return vgetmantph(iced_x86::internal::int_arg(args)...); }
+
 	/// `VGETMANTPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39152,6 +40475,13 @@ public:
 	/// ------------|--------|------
 	/// `VGETMANTPS zmm1 {k1}{z}, zmm2/m512/m32bcst{sae}, imm8` | `EVEX.512.66.0F3A.W0 26 /r ib` | `AVX512F`
 	CodeAssembler& vgetmantps(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VGETMANTPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantps(const Args&... args) { return vgetmantps(iced_x86::internal::int_arg(args)...); }
 };
 
 /// `CodeAssembler` instruction methods (part 7/10), see `CodeAssembler`.
@@ -39190,6 +40520,13 @@ public:
 	/// `VGETMANTSD xmm1 {k1}{z}, xmm2, xmm3/m64{sae}, imm8` | `EVEX.LIG.66.0F3A.W1 27 /r ib` | `AVX512F`
 	CodeAssembler& vgetmantsd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VGETMANTSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantsd(const Args&... args) { return vgetmantsd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VGETMANTSH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39218,6 +40555,13 @@ public:
 	/// `VGETMANTSH xmm1 {k1}{z}, xmm2, xmm3/m16{sae}, imm8` | `EVEX.LIG.0F3A.W0 27 /r ib` | `AVX512-FP16`
 	CodeAssembler& vgetmantsh(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VGETMANTSH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantsh(const Args&... args) { return vgetmantsh(iced_x86::internal::int_arg(args)...); }
+
 	/// `VGETMANTSS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39245,6 +40589,13 @@ public:
 	/// ------------|--------|------
 	/// `VGETMANTSS xmm1 {k1}{z}, xmm2, xmm3/m32{sae}, imm8` | `EVEX.LIG.66.0F3A.W0 27 /r ib` | `AVX512F`
 	CodeAssembler& vgetmantss(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VGETMANTSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgetmantss(const Args&... args) { return vgetmantss(iced_x86::internal::int_arg(args)...); }
 
 	/// `VGF2P8AFFINEINVQB` instruction
 	///
@@ -39338,6 +40689,13 @@ public:
 	/// `VGF2P8AFFINEINVQB zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 CF /r ib` | `AVX512F GFNI`
 	CodeAssembler& vgf2p8affineinvqb(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VGF2P8AFFINEINVQB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgf2p8affineinvqb(const Args&... args) { return vgf2p8affineinvqb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VGF2P8AFFINEQB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39429,6 +40787,13 @@ public:
 	/// ------------|--------|------
 	/// `VGF2P8AFFINEQB zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 CE /r ib` | `AVX512F GFNI`
 	CodeAssembler& vgf2p8affineqb(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VGF2P8AFFINEQB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vgf2p8affineqb(const Args&... args) { return vgf2p8affineqb(iced_x86::internal::int_arg(args)...); }
 
 	/// `VGF2P8MULB` instruction
 	///
@@ -39616,6 +40981,13 @@ public:
 	/// `VINSERTF128 ymm1, ymm2, xmm3/m128, imm8` | `VEX.256.66.0F3A.W0 18 /r ib` | `AVX`
 	CodeAssembler& vinsertf128(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTF128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertf128(const Args&... args) { return vinsertf128(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTF32X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39672,6 +41044,13 @@ public:
 	/// `VINSERTF32X4 zmm1 {k1}{z}, zmm2, xmm3/m128, imm8` | `EVEX.512.66.0F3A.W0 18 /r ib` | `AVX512F`
 	CodeAssembler& vinsertf32x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTF32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertf32x4(const Args&... args) { return vinsertf32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTF32X8` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39699,6 +41078,13 @@ public:
 	/// ------------|--------|------
 	/// `VINSERTF32X8 zmm1 {k1}{z}, zmm2, ymm3/m256, imm8` | `EVEX.512.66.0F3A.W0 1A /r ib` | `AVX512DQ`
 	CodeAssembler& vinsertf32x8(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VINSERTF32X8` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertf32x8(const Args&... args) { return vinsertf32x8(iced_x86::internal::int_arg(args)...); }
 
 	/// `VINSERTF64X2` instruction
 	///
@@ -39756,6 +41142,13 @@ public:
 	/// `VINSERTF64X2 zmm1 {k1}{z}, zmm2, xmm3/m128, imm8` | `EVEX.512.66.0F3A.W1 18 /r ib` | `AVX512DQ`
 	CodeAssembler& vinsertf64x2(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTF64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertf64x2(const Args&... args) { return vinsertf64x2(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTF64X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39784,6 +41177,13 @@ public:
 	/// `VINSERTF64X4 zmm1 {k1}{z}, zmm2, ymm3/m256, imm8` | `EVEX.512.66.0F3A.W1 1A /r ib` | `AVX512F`
 	CodeAssembler& vinsertf64x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTF64X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertf64x4(const Args&... args) { return vinsertf64x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTI128` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39811,6 +41211,13 @@ public:
 	/// ------------|--------|------
 	/// `VINSERTI128 ymm1, ymm2, xmm3/m128, imm8` | `VEX.256.66.0F3A.W0 38 /r ib` | `AVX2`
 	CodeAssembler& vinserti128(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VINSERTI128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinserti128(const Args&... args) { return vinserti128(iced_x86::internal::int_arg(args)...); }
 
 	/// `VINSERTI32X4` instruction
 	///
@@ -39868,6 +41275,13 @@ public:
 	/// `VINSERTI32X4 zmm1 {k1}{z}, zmm2, xmm3/m128, imm8` | `EVEX.512.66.0F3A.W0 38 /r ib` | `AVX512F`
 	CodeAssembler& vinserti32x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTI32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinserti32x4(const Args&... args) { return vinserti32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTI32X8` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39895,6 +41309,13 @@ public:
 	/// ------------|--------|------
 	/// `VINSERTI32X8 zmm1 {k1}{z}, zmm2, ymm3/m256, imm8` | `EVEX.512.66.0F3A.W0 3A /r ib` | `AVX512DQ`
 	CodeAssembler& vinserti32x8(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VINSERTI32X8` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinserti32x8(const Args&... args) { return vinserti32x8(iced_x86::internal::int_arg(args)...); }
 
 	/// `VINSERTI64X2` instruction
 	///
@@ -39952,6 +41373,13 @@ public:
 	/// `VINSERTI64X2 zmm1 {k1}{z}, zmm2, xmm3/m128, imm8` | `EVEX.512.66.0F3A.W1 38 /r ib` | `AVX512DQ`
 	CodeAssembler& vinserti64x2(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VINSERTI64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinserti64x2(const Args&... args) { return vinserti64x2(iced_x86::internal::int_arg(args)...); }
+
 	/// `VINSERTI64X4` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -39979,6 +41407,13 @@ public:
 	/// ------------|--------|------
 	/// `VINSERTI64X4 zmm1 {k1}{z}, zmm2, ymm3/m256, imm8` | `EVEX.512.66.0F3A.W1 3A /r ib` | `AVX512F`
 	CodeAssembler& vinserti64x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VINSERTI64X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinserti64x4(const Args&... args) { return vinserti64x4(iced_x86::internal::int_arg(args)...); }
 
 	/// `VINSERTPS` instruction
 	///
@@ -40011,6 +41446,13 @@ public:
 	/// `VINSERTPS xmm1, xmm2, xmm3/m32, imm8` | `VEX.128.66.0F3A.WIG 21 /r ib` | `AVX`
 	/// `VINSERTPS xmm1, xmm2, xmm3/m32, imm8` | `EVEX.128.66.0F3A.W0 21 /r ib` | `AVX512F`
 	CodeAssembler& vinsertps(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VINSERTPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vinsertps(const Args&... args) { return vinsertps(iced_x86::internal::int_arg(args)...); }
 
 	/// `VLDDQU` instruction
 	///
@@ -41850,6 +43292,13 @@ public:
 	/// `VMPSADBW ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.WIG 42 /r ib` | `AVX2`
 	CodeAssembler& vmpsadbw(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VMPSADBW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vmpsadbw(const Args&... args) { return vmpsadbw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VMPTRLD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -43153,6 +44602,13 @@ public:
 	/// `VPALIGNR zmm1 {k1}{z}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.WIG 0F /r ib` | `AVX512BW`
 	CodeAssembler& vpalignr(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPALIGNR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpalignr(const Args&... args) { return vpalignr(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPAND` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -43525,6 +44981,13 @@ public:
 	/// `VPBLENDD ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.W0 02 /r ib` | `AVX2`
 	CodeAssembler& vpblendd(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPBLENDD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpblendd(const Args&... args) { return vpblendd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPBLENDMB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -43776,6 +45239,13 @@ public:
 	/// ------------|--------|------
 	/// `VPBLENDW ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.WIG 0E /r ib` | `AVX2`
 	CodeAssembler& vpblendw(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPBLENDW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpblendw(const Args&... args) { return vpblendw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPBROADCASTB` instruction
 	///
@@ -44363,6 +45833,13 @@ public:
 	/// `VPCLMULQDQ zmm1, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.WIG 44 /r ib` | `AVX512F VPCLMULQDQ`
 	CodeAssembler& vpclmulqdq(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCLMULQDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpclmulqdq(const Args&... args) { return vpclmulqdq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMOV` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -44489,6 +45966,13 @@ public:
 	/// `VPCMPB k1 {k2}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W0 3F /r ib` | `AVX512BW`
 	CodeAssembler& vpcmpb(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCMPB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpb(const Args&... args) { return vpcmpb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -44572,6 +46056,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPD k1 {k2}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 1F /r ib` | `AVX512F`
 	CodeAssembler& vpcmpd(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCMPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpd(const Args&... args) { return vpcmpd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPEQB` instruction
 	///
@@ -45049,6 +46540,13 @@ public:
 	/// `VPCMPESTRI xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.W0 61 /r ib` | `AVX`
 	CodeAssembler& vpcmpestri(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPCMPESTRI` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpestri(const Args&... args) { return vpcmpestri(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPESTRI64` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -45076,6 +46574,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPESTRI64 xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.W1 61 /r ib` | `AVX`
 	CodeAssembler& vpcmpestri64(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPCMPESTRI64` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpestri64(const Args&... args) { return vpcmpestri64(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPESTRM` instruction
 	///
@@ -45105,6 +46610,13 @@ public:
 	/// `VPCMPESTRM xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.W0 60 /r ib` | `AVX`
 	CodeAssembler& vpcmpestrm(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPCMPESTRM` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpestrm(const Args&... args) { return vpcmpestrm(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPESTRM64` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -45132,6 +46644,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPESTRM64 xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.W1 60 /r ib` | `AVX`
 	CodeAssembler& vpcmpestrm64(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPCMPESTRM64` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpestrm64(const Args&... args) { return vpcmpestrm64(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPFALSEB` instruction
 	///
@@ -45786,6 +47305,13 @@ public:
 	/// `VPCMPISTRI xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.WIG 63 /r ib` | `AVX`
 	CodeAssembler& vpcmpistri(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPCMPISTRI` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpistri(const Args&... args) { return vpcmpistri(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPISTRM` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -45813,6 +47339,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPISTRM xmm1, xmm2/m128, imm8` | `VEX.128.66.0F3A.WIG 62 /r ib` | `AVX`
 	CodeAssembler& vpcmpistrm(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPCMPISTRM` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpistrm(const Args&... args) { return vpcmpistrm(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPLEB` instruction
 	///
@@ -47578,6 +49111,13 @@ public:
 	/// `VPCMPQ k1 {k2}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 1F /r ib` | `AVX512F`
 	CodeAssembler& vpcmpq(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCMPQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpq(const Args&... args) { return vpcmpq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPTRUEB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -47998,6 +49538,13 @@ public:
 	/// `VPCMPUB k1 {k2}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W0 3E /r ib` | `AVX512BW`
 	CodeAssembler& vpcmpub(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCMPUB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpub(const Args&... args) { return vpcmpub(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPUD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -48081,6 +49628,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPUD k1 {k2}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 1E /r ib` | `AVX512F`
 	CodeAssembler& vpcmpud(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCMPUD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpud(const Args&... args) { return vpcmpud(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPUQ` instruction
 	///
@@ -48166,6 +49720,13 @@ public:
 	/// `VPCMPUQ k1 {k2}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 1E /r ib` | `AVX512F`
 	CodeAssembler& vpcmpuq(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCMPUQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpuq(const Args&... args) { return vpcmpuq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCMPUW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -48249,6 +49810,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCMPUW k1 {k2}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W1 3E /r ib` | `AVX512BW`
 	CodeAssembler& vpcmpuw(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCMPUW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpuw(const Args&... args) { return vpcmpuw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCMPW` instruction
 	///
@@ -48334,6 +49902,13 @@ public:
 	/// `VPCMPW k1 {k2}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W1 3F /r ib` | `AVX512BW`
 	CodeAssembler& vpcmpw(AsmRegisterK op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCMPW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcmpw(const Args&... args) { return vpcmpw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -48362,6 +49937,13 @@ public:
 	/// `VPCOMB xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 CC /r ib` | `XOP`
 	CodeAssembler& vpcomb(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCOMB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomb(const Args&... args) { return vpcomb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -48389,6 +49971,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCOMD xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 CE /r ib` | `XOP`
 	CodeAssembler& vpcomd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCOMD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomd(const Args&... args) { return vpcomd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCOMEQB` instruction
 	///
@@ -49370,6 +50959,13 @@ public:
 	/// `VPCOMQ xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 CF /r ib` | `XOP`
 	CodeAssembler& vpcomq(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCOMQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomq(const Args&... args) { return vpcomq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMTRUEB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -49510,6 +51106,13 @@ public:
 	/// `VPCOMUB xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 EC /r ib` | `XOP`
 	CodeAssembler& vpcomub(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCOMUB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomub(const Args&... args) { return vpcomub(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMUD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -49537,6 +51140,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCOMUD xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 EE /r ib` | `XOP`
 	CodeAssembler& vpcomud(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCOMUD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomud(const Args&... args) { return vpcomud(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCOMUQ` instruction
 	///
@@ -49566,6 +51176,13 @@ public:
 	/// `VPCOMUQ xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 EF /r ib` | `XOP`
 	CodeAssembler& vpcomuq(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCOMUQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomuq(const Args&... args) { return vpcomuq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMUW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -49594,6 +51211,13 @@ public:
 	/// `VPCOMUW xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 ED /r ib` | `XOP`
 	CodeAssembler& vpcomuw(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPCOMUW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomuw(const Args&... args) { return vpcomuw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPCOMW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -49621,6 +51245,13 @@ public:
 	/// ------------|--------|------
 	/// `VPCOMW xmm1, xmm2, xmm3/m128, imm8` | `XOP.128.X8.W0 CD /r ib` | `XOP`
 	CodeAssembler& vpcomw(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPCOMW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpcomw(const Args&... args) { return vpcomw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPCONFLICTD` instruction
 	///
@@ -50254,6 +51885,13 @@ public:
 	/// `VPERM2F128 ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.W0 06 /r ib` | `AVX`
 	CodeAssembler& vperm2f128(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPERM2F128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vperm2f128(const Args&... args) { return vperm2f128(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPERM2I128` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -50281,6 +51919,13 @@ public:
 	/// ------------|--------|------
 	/// `VPERM2I128 ymm1, ymm2, ymm3/m256, imm8` | `VEX.256.66.0F3A.W0 46 /r ib` | `AVX2`
 	CodeAssembler& vperm2i128(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPERM2I128` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vperm2i128(const Args&... args) { return vperm2i128(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPERMB` instruction
 	///
@@ -50690,6 +52335,13 @@ public:
 	/// `VPERMIL2PD ymm1, ymm2, ymm3, ymm4/m256, imm4` | `VEX.256.66.0F3A.W1 49 /r /is5` | `XOP`
 	CodeAssembler& vpermil2pd(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmRegisterYmm op2, AsmMemoryOperand op3, std::uint32_t op4);
 
+	/// `VPERMIL2PD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermil2pd(const Args&... args) { return vpermil2pd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPERMIL2PS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -50773,6 +52425,13 @@ public:
 	/// ------------|--------|------
 	/// `VPERMIL2PS ymm1, ymm2, ymm3, ymm4/m256, imm4` | `VEX.256.66.0F3A.W1 48 /r /is5` | `XOP`
 	CodeAssembler& vpermil2ps(AsmRegisterYmm op0, AsmRegisterYmm op1, AsmRegisterYmm op2, AsmMemoryOperand op3, std::uint32_t op4);
+
+	/// `VPERMIL2PS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermil2ps(const Args&... args) { return vpermil2ps(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPERMILPD` instruction
 	///
@@ -50912,6 +52571,13 @@ public:
 	/// `VPERMILPD zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 05 /r ib` | `AVX512F`
 	CodeAssembler& vpermilpd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPERMILPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermilpd(const Args&... args) { return vpermilpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPERMILPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -51050,6 +52716,13 @@ public:
 	/// `VPERMILPS zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 04 /r ib` | `AVX512F`
 	CodeAssembler& vpermilps(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPERMILPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermilps(const Args&... args) { return vpermilps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPERMPD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -51137,6 +52810,13 @@ public:
 	/// ------------|--------|------
 	/// `VPERMPD zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 01 /r ib` | `AVX512F`
 	CodeAssembler& vpermpd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPERMPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermpd(const Args&... args) { return vpermpd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPERMPS` instruction
 	///
@@ -51255,6 +52935,13 @@ public:
 	/// ------------|--------|------
 	/// `VPERMQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 00 /r ib` | `AVX512F`
 	CodeAssembler& vpermq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPERMQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpermq(const Args&... args) { return vpermq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPERMT2B` instruction
 	///
@@ -51766,6 +53453,13 @@ public:
 	/// `VPEXTRB r32/m8, xmm2, imm8` | `EVEX.128.66.0F3A.W0 14 /r ib` | `AVX512BW`
 	CodeAssembler& vpextrb(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
 
+	/// `VPEXTRB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpextrb(const Args&... args) { return vpextrb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPEXTRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -51798,6 +53492,13 @@ public:
 	/// `VPEXTRD r/m32, xmm2, imm8` | `EVEX.128.66.0F3A.W0 16 /r ib` | `AVX512DQ`
 	CodeAssembler& vpextrd(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
 
+	/// `VPEXTRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpextrd(const Args&... args) { return vpextrd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPEXTRQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -51829,6 +53530,13 @@ public:
 	/// `VPEXTRQ r/m64, xmm2, imm8` | `VEX.128.66.0F3A.W1 16 /r ib` | `AVX`
 	/// `VPEXTRQ r/m64, xmm2, imm8` | `EVEX.128.66.0F3A.W1 16 /r ib` | `AVX512DQ`
 	CodeAssembler& vpextrq(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
+
+	/// `VPEXTRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpextrq(const Args&... args) { return vpextrq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPEXTRW` instruction
 	///
@@ -51877,6 +53585,13 @@ public:
 	/// `VPEXTRW r32/m16, xmm2, imm8` | `VEX.128.66.0F3A.W0 15 /r ib` | `AVX`
 	/// `VPEXTRW r32/m16, xmm2, imm8` | `EVEX.128.66.0F3A.W0 15 /r ib` | `AVX512BW`
 	CodeAssembler& vpextrw(AsmMemoryOperand op0, AsmRegisterXmm op1, std::uint32_t op2);
+
+	/// `VPEXTRW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpextrw(const Args&... args) { return vpextrw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPGATHERDD` instruction
 	///
@@ -52446,6 +54161,13 @@ public:
 	/// `VPINSRB xmm1, xmm2, r32/m8, imm8` | `EVEX.128.66.0F3A.W0 20 /r ib` | `AVX512BW`
 	CodeAssembler& vpinsrb(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPINSRB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpinsrb(const Args&... args) { return vpinsrb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPINSRD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -52478,6 +54200,13 @@ public:
 	/// `VPINSRD xmm1, xmm2, r/m32, imm8` | `EVEX.128.66.0F3A.W0 22 /r ib` | `AVX512DQ`
 	CodeAssembler& vpinsrd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPINSRD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpinsrd(const Args&... args) { return vpinsrd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPINSRQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -52509,6 +54238,13 @@ public:
 	/// `VPINSRQ xmm1, xmm2, r/m64, imm8` | `VEX.128.66.0F3A.W1 22 /r ib` | `AVX`
 	/// `VPINSRQ xmm1, xmm2, r/m64, imm8` | `EVEX.128.66.0F3A.W1 22 /r ib` | `AVX512DQ`
 	CodeAssembler& vpinsrq(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPINSRQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpinsrq(const Args&... args) { return vpinsrq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPINSRW` instruction
 	///
@@ -52557,6 +54293,13 @@ public:
 	/// `VPINSRW xmm1, xmm2, r32/m16, imm8` | `VEX.128.66.0F.W0 C4 /r ib` | `AVX`
 	/// `VPINSRW xmm1, xmm2, r32/m16, imm8` | `EVEX.128.66.0F.W0 C4 /r ib` | `AVX512BW`
 	CodeAssembler& vpinsrw(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPINSRW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpinsrw(const Args&... args) { return vpinsrw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPLZCNTD` instruction
 	///
@@ -56074,6 +57817,13 @@ public:
 	/// `VPROLD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 72 /1 ib` | `AVX512F`
 	CodeAssembler& vprold(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPROLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprold(const Args&... args) { return vprold(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPROLQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -56157,6 +57907,13 @@ public:
 	/// ------------|--------|------
 	/// `VPROLQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 72 /1 ib` | `AVX512F`
 	CodeAssembler& vprolq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPROLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprolq(const Args&... args) { return vprolq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPROLVD` instruction
 	///
@@ -56326,6 +58083,13 @@ public:
 	/// `VPRORD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 72 /0 ib` | `AVX512F`
 	CodeAssembler& vprord(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPRORD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprord(const Args&... args) { return vprord(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPRORQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -56409,6 +58173,13 @@ public:
 	/// ------------|--------|------
 	/// `VPRORQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 72 /0 ib` | `AVX512F`
 	CodeAssembler& vprorq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPRORQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprorq(const Args&... args) { return vprorq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPRORVD` instruction
 	///
@@ -56543,6 +58314,13 @@ public:
 	/// `VPROTB xmm1, xmm2/m128, imm8` | `XOP.128.X8.W0 C0 /r ib` | `XOP`
 	CodeAssembler& vprotb(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPROTB` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprotb(const Args&... args) { return vprotb(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPROTD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -56591,6 +58369,13 @@ public:
 	/// ------------|--------|------
 	/// `VPROTD xmm1, xmm2/m128, imm8` | `XOP.128.X8.W0 C2 /r ib` | `XOP`
 	CodeAssembler& vprotd(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPROTD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprotd(const Args&... args) { return vprotd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPROTQ` instruction
 	///
@@ -56641,6 +58426,13 @@ public:
 	/// `VPROTQ xmm1, xmm2/m128, imm8` | `XOP.128.X8.W0 C3 /r ib` | `XOP`
 	CodeAssembler& vprotq(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPROTQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprotq(const Args&... args) { return vprotq(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPROTW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -56689,6 +58481,13 @@ public:
 	/// ------------|--------|------
 	/// `VPROTW xmm1, xmm2/m128, imm8` | `XOP.128.X8.W0 C1 /r ib` | `XOP`
 	CodeAssembler& vprotw(AsmRegisterXmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPROTW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vprotw(const Args&... args) { return vprotw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSADBW` instruction
 	///
@@ -57024,6 +58823,13 @@ public:
 	/// `VPSHLDD zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 71 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshldd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPSHLDD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshldd(const Args&... args) { return vpshldd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHLDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -57107,6 +58913,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSHLDQ zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 71 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshldq(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPSHLDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshldq(const Args&... args) { return vpshldq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSHLDVD` instruction
 	///
@@ -57318,6 +59131,13 @@ public:
 	/// `VPSHLDW zmm1 {k1}{z}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W1 70 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshldw(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPSHLDW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshldw(const Args&... args) { return vpshldw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHLQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -57444,6 +59264,13 @@ public:
 	/// `VPSHRDD zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 73 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshrdd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPSHRDD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshrdd(const Args&... args) { return vpshrdd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHRDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -57527,6 +59354,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSHRDQ zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 73 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshrdq(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPSHRDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshrdq(const Args&... args) { return vpshrdq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSHRDVD` instruction
 	///
@@ -57738,6 +59572,13 @@ public:
 	/// `VPSHRDW zmm1 {k1}{z}, zmm2, zmm3/m512, imm8` | `EVEX.512.66.0F3A.W1 72 /r ib` | `AVX512_VBMI2`
 	CodeAssembler& vpshrdw(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPSHRDW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshrdw(const Args&... args) { return vpshrdw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHUFB` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -57918,6 +59759,13 @@ public:
 	/// `VPSHUFD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 70 /r ib` | `AVX512F`
 	CodeAssembler& vpshufd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSHUFD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshufd(const Args&... args) { return vpshufd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHUFHW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -58010,6 +59858,13 @@ public:
 	/// `VPSHUFHW zmm1 {k1}{z}, zmm2/m512, imm8` | `EVEX.512.F3.0F.WIG 70 /r ib` | `AVX512BW`
 	CodeAssembler& vpshufhw(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSHUFHW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshufhw(const Args&... args) { return vpshufhw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSHUFLW` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -58101,6 +59956,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSHUFLW zmm1 {k1}{z}, zmm2/m512, imm8` | `EVEX.512.F2.0F.WIG 70 /r ib` | `AVX512BW`
 	CodeAssembler& vpshuflw(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSHUFLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpshuflw(const Args&... args) { return vpshuflw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSIGNB` instruction
 	///
@@ -58320,6 +60182,13 @@ public:
 	/// `VPSLLD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 72 /6 ib` | `AVX512F`
 	CodeAssembler& vpslld(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSLLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpslld(const Args&... args) { return vpslld(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSLLDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -58407,6 +60276,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSLLDQ zmm1, zmm2/m512, imm8` | `EVEX.512.66.0F.WIG 73 /7 ib` | `AVX512BW`
 	CodeAssembler& vpslldq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSLLDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpslldq(const Args&... args) { return vpslldq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSLLQ` instruction
 	///
@@ -58541,6 +60417,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSLLQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 73 /6 ib` | `AVX512F`
 	CodeAssembler& vpsllq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSLLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsllq(const Args&... args) { return vpsllq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSLLVD` instruction
 	///
@@ -58810,6 +60693,13 @@ public:
 	/// `VPSLLW zmm1 {k1}{z}, zmm2/m512, imm8` | `EVEX.512.66.0F.WIG 71 /6 ib` | `AVX512BW`
 	CodeAssembler& vpsllw(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSLLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsllw(const Args&... args) { return vpsllw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSRAD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -58944,6 +60834,13 @@ public:
 	/// `VPSRAD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 72 /4 ib` | `AVX512F`
 	CodeAssembler& vpsrad(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSRAD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsrad(const Args&... args) { return vpsrad(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSRAQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -59069,6 +60966,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSRAQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 72 /4 ib` | `AVX512F`
 	CodeAssembler& vpsraq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSRAQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsraq(const Args&... args) { return vpsraq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSRAVD` instruction
 	///
@@ -59343,6 +61247,13 @@ public:
 	/// `VPSRAW zmm1 {k1}{z}, zmm2/m512, imm8` | `EVEX.512.66.0F.WIG 71 /4 ib` | `AVX512BW`
 	CodeAssembler& vpsraw(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSRAW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsraw(const Args&... args) { return vpsraw(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSRLD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -59477,6 +61388,13 @@ public:
 	/// `VPSRLD zmm1 {k1}{z}, zmm2/m512/m32bcst, imm8` | `EVEX.512.66.0F.W0 72 /2 ib` | `AVX512F`
 	CodeAssembler& vpsrld(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VPSRLD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsrld(const Args&... args) { return vpsrld(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPSRLDQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -59564,6 +61482,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSRLDQ zmm1, zmm2/m512, imm8` | `EVEX.512.66.0F.WIG 73 /3 ib` | `AVX512BW`
 	CodeAssembler& vpsrldq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSRLDQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsrldq(const Args&... args) { return vpsrldq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSRLQ` instruction
 	///
@@ -59698,6 +61623,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSRLQ zmm1 {k1}{z}, zmm2/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 73 /2 ib` | `AVX512F`
 	CodeAssembler& vpsrlq(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSRLQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsrlq(const Args&... args) { return vpsrlq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSRLVD` instruction
 	///
@@ -59966,6 +61898,13 @@ public:
 	/// ------------|--------|------
 	/// `VPSRLW zmm1 {k1}{z}, zmm2/m512, imm8` | `EVEX.512.66.0F.WIG 71 /2 ib` | `AVX512BW`
 	CodeAssembler& vpsrlw(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VPSRLW` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpsrlw(const Args&... args) { return vpsrlw(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPSUBB` instruction
 	///
@@ -60419,6 +62358,13 @@ public:
 	/// `VPTERNLOGD zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 25 /r ib` | `AVX512F`
 	CodeAssembler& vpternlogd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VPTERNLOGD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpternlogd(const Args&... args) { return vpternlogd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VPTERNLOGQ` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -60502,6 +62448,13 @@ public:
 	/// ------------|--------|------
 	/// `VPTERNLOGQ zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 25 /r ib` | `AVX512F`
 	CodeAssembler& vpternlogq(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VPTERNLOGQ` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vpternlogq(const Args&... args) { return vpternlogq(iced_x86::internal::int_arg(args)...); }
 
 	/// `VPTEST` instruction
 	///
@@ -61431,6 +63384,13 @@ public:
 	/// `VRANGEPD zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F3A.W1 50 /r ib` | `AVX512DQ`
 	CodeAssembler& vrangepd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VRANGEPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrangepd(const Args&... args) { return vrangepd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRANGEPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -61515,6 +63475,13 @@ public:
 	/// `VRANGEPS zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8` | `EVEX.512.66.0F3A.W0 50 /r ib` | `AVX512DQ`
 	CodeAssembler& vrangeps(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VRANGEPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrangeps(const Args&... args) { return vrangeps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRANGESD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -61543,6 +63510,13 @@ public:
 	/// `VRANGESD xmm1 {k1}{z}, xmm2, xmm3/m64{sae}, imm8` | `EVEX.LIG.66.0F3A.W1 51 /r ib` | `AVX512DQ`
 	CodeAssembler& vrangesd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VRANGESD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrangesd(const Args&... args) { return vrangesd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRANGESS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -61570,6 +63544,13 @@ public:
 	/// ------------|--------|------
 	/// `VRANGESS xmm1 {k1}{z}, xmm2, xmm3/m32{sae}, imm8` | `EVEX.LIG.66.0F3A.W0 51 /r ib` | `AVX512DQ`
 	CodeAssembler& vrangess(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VRANGESS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrangess(const Args&... args) { return vrangess(iced_x86::internal::int_arg(args)...); }
 
 	/// `VRCP14PD` instruction
 	///
@@ -61921,6 +63902,13 @@ public:
 	/// `VREDUCEPD zmm1 {k1}{z}, zmm2/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F3A.W1 56 /r ib` | `AVX512DQ`
 	CodeAssembler& vreducepd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VREDUCEPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreducepd(const Args&... args) { return vreducepd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VREDUCEPH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62004,6 +63992,13 @@ public:
 	/// ------------|--------|------
 	/// `VREDUCEPH zmm1 {k1}{z}, zmm2/m512/m16bcst{sae}, imm8` | `EVEX.512.0F3A.W0 56 /r ib` | `AVX512-FP16`
 	CodeAssembler& vreduceph(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VREDUCEPH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreduceph(const Args&... args) { return vreduceph(iced_x86::internal::int_arg(args)...); }
 
 	/// `VREDUCEPS` instruction
 	///
@@ -62089,6 +64084,13 @@ public:
 	/// `VREDUCEPS zmm1 {k1}{z}, zmm2/m512/m32bcst{sae}, imm8` | `EVEX.512.66.0F3A.W0 56 /r ib` | `AVX512DQ`
 	CodeAssembler& vreduceps(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VREDUCEPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreduceps(const Args&... args) { return vreduceps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VREDUCESD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62116,6 +64118,13 @@ public:
 	/// ------------|--------|------
 	/// `VREDUCESD xmm1 {k1}{z}, xmm2, xmm3/m64{sae}, imm8` | `EVEX.LIG.66.0F3A.W1 57 /r ib` | `AVX512DQ`
 	CodeAssembler& vreducesd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VREDUCESD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreducesd(const Args&... args) { return vreducesd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VREDUCESH` instruction
 	///
@@ -62145,6 +64154,13 @@ public:
 	/// `VREDUCESH xmm1 {k1}{z}, xmm2, xmm3/m16{sae}, imm8` | `EVEX.LIG.0F3A.W0 57 /r ib` | `AVX512-FP16`
 	CodeAssembler& vreducesh(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VREDUCESH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreducesh(const Args&... args) { return vreducesh(iced_x86::internal::int_arg(args)...); }
+
 	/// `VREDUCESS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62172,6 +64188,13 @@ public:
 	/// ------------|--------|------
 	/// `VREDUCESS xmm1 {k1}{z}, xmm2, xmm3/m32{sae}, imm8` | `EVEX.LIG.66.0F3A.W0 57 /r ib` | `AVX512DQ`
 	CodeAssembler& vreducess(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VREDUCESS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vreducess(const Args&... args) { return vreducess(iced_x86::internal::int_arg(args)...); }
 
 	/// `VRNDSCALEPD` instruction
 	///
@@ -62257,6 +64280,13 @@ public:
 	/// `VRNDSCALEPD zmm1 {k1}{z}, zmm2/m512/m64bcst{sae}, imm8` | `EVEX.512.66.0F3A.W1 09 /r ib` | `AVX512F`
 	CodeAssembler& vrndscalepd(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VRNDSCALEPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscalepd(const Args&... args) { return vrndscalepd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRNDSCALEPH` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62340,6 +64370,13 @@ public:
 	/// ------------|--------|------
 	/// `VRNDSCALEPH zmm1 {k1}{z}, zmm2/m512/m16bcst{sae}, imm8` | `EVEX.512.0F3A.W0 08 /r ib` | `AVX512-FP16`
 	CodeAssembler& vrndscaleph(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
+
+	/// `VRNDSCALEPH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscaleph(const Args&... args) { return vrndscaleph(iced_x86::internal::int_arg(args)...); }
 
 	/// `VRNDSCALEPS` instruction
 	///
@@ -62425,6 +64462,13 @@ public:
 	/// `VRNDSCALEPS zmm1 {k1}{z}, zmm2/m512/m32bcst{sae}, imm8` | `EVEX.512.66.0F3A.W0 08 /r ib` | `AVX512F`
 	CodeAssembler& vrndscaleps(AsmRegisterZmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VRNDSCALEPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscaleps(const Args&... args) { return vrndscaleps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRNDSCALESD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62452,6 +64496,13 @@ public:
 	/// ------------|--------|------
 	/// `VRNDSCALESD xmm1 {k1}{z}, xmm2, xmm3/m64{sae}, imm8` | `EVEX.LIG.66.0F3A.W1 0B /r ib` | `AVX512F`
 	CodeAssembler& vrndscalesd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VRNDSCALESD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscalesd(const Args&... args) { return vrndscalesd(iced_x86::internal::int_arg(args)...); }
 
 	/// `VRNDSCALESH` instruction
 	///
@@ -62481,6 +64532,13 @@ public:
 	/// `VRNDSCALESH xmm1 {k1}{z}, xmm2, xmm3/m16{sae}, imm8` | `EVEX.LIG.0F3A.W0 0A /r ib` | `AVX512-FP16`
 	CodeAssembler& vrndscalesh(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VRNDSCALESH` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscalesh(const Args&... args) { return vrndscalesh(iced_x86::internal::int_arg(args)...); }
+
 	/// `VRNDSCALESS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62508,6 +64566,13 @@ public:
 	/// ------------|--------|------
 	/// `VRNDSCALESS xmm1 {k1}{z}, xmm2, xmm3/m32{sae}, imm8` | `EVEX.LIG.66.0F3A.W0 0A /r ib` | `AVX512F`
 	CodeAssembler& vrndscaless(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VRNDSCALESS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vrndscaless(const Args&... args) { return vrndscaless(iced_x86::internal::int_arg(args)...); }
 
 	/// `VROUNDPD` instruction
 	///
@@ -62565,6 +64630,13 @@ public:
 	/// `VROUNDPD ymm1, ymm2/m256, imm8` | `VEX.256.66.0F3A.WIG 09 /r ib` | `AVX`
 	CodeAssembler& vroundpd(AsmRegisterYmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VROUNDPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vroundpd(const Args&... args) { return vroundpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VROUNDPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62621,6 +64693,13 @@ public:
 	/// `VROUNDPS ymm1, ymm2/m256, imm8` | `VEX.256.66.0F3A.WIG 08 /r ib` | `AVX`
 	CodeAssembler& vroundps(AsmRegisterYmm op0, AsmMemoryOperand op1, std::uint32_t op2);
 
+	/// `VROUNDPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vroundps(const Args&... args) { return vroundps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VROUNDSD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62649,6 +64728,13 @@ public:
 	/// `VROUNDSD xmm1, xmm2, xmm3/m64, imm8` | `VEX.LIG.66.0F3A.WIG 0B /r ib` | `AVX`
 	CodeAssembler& vroundsd(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VROUNDSD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vroundsd(const Args&... args) { return vroundsd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VROUNDSS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -62676,6 +64762,13 @@ public:
 	/// ------------|--------|------
 	/// `VROUNDSS xmm1, xmm2, xmm3/m32, imm8` | `VEX.LIG.66.0F3A.WIG 0A /r ib` | `AVX`
 	CodeAssembler& vroundss(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VROUNDSS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vroundss(const Args&... args) { return vroundss(iced_x86::internal::int_arg(args)...); }
 
 	/// `VRSQRT14PD` instruction
 	///
@@ -63322,6 +65415,13 @@ public:
 	/// `VSHUFF32X4 zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 23 /r ib` | `AVX512F`
 	CodeAssembler& vshuff32x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VSHUFF32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshuff32x4(const Args&... args) { return vshuff32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VSHUFF64X2` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -63377,6 +65477,13 @@ public:
 	/// ------------|--------|------
 	/// `VSHUFF64X2 zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 23 /r ib` | `AVX512F`
 	CodeAssembler& vshuff64x2(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VSHUFF64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshuff64x2(const Args&... args) { return vshuff64x2(iced_x86::internal::int_arg(args)...); }
 
 	/// `VSHUFI32X4` instruction
 	///
@@ -63434,6 +65541,13 @@ public:
 	/// `VSHUFI32X4 zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.66.0F3A.W0 43 /r ib` | `AVX512F`
 	CodeAssembler& vshufi32x4(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VSHUFI32X4` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshufi32x4(const Args&... args) { return vshufi32x4(iced_x86::internal::int_arg(args)...); }
+
 	/// `VSHUFI64X2` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -63489,6 +65603,13 @@ public:
 	/// ------------|--------|------
 	/// `VSHUFI64X2 zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F3A.W1 43 /r ib` | `AVX512F`
 	CodeAssembler& vshufi64x2(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VSHUFI64X2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshufi64x2(const Args&... args) { return vshufi64x2(iced_x86::internal::int_arg(args)...); }
 
 	/// `VSHUFPD` instruction
 	///
@@ -63582,6 +65703,13 @@ public:
 	/// `VSHUFPD zmm1 {k1}{z}, zmm2, zmm3/m512/m64bcst, imm8` | `EVEX.512.66.0F.W1 C6 /r ib` | `AVX512F`
 	CodeAssembler& vshufpd(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VSHUFPD` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshufpd(const Args&... args) { return vshufpd(iced_x86::internal::int_arg(args)...); }
+
 	/// `VSHUFPS` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -63674,6 +65802,13 @@ public:
 	/// `VSHUFPS zmm1 {k1}{z}, zmm2, zmm3/m512/m32bcst, imm8` | `EVEX.512.0F.W0 C6 /r ib` | `AVX512F`
 	CodeAssembler& vshufps(AsmRegisterZmm op0, AsmRegisterZmm op1, AsmMemoryOperand op2, std::uint32_t op3);
 
+	/// `VSHUFPS` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vshufps(const Args&... args) { return vshufps(iced_x86::internal::int_arg(args)...); }
+
 	/// `VSM3MSG1` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -63729,6 +65864,13 @@ public:
 	/// ------------|--------|------
 	/// `VSM3RNDS2 xmm1, xmm2, xmm3/m128, imm8` | `VEX.128.66.0F3A.W0 DE /r ib` | `AVX SM3`
 	CodeAssembler& vsm3rnds2(AsmRegisterXmm op0, AsmRegisterXmm op1, AsmMemoryOperand op2, std::uint32_t op3);
+
+	/// `VSM3RNDS2` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& vsm3rnds2(const Args&... args) { return vsm3rnds2(iced_x86::internal::int_arg(args)...); }
 
 	/// `VSM4KEY4` instruction
 	///
@@ -64685,6 +66827,13 @@ public:
 	/// `XABORT imm8` | `C6 F8 ib` | `RTM`
 	CodeAssembler& xabort(std::uint32_t op0);
 
+	/// `XABORT` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& xabort(const Args&... args) { return xabort(iced_x86::internal::int_arg(args)...); }
+
 	/// `XADD` instruction
 	///
 	/// Instruction | Opcode | CPUID
@@ -64756,6 +66905,13 @@ public:
 	/// `XBEGIN rel16` | `o16 C7 F8 cw` | `RTM`
 	/// `XBEGIN rel32` | `o32 C7 F8 cd` | `RTM`
 	CodeAssembler& xbegin(std::uint64_t op0);
+
+	/// `XBEGIN` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& xbegin(const Args&... args) { return xbegin(iced_x86::internal::int_arg(args)...); }
 
 	/// `XBTS` instruction
 	///
@@ -65071,6 +67227,13 @@ public:
 	/// `XOR r/m16, imm8` | `o16 83 /6 ib` | `8086+`
 	/// `XOR r/m32, imm8` | `o32 83 /6 ib` | `386+`
 	CodeAssembler& xor_(AsmMemoryOperand op0, std::uint32_t op1);
+
+	/// `XOR` instruction (other integer types, eg. `long long`, `unsigned long`)
+	///
+	/// Converts each integer arg to the `std::int32_t`/`std::uint32_t`/`std::int64_t`/`std::uint64_t` with the same size
+	/// and signedness and calls one of the overloads above.
+	template <typename... Args, iced_x86::internal::EnableIfOtherIntArgs<Args...> = 0>
+	CodeAssembler& xor_(const Args&... args) { return xor_(iced_x86::internal::int_arg(args)...); }
 
 	/// `XORPD` instruction
 	///

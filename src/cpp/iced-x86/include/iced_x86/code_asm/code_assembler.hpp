@@ -45,6 +45,15 @@ public:
 /// The instruction methods (eg. `mov()`, thousands of overloads) and the option and error methods (eg. `bitness()`,
 /// `has_error()`) are declared in the base classes (`internal::CodeAssemblerBase`, `internal::CodeAssemblerFns0`, ...).
 ///
+/// # Integer arguments
+///
+/// The instruction methods have `std::int32_t`/`std::uint32_t` (or `std::int64_t`/`std::uint64_t`) overloads for
+/// immediates (Rust: `i32`/`u32`/`i64`/`u64` trait impls). Other integer types (eg. `long long`, `unsigned long`,
+/// `std::size_t`, `-1LL`, `0x1234ULL`) are converted to the type with the same size and signedness (types smaller than
+/// `int` are promoted to `int`), so any integer type can be passed as long as the instruction supports an immediate of
+/// that size, eg. `a.mov(rax, 0x1234'5678'9ABC'DEF0ULL)` works but `a.add(rax, 1LL)` doesn't compile since `add()`
+/// only takes 32-bit immediates (same as `a.add(rax, std::int64_t{1})`: use `1` instead).
+///
 /// # Errors
 ///
 /// All instruction methods (eg. `mov()`), prefix methods, `db()`, `set_label()` etc return `CodeAssembler&` so calls
@@ -86,8 +95,8 @@ public:
 /// a.xor_(byte_ptr(rdx + r14 * 4 + 123), 0x10);
 /// // Prefixes are also methods
 /// a.rep().stosd();
-/// // Sometimes, you must use an integer of the right type to help the compiler:
-/// a.mov(rax, UINT64_C(0x123456789ABCDEF0));
+/// // Immediates can be any integer type (eg. `int`, `unsigned`, `long long`, `std::uint64_t`):
+/// a.mov(rax, 0x1234'5678'9ABC'DEF0ULL);
 ///
 /// // Create labels that can be referenced by code
 /// CodeLabel loop_lbl1 = a.create_label();
@@ -427,6 +436,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& db(const std::vector<std::uint8_t>& data) { return db(data.data(), data.size()); }
+	/// Adds data, see `db(const std::uint8_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& db(const std::uint8_t (&data)[N]) { return db(data, N); }
 
 	/// Adds data
 	///
@@ -454,6 +468,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& db_i(const std::vector<std::int8_t>& data) { return db_i(data.data(), data.size()); }
+	/// Adds data, see `db_i(const std::int8_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& db_i(const std::int8_t (&data)[N]) { return db_i(data, N); }
 
 	/// Adds data
 	///
@@ -481,6 +500,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dw(const std::vector<std::uint16_t>& data) { return dw(data.data(), data.size()); }
+	/// Adds data, see `dw(const std::uint16_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dw(const std::uint16_t (&data)[N]) { return dw(data, N); }
 
 	/// Adds data
 	///
@@ -508,6 +532,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dw_i(const std::vector<std::int16_t>& data) { return dw_i(data.data(), data.size()); }
+	/// Adds data, see `dw_i(const std::int16_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dw_i(const std::int16_t (&data)[N]) { return dw_i(data, N); }
 
 	/// Adds data
 	///
@@ -535,6 +564,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dd(const std::vector<std::uint32_t>& data) { return dd(data.data(), data.size()); }
+	/// Adds data, see `dd(const std::uint32_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dd(const std::uint32_t (&data)[N]) { return dd(data, N); }
 
 	/// Adds data
 	///
@@ -562,6 +596,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dd_i(const std::vector<std::int32_t>& data) { return dd_i(data.data(), data.size()); }
+	/// Adds data, see `dd_i(const std::int32_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dd_i(const std::int32_t (&data)[N]) { return dd_i(data, N); }
 
 	/// Adds data
 	///
@@ -589,6 +628,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dd_f32(const std::vector<float>& data) { return dd_f32(data.data(), data.size()); }
+	/// Adds data, see `dd_f32(const float*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dd_f32(const float (&data)[N]) { return dd_f32(data, N); }
 
 	/// Adds data
 	///
@@ -616,6 +660,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dq(const std::vector<std::uint64_t>& data) { return dq(data.data(), data.size()); }
+	/// Adds data, see `dq(const std::uint64_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dq(const std::uint64_t (&data)[N]) { return dq(data, N); }
 
 	/// Adds data
 	///
@@ -643,6 +692,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dq_i(const std::vector<std::int64_t>& data) { return dq_i(data.data(), data.size()); }
+	/// Adds data, see `dq_i(const std::int64_t*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dq_i(const std::int64_t (&data)[N]) { return dq_i(data, N); }
 
 	/// Adds data
 	///
@@ -670,6 +724,11 @@ public:
 	///
 	/// @param data Data that will be added at the current position
 	CodeAssembler& dq_f64(const std::vector<double>& data) { return dq_f64(data.data(), data.size()); }
+	/// Adds data, see `dq_f64(const double*, std::size_t)`
+	///
+	/// @param data Data that will be added at the current position
+	template <std::size_t N>
+	CodeAssembler& dq_f64(const double (&data)[N]) { return dq_f64(data, N); }
 
 	/// Adds nops, preferring long nops
 	///

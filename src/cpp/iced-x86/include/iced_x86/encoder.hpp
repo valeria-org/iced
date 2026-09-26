@@ -27,7 +27,7 @@ enum class ImmSize : std::uint8_t;
 /// ```cpp
 /// // xchg ah,[rdx+rsi+16h]
 /// const std::uint8_t bytes[] = {0x86, 0x64, 0x32, 0x16};
-/// Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+/// Decoder decoder(64, bytes, DecoderOptions::NONE);
 /// decoder.set_ip(0x1234'5678);
 /// Instruction instr = decoder.decode();
 ///
@@ -101,7 +101,7 @@ public:
 	/// ```cpp
 	/// // je short $+4
 	/// const std::uint8_t bytes[] = {0x75, 0x02};
-	/// Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	/// Decoder decoder(64, bytes, DecoderOptions::NONE);
 	/// decoder.set_ip(0x1234'5678);
 	/// Instruction instr = decoder.decode();
 	///

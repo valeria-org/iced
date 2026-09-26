@@ -22,7 +22,7 @@ static void check(bool condition, const char* message) {
 static void how_to_get_virtual_address() {
 	// add [rdi+r12*8-5AA5EDCCh],esi
 	static const std::uint8_t bytes[] = {0x42, 0x01, 0xB4, 0xE7, 0x34, 0x12, 0x5A, 0xA5};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 	Instruction instr = decoder.decode();
 
 	auto va = instr.virtual_address(
