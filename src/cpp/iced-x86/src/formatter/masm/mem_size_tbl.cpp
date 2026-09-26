@@ -10,6 +10,7 @@
 #include <cstdint>
 
 #include "iced_x86/iced_constants.hpp"
+#include "internal/encoder/const_init.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/masm/mem_size_tbl_data.hpp"
 
@@ -21,8 +22,8 @@ namespace {
 struct MemSizeTblHolder {
 	std::array<MemSizeInfo, IcedConstants::MEMORY_SIZE_ENUM_COUNT> infos;
 
-	MemSizeTblHolder() {
-		const auto& ac = get_array_constants();
+	constexpr MemSizeTblHolder() noexcept : infos{} {
+		const auto& ac = ARRAY_CONSTANTS;
 		for (std::size_t i = 0; i < infos.size(); i++) {
 			const std::uint32_t d = MEM_SIZE_TBL_DATA[i];
 			auto& info = infos[i];
@@ -32,11 +33,11 @@ struct MemSizeTblHolder {
 		}
 	}
 };
+ICED_CONSTINIT const MemSizeTblHolder HOLDER;
 } // namespace
 
-const MemSizeInfo* get_mem_size_tbl() {
-	static const MemSizeTblHolder holder;
-	return holder.infos.data();
+const MemSizeInfo* get_mem_size_tbl() noexcept {
+	return HOLDER.infos.data();
 }
 
 } // namespace iced_x86::internal::masm

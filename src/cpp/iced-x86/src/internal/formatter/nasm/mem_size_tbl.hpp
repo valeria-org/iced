@@ -15,7 +15,7 @@ struct MemSizeInfo {
 	const FormatterString* bcst_to;
 };
 
-/// Gets the memory size infos (index = `MemorySize` value). The table is created the first time it's called.
-const MemSizeInfo* get_mem_size_tbl();
+/// Gets the memory size infos (index = `MemorySize` value). It's constant data.
+const MemSizeInfo* get_mem_size_tbl() noexcept;
 
 } // namespace iced_x86::internal::nasm

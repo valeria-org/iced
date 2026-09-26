@@ -27,7 +27,6 @@ struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace masm {
-class InstrInfo;
 struct MemSizeInfo;
 template <typename TOutput>
 struct MasmFormatterImpl;
@@ -349,9 +348,8 @@ public:
 
 private:
 	FormatterOptions options_;
-	// Read-only tables (created the first time a formatter is created)
+	// Read-only tables (constant data)
 	const internal::FormatterString* all_registers_;
-	const internal::masm::InstrInfo* const* instr_infos_;
 	const internal::masm::MemSizeInfo* all_memory_sizes_;
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;

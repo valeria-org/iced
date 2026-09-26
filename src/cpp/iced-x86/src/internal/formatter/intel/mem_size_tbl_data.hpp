@@ -184,7 +184,7 @@ inline constexpr std::uint8_t MEM_SIZE_TBL_DATA[162] = {
 // clang-format on
 
 /// Converts a memory keywords value to its keywords (eg. `dword ptr`)
-inline FormatterStringSlice get_memory_keywords(const FormatterArrayConstants& ac, std::uint32_t memory_keywords) noexcept {
+constexpr FormatterStringSlice get_memory_keywords(const FormatterArrayConstants& ac, std::uint32_t memory_keywords) noexcept {
 	switch (memory_keywords) {
 	case 0x00: return ac.nothing;
 	case 0x01: return ac.byte_ptr;
@@ -206,7 +206,7 @@ inline FormatterStringSlice get_memory_keywords(const FormatterArrayConstants& a
 }
 
 /// Converts a `BroadcastToKind` value to its string (eg. `1to8`)
-inline const FormatterString& get_bcst_to_string(const FormatterConstants& c, std::uint32_t bcst_to_kind) noexcept {
+constexpr const FormatterString& get_bcst_to_string(const FormatterConstants& c, std::uint32_t bcst_to_kind) noexcept {
 	switch (bcst_to_kind) {
 	case 0x00: return c.empty;
 	case 0x01: return c.b1to2;

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (C) 2018-present iced project and contributors
 
-// Tests the shared formatter runtime (number formatter, register names, strings table, output helpers) with a minimal
+// Tests the shared formatter runtime (number formatter, register names, constant string tables, output helpers) with a minimal
 // `Formatter` implementation so it's tested even if no syntax formatter is available. The shared test helpers
 // (`number_tests()`, `register_tests()`) are also tested this way.
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -12,15 +13,23 @@
 #include <string_view>
 
 #include "formatter/formatter_test_utils.hpp"
+#include "iced_x86/code.hpp"
 #include "iced_x86/formatter.hpp"
+#include "iced_x86/iced_constants.hpp"
+#include "iced_x86/register.hpp"
 #include "internal/formatter/fmt_common.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/fmt_utils.hpp"
+#include "internal/formatter/gas/fmt_data.hpp"
+#include "internal/formatter/gas/regs.hpp"
+#include "internal/formatter/intel/fmt_data.hpp"
+#include "internal/formatter/masm/fmt_data.hpp"
+#include "internal/formatter/nasm/fmt_data.hpp"
+#include "internal/formatter/nasm/regs.hpp"
 #include "internal/formatter/num_fmt.hpp"
 #include "internal/formatter/pseudo_ops.hpp"
+#include "internal/formatter/pseudo_ops_defs.hpp"
 #include "internal/formatter/regs_tbl_ls.hpp"
-#include "internal/formatter/strings_data.hpp"
-#include "internal/formatter/strings_tbl.hpp"
 #include "test_framework.hpp"
 
 using namespace iced_x86;
@@ -121,17 +130,54 @@ TEST_CASE("formatter/shared/register_names") {
 	register_tests("Intel", "RegisterTests", [] { return std::unique_ptr<Formatter>(std::make_unique<NumberAndRegisterFormatter>()); });
 }
 
-TEST_CASE("formatter/shared/strings_table") {
-	const auto strings = internal::get_strings_table_ref();
-	REQUIRE_EQ(strings.size(), internal::strings_data::STRINGS_COUNT);
-	std::size_t max_len = 0;
-	for (const auto s : strings) {
-		CHECK(!s.empty());
-		max_len = std::max(max_len, s.size());
-		for (const char c : s)
-			CHECK(!(c >= 'A' && c <= 'Z'));
+namespace {
+// Verifies the constant FormatterString data: the uppercase string must be the lowercase string converted to uppercase
+void check_formatter_string(internal::FormatterString s, bool can_be_empty = false) {
+	const std::string_view lower = s.lower();
+	const std::string_view upper = s.upper();
+	CHECK_EQ(lower.size(), s.len());
+	REQUIRE_EQ(lower.size(), upper.size());
+	CHECK_EQ(s.is_default(), lower.empty());
+	if (!can_be_empty)
+		CHECK(!lower.empty());
+	for (std::size_t i = 0; i < lower.size(); i++) {
+		const char c = lower[i];
+		CHECK(!(c >= 'A' && c <= 'Z'));
+		CHECK_EQ(upper[i], c >= 'a' && c <= 'z' ? static_cast<char>(c - 'a' + 'A') : c);
 	}
-	CHECK_EQ(max_len, internal::strings_data::MAX_STRING_LEN);
+}
+
+template <typename T>
+void check_instr_infos(const T* infos, const char* strings) {
+	for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++)
+		check_formatter_string(internal::FormatterString(strings + infos[i].mnemonic));
+}
+} // namespace
+
+TEST_CASE("formatter/shared/formatter_string_tables") {
+	check_formatter_string(internal::FormatterString(), true);
+	for (const auto& s : internal::get_regs_tbl())
+		check_formatter_string(s, true);
+	for (const auto& s : internal::gas::get_all_registers())
+		check_formatter_string(s);
+	for (std::size_t i = 0; i < IcedConstants::REGISTER_ENUM_COUNT; i++)
+		check_formatter_string(internal::nasm::get_all_registers()[i], true);
+	CHECK(internal::get_regs_tbl()[static_cast<std::size_t>(Register::ST0)].get(false) == "st(0)");
+	CHECK(internal::gas::get_all_registers()[static_cast<std::size_t>(Register::ST0)].get(true) == "%ST(0)");
+	CHECK(internal::nasm::get_all_registers()[static_cast<std::size_t>(Register::ST7)].get(false) == "st7");
+	CHECK(internal::nasm::get_all_registers()[static_cast<std::size_t>(Register::RAX)].get(true) == "RAX");
+	for (const auto& def : internal::pseudo_ops_defs::PSEUDO_OPS_DEFS) {
+		const auto pseudo_ops = internal::get_pseudo_ops(def.kind);
+		REQUIRE_EQ(pseudo_ops.size(), def.size);
+		for (std::size_t i = 0; i < pseudo_ops.size(); i++)
+			check_formatter_string(pseudo_ops[i]);
+	}
+	check_instr_infos(internal::gas::INSTR_INFOS, internal::gas::STRINGS);
+	check_instr_infos(internal::intel::INSTR_INFOS, internal::intel::STRINGS);
+	check_instr_infos(internal::masm::INSTR_INFOS, internal::masm::STRINGS);
+	check_instr_infos(internal::nasm::INSTR_INFOS, internal::nasm::STRINGS);
+	CHECK(internal::FormatterString(internal::gas::STRINGS + internal::gas::INSTR_INFOS[static_cast<std::size_t>(Code::Add_rm8_r8)].mnemonic)
+			  .get(false) == "add");
 }
 
 TEST_CASE("formatter/shared/pseudo_ops") {
@@ -166,6 +212,11 @@ TEST_CASE("formatter/shared/formatter_constants") {
 	CHECK(ac.nasm_branch_infos[2].size() == 2);
 	CHECK(ac.nasm_branch_infos[2][0] == &c.near);
 	CHECK(ac.mvex_reg_mem_consts_64[10] == &c.mvex.mem_1to8);
+	REQUIRE_EQ(ac.nasm_branch_infos[6].size(), static_cast<std::size_t>(1));
+	CHECK(ac.nasm_branch_infos[6][0] == &c.short_);
+	REQUIRE_EQ(ac.intel_branch_infos[1].size(), static_cast<std::size_t>(1));
+	CHECK(ac.intel_branch_infos[1][0] == &c.short_);
+	CHECK(ac.intel_branch_infos[0].empty());
 }
 
 TEST_CASE("formatter/shared/add_tabs") {
@@ -236,8 +287,11 @@ TEST_CASE("formatter/shared/formatter_output_methods_write") {
 
 TEST_CASE("formatter/shared/get_mnemonic_cc") {
 	FormatterOptions options;
-	const std::vector<internal::FormatterString> mnemonics = {internal::FormatterString("jb"), internal::FormatterString("jc"),
-															   internal::FormatterString("jnae")};
+	static constexpr internal::FormatterStringData<sizeof("jb")> JB("jb");
+	static constexpr internal::FormatterStringData<sizeof("jc")> JC("jc");
+	static constexpr internal::FormatterStringData<sizeof("jnae")> JNAE("jnae");
+	const std::array<internal::FormatterString, 3> mnemonics = {internal::FormatterString(JB), internal::FormatterString(JC),
+																internal::FormatterString(JNAE)};
 	CHECK(internal::get_mnemonic_cc(options, 2, mnemonics).get(false) == "jb");
 	options.set_cc_b(CC_b::c);
 	CHECK(internal::get_mnemonic_cc(options, 2, mnemonics).get(false) == "jc");

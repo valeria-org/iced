@@ -10,11 +10,11 @@
 
 namespace iced_x86::internal::strings_data {
 
-constexpr std::size_t STRINGS_COUNT = 1761;
+constexpr std::size_t STRINGS_COUNT = 1649;
 constexpr std::size_t MAX_STRING_LEN = 18;
 constexpr std::size_t VALID_STRING_LENGTH = 20;
 constexpr std::size_t PADDING_SIZE = 11;
-constexpr std::size_t STRINGS_TBL_DATA_SIZE = 14794;
+constexpr std::size_t STRINGS_TBL_DATA_SIZE = 14030;
 /// Each string is stored as a length byte followed by the ASCII chars. The last string is followed by padding
 /// so it's possible to read `VALID_STRING_LENGTH` bytes from any string.
 extern const std::uint8_t STRINGS_TBL_DATA[STRINGS_TBL_DATA_SIZE];

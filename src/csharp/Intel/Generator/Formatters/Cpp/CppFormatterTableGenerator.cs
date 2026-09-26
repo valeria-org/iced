@@ -6,10 +6,12 @@ using Generator.IO;
 
 namespace Generator.Formatters.Cpp {
 	/// <summary>
-	/// Generates the serialized formatter tables of all formatters (gas, intel, masm, nasm, fast):
+	/// Generates the instruction tables of all formatters (gas, intel, masm, nasm, fast):
 	/// <list type="bullet">
-	/// <item><c>src/formatter/strings_data.cpp</c> + <c>src/internal/formatter/strings_data.hpp</c>: the strings table shared by all formatters</item>
-	/// <item><c>src/formatter/&lt;syntax&gt;/fmt_data.cpp</c> + <c>src/internal/formatter/&lt;syntax&gt;/fmt_data.hpp</c>: the per-syntax instruction tables</item>
+	/// <item><c>src/formatter/strings_data.cpp</c> + <c>src/internal/formatter/strings_data.hpp</c>: the strings table used by the fast formatter</item>
+	/// <item><c>src/formatter/fast/fmt_data.cpp</c> + <c>src/internal/formatter/fast/fmt_data.hpp</c>: the serialized fast formatter instruction table</item>
+	/// <item><c>src/formatter/&lt;syntax&gt;/fmt_data.cpp</c> + <c>src/internal/formatter/&lt;syntax&gt;/fmt_data.hpp</c>: the constant gas/intel/masm/nasm
+	/// instruction info tables (see <see cref="CppInstrInfoTableGen"/>)</item>
 	/// </list>
 	/// </summary>
 	[Generator(TargetLanguage.Cpp)]
@@ -27,16 +29,6 @@ namespace Generator.Formatters.Cpp {
 			string HeaderFilename { get; }
 		}
 
-		sealed class FmtSerializer : ICppSerializer {
-			readonly CppFormatterTableSerializer serializer;
-			public FmtSerializer(CppFormatterTableSerializer serializer) => this.serializer = serializer;
-			public IFormatterTableSerializer Serializer => serializer;
-			public string DataFilename => serializer.DataFilename;
-			public string HeaderFilename => serializer.HeaderFilename;
-			public void SerializeData(FileWriter writer, StringsTable stringsTable) => serializer.SerializeData(writer, stringsTable);
-			public void SerializeHeader(FileWriter writer) => serializer.SerializeHeader(writer);
-		}
-
 		sealed class FastSerializer : ICppSerializer {
 			readonly GenTypes genTypes;
 			readonly CppFastFormatterTableSerializer serializer;
@@ -52,15 +44,17 @@ namespace Generator.Formatters.Cpp {
 		}
 
 		public void Generate() {
-			var serializers = new List<ICppSerializer>();
 			if (genTypes.Options.HasGasFormatter)
-				serializers.Add(new FmtSerializer(new CppFormatterTableSerializer(genTypes, "gas", genTypes.GetObject<Gas.CtorInfos>(TypeIds.GasCtorInfos).Infos, genTypes[TypeIds.GasCtorKind])));
+				new CppGasInstrInfoTableGen(genTypes).Generate();
 			if (genTypes.Options.HasIntelFormatter)
-				serializers.Add(new FmtSerializer(new CppFormatterTableSerializer(genTypes, "intel", genTypes.GetObject<Intel.CtorInfos>(TypeIds.IntelCtorInfos).Infos, genTypes[TypeIds.IntelCtorKind])));
+				new CppIntelInstrInfoTableGen(genTypes).Generate();
 			if (genTypes.Options.HasMasmFormatter)
-				serializers.Add(new FmtSerializer(new CppFormatterTableSerializer(genTypes, "masm", genTypes.GetObject<Masm.CtorInfos>(TypeIds.MasmCtorInfos).Infos, genTypes[TypeIds.MasmCtorKind])));
+				new CppMasmInstrInfoTableGen(genTypes).Generate();
 			if (genTypes.Options.HasNasmFormatter)
-				serializers.Add(new FmtSerializer(new CppFormatterTableSerializer(genTypes, "nasm", genTypes.GetObject<Nasm.CtorInfos>(TypeIds.NasmCtorInfos).Infos, genTypes[TypeIds.NasmCtorKind])));
+				new CppNasmInstrInfoTableGen(genTypes).Generate();
+
+			// The strings table is only used by the fast formatter
+			var serializers = new List<ICppSerializer>();
 			if (genTypes.Options.HasFastFormatter)
 				serializers.Add(new FastSerializer(genTypes, new CppFastFormatterTableSerializer(genTypes, "fast", genTypes.GetObject<Fast.FmtTblInfos>(TypeIds.FastFmtTblInfos).Infos)));
 

@@ -22,7 +22,7 @@ struct MemSizeInfo {
 
 using MemSizeTbl = std::array<MemSizeInfo, IcedConstants::MEMORY_SIZE_ENUM_COUNT>;
 
-/// Gets the info of each `MemorySize` (Rust: `MEM_SIZE_TBL`). It's created the first time it's called.
-const MemSizeTbl& get_mem_size_tbl();
+/// Gets the info of each `MemorySize` (Rust: `MEM_SIZE_TBL`). It's constant data.
+const MemSizeTbl& get_mem_size_tbl() noexcept;
 
 } // namespace iced_x86::internal::intel

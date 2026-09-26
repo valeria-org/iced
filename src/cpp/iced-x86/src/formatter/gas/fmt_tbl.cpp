@@ -6,33 +6,26 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <string>
-#include <string_view>
-#include <utility>
-#include <vector>
 
 #include "iced_x86/code.hpp"
 #include "iced_x86/code_size.hpp"
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/rounding_control.hpp"
-#include "internal/data_reader.hpp"
 #include "internal/formatter/fmt_common.hpp"
 #include "internal/formatter/fmt_utils.hpp"
-#include "internal/formatter/gas/ctor_kind.hpp"
 #include "internal/formatter/gas/fmt_data.hpp"
 #include "internal/formatter/gas/info.hpp"
 #include "internal/formatter/gas/instr_op_info_flags.hpp"
 #include "internal/formatter/gas/mem_size_tbl.hpp"
 #include "internal/formatter/pseudo_ops.hpp"
-#include "internal/formatter/strings_tbl.hpp"
+#include "internal/formatter/pseudo_ops_kind.hpp"
 #include "internal/iced_assert.hpp"
 
 namespace iced_x86::internal::gas {
 
 static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
 
-InstrOpInfo::InstrOpInfo(const FormatterString& mnemonic_, const Instruction& instruction, std::uint32_t flags_) noexcept
+InstrOpInfo::InstrOpInfo(FormatterString mnemonic_, const Instruction& instruction, std::uint32_t flags_) noexcept
 	: InstrOpInfo(mnemonic_) {
 	flags = static_cast<std::uint16_t>(flags_);
 	const std::uint32_t instr_op_count = instruction.op_count();
@@ -153,6 +146,11 @@ InstrOpInfo::InstrOpInfo(const FormatterString& mnemonic_, const Instruction& in
 
 namespace {
 
+constexpr FormatterStringData<sizeof("xchg")> STR_XCHG("xchg");
+constexpr FormatterStringData<sizeof("xchgw")> STR_XCHGW("xchgw");
+constexpr FormatterStringData<sizeof("xchgl")> STR_XCHGL("xchgl");
+constexpr FormatterStringData<sizeof("xchgq")> STR_XCHGQ("xchgq");
+
 std::uint32_t get_bitness(CodeSize code_size) noexcept {
 	static constexpr std::uint32_t CODESIZE_TO_BITNESS[4] = {0, 16, 32, 64};
 	static_assert(static_cast<std::uint32_t>(CodeSize::Unknown) == 0, "");
@@ -162,8 +160,10 @@ std::uint32_t get_bitness(CodeSize code_size) noexcept {
 	return CODESIZE_TO_BITNESS[static_cast<std::size_t>(code_size) & 3];
 }
 
-const FormatterString& get_mnemonic(const FormatterOptions& options, const Instruction& instruction, const FormatterString& mnemonic,
-									const FormatterString& mnemonic_suffix, std::uint32_t flags) noexcept {
+FormatterString str(std::uint32_t offset) noexcept { return FormatterString(STRINGS + offset); }
+
+FormatterString get_mnemonic(const FormatterOptions& options, const Instruction& instruction, FormatterString mnemonic,
+							 FormatterString mnemonic_suffix, std::uint32_t flags) noexcept {
 	if (options.gas_show_mnemonic_size_suffix())
 		return mnemonic_suffix;
 	if ((flags & InstrOpInfoFlags::MNEMONIC_SUFFIX_IF_MEM) != 0 &&
@@ -174,16 +174,11 @@ const FormatterString& get_mnemonic(const FormatterOptions& options, const Instr
 	return mnemonic;
 }
 
-std::vector<FormatterString> to_formatter_strings(std::vector<std::string> strings) {
-	return FormatterString::with_strings(std::move(strings));
-}
-
-class SimpleInstrInfo final : public InstrInfo {
+class SimpleInstrInfo final {
 public:
-	SimpleInstrInfo(std::string mnemonic, std::string mnemonic_suffix, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), flags_(flags) {}
+	explicit SimpleInstrInfo(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), flags_(e.arg2) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		return InstrOpInfo(get_mnemonic(options, instruction, mnemonic_, mnemonic_suffix_, flags_), instruction, flags_);
 	}
 
@@ -193,30 +188,30 @@ private:
 	std::uint32_t flags_;
 };
 
-class SimpleInstrInfo_cc final : public InstrInfo {
+class SimpleInstrInfo_cc final {
 public:
-	SimpleInstrInfo_cc(std::uint32_t cc_index, std::vector<std::string> mnemonics, std::vector<std::string> mnemonics_suffix)
-		: mnemonics_(to_formatter_strings(std::move(mnemonics))), mnemonics_suffix_(to_formatter_strings(std::move(mnemonics_suffix))),
-		  cc_index_(cc_index) {}
+	explicit SimpleInstrInfo_cc(const InstrInfo& e) noexcept : mnemonics_(ARGS + e.arg1), cc_index_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
-		const FormatterString& mnemonic = get_mnemonic_cc(options, cc_index_, mnemonics_);
-		const FormatterString& mnemonic_suffix = get_mnemonic_cc(options, cc_index_, mnemonics_suffix_);
+		const std::size_t count = get_cc_mnemonics_count(cc_index_);
+		const std::size_t index = get_mnemonic_cc_index(options, cc_index_, count);
+		const FormatterString mnemonic = str(mnemonics_[index]);
+		const FormatterString mnemonic_suffix = str(mnemonics_[count + index]);
 		return InstrOpInfo(get_mnemonic(options, instruction, mnemonic, mnemonic_suffix, FLAGS), instruction, FLAGS);
 	}
 
 private:
-	std::vector<FormatterString> mnemonics_;
-	std::vector<FormatterString> mnemonics_suffix_;
+	// The mnemonics followed by the mnemonics with a suffix (offsets in STRINGS)
+	const std::uint16_t* mnemonics_;
 	std::uint32_t cc_index_;
 };
 
-class SimpleInstrInfo_AamAad final : public InstrInfo {
+class SimpleInstrInfo_AamAad final {
 public:
-	explicit SimpleInstrInfo_AamAad(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_AamAad(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		if (instruction.immediate8() == 10)
 			return InstrOpInfo(mnemonic_);
@@ -227,28 +222,27 @@ private:
 	FormatterString mnemonic_;
 };
 
-class SimpleInstrInfo_nop final : public InstrInfo {
+class SimpleInstrInfo_nop final {
 public:
-	SimpleInstrInfo_nop(std::uint32_t bitness, std::string mnemonic, Register register_)
-		: mnemonic_(std::move(mnemonic)), bitness_(bitness), register_(register_), str_xchg_("xchg"), str_xchgw_("xchgw"), str_xchgl_("xchgl"),
-		  str_xchgq_("xchgq") {}
+	explicit SimpleInstrInfo_nop(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), bitness_(e.arg3), register_(static_cast<Register>(e.arg2)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		if (instr_bitness == 0 || (instr_bitness & bitness_) != 0)
 			return InstrOpInfo(mnemonic_, instruction, InstrOpInfoFlags::NONE);
-		const FormatterString* mnemonic;
+		FormatterString mnemonic;
 		if (!options.gas_show_mnemonic_size_suffix())
-			mnemonic = &str_xchg_;
+			mnemonic = FormatterString(STR_XCHG);
 		else if (register_ == Register::AX)
-			mnemonic = &str_xchgw_;
+			mnemonic = FormatterString(STR_XCHGW);
 		else if (register_ == Register::EAX)
-			mnemonic = &str_xchgl_;
+			mnemonic = FormatterString(STR_XCHGL);
 		else if (register_ == Register::RAX)
-			mnemonic = &str_xchgq_;
+			mnemonic = FormatterString(STR_XCHGQ);
 		else
 			ICED_UNREACHABLE();
-		InstrOpInfo info(*mnemonic);
+		InstrOpInfo info(mnemonic);
 		info.op_count = 2;
 		static_assert(static_cast<std::uint32_t>(InstrOpKind::Register) == 0, "");
 		// info.op_kinds[0] = InstrOpKind::Register;
@@ -264,17 +258,13 @@ private:
 	FormatterString mnemonic_;
 	std::uint32_t bitness_;
 	Register register_;
-	FormatterString str_xchg_;
-	FormatterString str_xchgw_;
-	FormatterString str_xchgl_;
-	FormatterString str_xchgq_;
 };
 
-class SimpleInstrInfo_STIG1 final : public InstrInfo {
+class SimpleInstrInfo_STIG1 final {
 public:
-	SimpleInstrInfo_STIG1(std::string mnemonic, bool pseudo_op) : mnemonic_(std::move(mnemonic)), pseudo_op_(pseudo_op) {}
+	explicit SimpleInstrInfo_STIG1(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), pseudo_op_(e.arg3 != 0) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		InstrOpInfo info(mnemonic_);
 		ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 		ICED_DEBUG_ASSERT(instruction.op0_kind() == OpKind::Register && instruction.op0_register() == Register::ST0);
@@ -293,11 +283,11 @@ private:
 	bool pseudo_op_;
 };
 
-class SimpleInstrInfo_STi_ST final : public InstrInfo {
+class SimpleInstrInfo_STi_ST final {
 public:
-	SimpleInstrInfo_STi_ST(std::string mnemonic, bool pseudo_op) : mnemonic_(std::move(mnemonic)), pseudo_op_(pseudo_op) {}
+	explicit SimpleInstrInfo_STi_ST(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), pseudo_op_(e.arg3 != 0) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		if (pseudo_op_ && options.use_pseudo_ops() && (instruction.op0_register() == Register::ST1 || instruction.op1_register() == Register::ST1))
 			return InstrOpInfo(mnemonic_);
@@ -312,11 +302,11 @@ private:
 	bool pseudo_op_;
 };
 
-class SimpleInstrInfo_ST_STi final : public InstrInfo {
+class SimpleInstrInfo_ST_STi final {
 public:
-	explicit SimpleInstrInfo_ST_STi(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_ST_STi(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		InstrOpInfo info(mnemonic_, instruction, InstrOpInfoFlags::NONE);
 		ICED_DEBUG_ASSERT(info.op_registers[1] == Register::ST0);
@@ -328,11 +318,11 @@ private:
 	FormatterString mnemonic_;
 };
 
-class SimpleInstrInfo_as final : public InstrInfo {
+class SimpleInstrInfo_as final {
 public:
-	SimpleInstrInfo_as(std::uint32_t bitness, std::string mnemonic) : mnemonic_(std::move(mnemonic)), bitness_(bitness) {}
+	explicit SimpleInstrInfo_as(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), bitness_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		std::uint32_t flags = 0;
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
@@ -352,11 +342,11 @@ private:
 	std::uint32_t bitness_;
 };
 
-class SimpleInstrInfo_maskmovq final : public InstrInfo {
+class SimpleInstrInfo_maskmovq final {
 public:
-	explicit SimpleInstrInfo_maskmovq(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_maskmovq(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 
@@ -401,11 +391,11 @@ private:
 	FormatterString mnemonic_;
 };
 
-class SimpleInstrInfo_pblendvb final : public InstrInfo {
+class SimpleInstrInfo_pblendvb final {
 public:
-	explicit SimpleInstrInfo_pblendvb(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_pblendvb(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		InstrOpInfo info(mnemonic_);
 		ICED_DEBUG_ASSERT(instruction.op_count() == 2);
@@ -426,14 +416,13 @@ private:
 	FormatterString mnemonic_;
 };
 
-class SimpleInstrInfo_OpSize final : public InstrInfo {
+class SimpleInstrInfo_OpSize final {
 public:
-	SimpleInstrInfo_OpSize(CodeSize code_size, std::string mnemonic, std::string mnemonic16, std::string mnemonic32, std::string mnemonic64)
-		: mnemonics_{FormatterString(std::move(mnemonic)), FormatterString(std::move(mnemonic16)), FormatterString(std::move(mnemonic32)),
-					 FormatterString(std::move(mnemonic64))},
-		  code_size_(code_size) {}
+	explicit SimpleInstrInfo_OpSize(const InstrInfo& e) noexcept
+		: mnemonics_{str(e.mnemonic), str(ARGS[e.arg1]), str(ARGS[e.arg1 + 1U]), str(ARGS[e.arg1 + 2U])}
+		, code_size_(static_cast<CodeSize>(e.arg3)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		const FormatterString* mnemonic;
 		if (instruction.code_size() == code_size_ && !options.gas_show_mnemonic_size_suffix())
 			mnemonic = &mnemonics_[static_cast<std::size_t>(CodeSize::Unknown)];
@@ -447,13 +436,12 @@ private:
 	CodeSize code_size_;
 };
 
-class SimpleInstrInfo_OpSize2_bnd final : public InstrInfo {
+class SimpleInstrInfo_OpSize2_bnd final {
 public:
-	SimpleInstrInfo_OpSize2_bnd(std::string mnemonic, std::string mnemonic16, std::string mnemonic32, std::string mnemonic64)
-		: mnemonics_{FormatterString(std::move(mnemonic)), FormatterString(std::move(mnemonic16)), FormatterString(std::move(mnemonic32)),
-					 FormatterString(std::move(mnemonic64))} {}
+	explicit SimpleInstrInfo_OpSize2_bnd(const InstrInfo& e) noexcept
+		: mnemonics_{str(e.mnemonic), str(ARGS[e.arg1]), str(ARGS[e.arg1 + 1U]), str(ARGS[e.arg1 + 2U])} {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = InstrOpInfoFlags::NONE;
 		if (instruction.has_repne_prefix())
 			flags |= InstrOpInfoFlags::BND_PREFIX;
@@ -469,12 +457,12 @@ private:
 	std::array<FormatterString, 4> mnemonics_;
 };
 
-class SimpleInstrInfo_OpSize3 final : public InstrInfo {
+class SimpleInstrInfo_OpSize3 final {
 public:
-	SimpleInstrInfo_OpSize3(std::uint32_t bitness, std::string mnemonic, std::string mnemonic_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), bitness_(bitness) {}
+	explicit SimpleInstrInfo_OpSize3(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), bitness_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		const FormatterString& mnemonic =
 			!options.gas_show_mnemonic_size_suffix() && (instr_bitness == 0 || (instr_bitness & bitness_) != 0) ? mnemonic_ : mnemonic_suffix_;
@@ -487,12 +475,16 @@ private:
 	std::uint32_t bitness_;
 };
 
-class SimpleInstrInfo_os2 final : public InstrInfo {
+class SimpleInstrInfo_os2 final {
 public:
-	SimpleInstrInfo_os2(std::uint32_t bitness, std::string mnemonic, std::string mnemonic_suffix, bool can_use_bnd, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), bitness_(bitness), flags_(flags), can_use_bnd_(can_use_bnd) {}
+	explicit SimpleInstrInfo_os2(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic))
+		, mnemonic_suffix_(str(ARGS[e.arg1]))
+		, bitness_(e.arg3)
+		, flags_(ARGS[e.arg1 + 2U])
+		, can_use_bnd_(ARGS[e.arg1 + 1U] != 0) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = flags_;
 		if (can_use_bnd_ && instruction.has_repne_prefix())
 			flags |= InstrOpInfoFlags::BND_PREFIX;
@@ -511,12 +503,12 @@ private:
 	bool can_use_bnd_;
 };
 
-class SimpleInstrInfo_os final : public InstrInfo {
+class SimpleInstrInfo_os final {
 public:
-	SimpleInstrInfo_os(std::uint32_t bitness, std::string mnemonic, bool can_use_bnd, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), bitness_(bitness), flags_(flags), can_use_bnd_(can_use_bnd) {}
+	explicit SimpleInstrInfo_os(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), bitness_(e.arg3), flags_(e.arg2), can_use_bnd_(e.arg1 != 0) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = flags_;
 		if (can_use_bnd_ && instruction.has_repne_prefix())
 			flags |= InstrOpInfoFlags::BND_PREFIX;
@@ -539,39 +531,12 @@ private:
 	bool can_use_bnd_;
 };
 
-class SimpleInstrInfo_os_mem final : public InstrInfo {
+class SimpleInstrInfo_os_mem2 final {
 public:
-	SimpleInstrInfo_os_mem(std::uint32_t bitness, std::string mnemonic, std::string mnemonic_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), bitness_(bitness) {}
+	explicit SimpleInstrInfo_os_mem2(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), bitness_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
-		std::uint32_t flags = InstrOpInfoFlags::NONE;
-		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
-		const bool has_mem_op = instruction.op0_kind() == OpKind::Memory || instruction.op1_kind() == OpKind::Memory;
-		if (has_mem_op && !(instr_bitness == 0 || (instr_bitness != 64 && instr_bitness == bitness_) || (instr_bitness == 64 && bitness_ == 32))) {
-			if (bitness_ == 16)
-				flags |= InstrOpInfoFlags::OP_SIZE16;
-			else if (bitness_ == 32)
-				flags |= InstrOpInfoFlags::OP_SIZE32;
-			else
-				flags |= InstrOpInfoFlags::OP_SIZE64;
-		}
-		const FormatterString& mnemonic = has_mem_op ? mnemonic_ : get_mnemonic(options, instruction, mnemonic_, mnemonic_suffix_, flags);
-		return InstrOpInfo(mnemonic, instruction, flags);
-	}
-
-private:
-	FormatterString mnemonic_;
-	FormatterString mnemonic_suffix_;
-	std::uint32_t bitness_;
-};
-
-class SimpleInstrInfo_os_mem2 final : public InstrInfo {
-public:
-	SimpleInstrInfo_os_mem2(std::uint32_t bitness, std::string mnemonic, std::string mnemonic_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), bitness_(bitness) {}
-
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		const FormatterString& mnemonic = instr_bitness != 0 && (instr_bitness & bitness_) == 0
@@ -586,12 +551,11 @@ private:
 	std::uint32_t bitness_;
 };
 
-class SimpleInstrInfo_Reg16 final : public InstrInfo {
+class SimpleInstrInfo_Reg16 final {
 public:
-	SimpleInstrInfo_Reg16(std::string mnemonic, std::string mnemonic_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)) {}
+	explicit SimpleInstrInfo_Reg16(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		InstrOpInfo info(get_mnemonic(options, instruction, mnemonic_, mnemonic_suffix_, FLAGS), instruction, FLAGS);
 		info.op_registers[0] = r_to_r16(info.op_registers[0]);
@@ -605,12 +569,12 @@ private:
 	FormatterString mnemonic_suffix_;
 };
 
-class SimpleInstrInfo_mem16 final : public InstrInfo {
+class SimpleInstrInfo_mem16 final {
 public:
-	SimpleInstrInfo_mem16(std::string mnemonic, std::string mnemonic_reg_suffix, std::string mnemonic_mem_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_reg_suffix_(std::move(mnemonic_reg_suffix)), mnemonic_mem_suffix_(std::move(mnemonic_mem_suffix)) {}
+	explicit SimpleInstrInfo_mem16(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), mnemonic_reg_suffix_(str(e.arg1)), mnemonic_mem_suffix_(str(e.arg2)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		const FormatterString& mnemonic_suffix =
 			instruction.op0_kind() == OpKind::Memory || instruction.op1_kind() == OpKind::Memory ? mnemonic_mem_suffix_ : mnemonic_reg_suffix_;
@@ -624,19 +588,20 @@ private:
 };
 
 constexpr std::uint32_t NO_CC_INDEX = 0xFFFF'FFFF;
+// `InstrInfo::arg3` value if there's no cc index
+constexpr std::uint8_t NO_CC_INDEX_U8 = 0xFF;
 
-class SimpleInstrInfo_os_loop final : public InstrInfo {
+class SimpleInstrInfo_os_loop final {
 public:
-	SimpleInstrInfo_os_loop(std::uint32_t bitness, std::uint32_t reg_size, std::uint32_t cc_index, std::vector<std::string> mnemonics,
-							std::vector<std::string> mnemonics_suffix)
-		: mnemonics_(to_formatter_strings(std::move(mnemonics))), mnemonics_suffix_(to_formatter_strings(std::move(mnemonics_suffix))),
-		  bitness_(bitness), cc_index_(cc_index), reg_size_(reg_size) {}
+	explicit SimpleInstrInfo_os_loop(const InstrInfo& e) noexcept
+		: args_(ARGS + e.arg1), bitness_(e.arg2), cc_index_(e.arg3 == NO_CC_INDEX_U8 ? NO_CC_INDEX : e.arg3), reg_size_(args_[0]) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = InstrOpInfoFlags::NONE;
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
-		const std::vector<FormatterString>& mnemonics =
-			(instr_bitness != 0 && instr_bitness != reg_size_) || options.gas_show_mnemonic_size_suffix() ? mnemonics_suffix_ : mnemonics_;
+		const std::size_t count = cc_index_ == NO_CC_INDEX ? 1 : get_cc_mnemonics_count(cc_index_);
+		const std::uint16_t* mnemonics =
+			(instr_bitness != 0 && instr_bitness != reg_size_) || options.gas_show_mnemonic_size_suffix() ? args_ + 1 + count : args_ + 1;
 		if (instr_bitness != 0 && instr_bitness != bitness_) {
 			if (bitness_ == 16)
 				flags |= InstrOpInfoFlags::OP_SIZE16 | InstrOpInfoFlags::OP_SIZE_IS_BYTE_DIRECTIVE;
@@ -645,24 +610,24 @@ public:
 			else
 				flags |= InstrOpInfoFlags::OP_SIZE64;
 		}
-		const FormatterString& mnemonic = cc_index_ == NO_CC_INDEX ? mnemonics[0] : get_mnemonic_cc(options, cc_index_, mnemonics);
+		const std::size_t index = cc_index_ == NO_CC_INDEX ? 0 : get_mnemonic_cc_index(options, cc_index_, count);
+		const FormatterString mnemonic = str(mnemonics[index]);
 		return InstrOpInfo(mnemonic, instruction, flags);
 	}
 
 private:
-	std::vector<FormatterString> mnemonics_;
-	std::vector<FormatterString> mnemonics_suffix_;
+	// reg_size, the mnemonics, the mnemonics with a suffix (offsets in STRINGS)
+	const std::uint16_t* args_;
 	std::uint32_t bitness_;
 	std::uint32_t cc_index_;
 	std::uint32_t reg_size_;
 };
 
-class SimpleInstrInfo_os_jcc final : public InstrInfo {
+class SimpleInstrInfo_os_jcc final {
 public:
-	SimpleInstrInfo_os_jcc(std::uint32_t bitness, std::uint32_t cc_index, std::vector<std::string> mnemonics)
-		: mnemonics_(to_formatter_strings(std::move(mnemonics))), bitness_(bitness), cc_index_(cc_index) {}
+	explicit SimpleInstrInfo_os_jcc(const InstrInfo& e) noexcept : mnemonics_(ARGS + e.arg1), bitness_(e.arg2), cc_index_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = InstrOpInfoFlags::NONE;
 		const std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		if (instr_bitness != 0 && instr_bitness != bitness_) {
@@ -680,23 +645,26 @@ public:
 			flags |= InstrOpInfoFlags::JCC_TAKEN;
 		if (instruction.has_repne_prefix())
 			flags |= InstrOpInfoFlags::BND_PREFIX;
-		const FormatterString& mnemonic = get_mnemonic_cc(options, cc_index_, mnemonics_);
+		const FormatterString mnemonic = str(mnemonics_[get_mnemonic_cc_index(options, cc_index_, get_cc_mnemonics_count(cc_index_))]);
 		return InstrOpInfo(get_mnemonic(options, instruction, mnemonic, mnemonic, flags), instruction, flags);
 	}
 
 private:
-	std::vector<FormatterString> mnemonics_;
+	// Offsets in STRINGS
+	const std::uint16_t* mnemonics_;
 	std::uint32_t bitness_;
 	std::uint32_t cc_index_;
 };
 
-class SimpleInstrInfo_movabs final : public InstrInfo {
+class SimpleInstrInfo_movabs final {
 public:
-	SimpleInstrInfo_movabs(std::string mnemonic, std::string mnemonic_suffix, std::string mnemonic64, std::string mnemonic_suffix64)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), mnemonic64_(std::move(mnemonic64)),
-		  mnemonic_suffix64_(std::move(mnemonic_suffix64)) {}
+	explicit SimpleInstrInfo_movabs(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic))
+		, mnemonic_suffix_(str(ARGS[e.arg1]))
+		, mnemonic64_(str(ARGS[e.arg1 + 1U]))
+		, mnemonic_suffix64_(str(ARGS[e.arg1 + 2U])) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = InstrOpInfoFlags::NONE;
 		std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		std::uint32_t mem_size;
@@ -783,14 +751,12 @@ void move_operands(InstrOpInfo& info, std::uint32_t index, InstrOpKind new_op_ki
 	}
 }
 
-class SimpleInstrInfo_er final : public InstrInfo {
+class SimpleInstrInfo_er final {
 public:
-	SimpleInstrInfo_er(std::uint32_t er_index, std::string mnemonic)
-		: mnemonic_(mnemonic), mnemonic_suffix_(std::move(mnemonic)), er_index_(er_index), flags_(InstrOpInfoFlags::NONE) {}
-	SimpleInstrInfo_er(std::uint32_t er_index, std::string mnemonic, std::string mnemonic_suffix, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), er_index_(er_index), flags_(flags) {}
+	explicit SimpleInstrInfo_er(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), er_index_(e.arg3), flags_(e.arg2) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		InstrOpInfo info(get_mnemonic(options, instruction, mnemonic_, mnemonic_suffix_, flags_), instruction, flags_);
 		if (IcedConstants::is_mvex(instruction.code())) {
 			const RoundingControl rc = instruction.rounding_control();
@@ -867,11 +833,11 @@ private:
 	std::uint32_t flags_;
 };
 
-class SimpleInstrInfo_sae final : public InstrInfo {
+class SimpleInstrInfo_sae final {
 public:
-	SimpleInstrInfo_sae(std::uint32_t sae_index, std::string mnemonic) : mnemonic_(std::move(mnemonic)), sae_index_(sae_index) {}
+	explicit SimpleInstrInfo_sae(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), sae_index_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		InstrOpInfo info(mnemonic_, instruction, InstrOpInfoFlags::NONE);
 		if (instruction.suppress_all_exceptions())
@@ -884,12 +850,12 @@ private:
 	std::uint32_t sae_index_;
 };
 
-class SimpleInstrInfo_far final : public InstrInfo {
+class SimpleInstrInfo_far final {
 public:
-	SimpleInstrInfo_far(std::uint32_t bitness, std::string mnemonic, std::string mnemonic_suffix)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), bitness_(bitness) {}
+	explicit SimpleInstrInfo_far(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), bitness_(e.arg3) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = InstrOpInfoFlags::INDIRECT_OPERAND;
 		std::uint32_t instr_bitness = get_bitness(instruction.code_size());
 		if (instr_bitness == 0)
@@ -914,12 +880,11 @@ private:
 	std::uint32_t bitness_;
 };
 
-class SimpleInstrInfo_bnd final : public InstrInfo {
+class SimpleInstrInfo_bnd final {
 public:
-	SimpleInstrInfo_bnd(std::string mnemonic, std::string mnemonic_suffix, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)), flags_(flags) {}
+	explicit SimpleInstrInfo_bnd(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)), flags_(e.arg2) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		std::uint32_t flags = flags_;
 		if (instruction.has_repne_prefix())
 			flags |= InstrOpInfoFlags::BND_PREFIX;
@@ -991,35 +956,35 @@ void remove_first_imm8_operand(InstrOpInfo& info) noexcept {
 	}
 }
 
-class SimpleInstrInfo_pops final : public InstrInfo {
+class SimpleInstrInfo_pops final {
 public:
-	SimpleInstrInfo_pops(std::string mnemonic, const std::vector<FormatterString>& pseudo_ops, bool can_use_sae)
-		: mnemonic_(std::move(mnemonic)), pseudo_ops_(&pseudo_ops), can_use_sae_(can_use_sae) {}
+	explicit SimpleInstrInfo_pops(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), pseudo_ops_(get_pseudo_ops(static_cast<PseudoOpsKind>(e.arg3))), can_use_sae_(e.arg1 != 0) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		InstrOpInfo info(mnemonic_, instruction, InstrOpInfoFlags::NONE);
 		if (can_use_sae_ && instruction.suppress_all_exceptions())
 			move_operands(info, 1, InstrOpKind::Sae);
 		const std::size_t imm = instruction.immediate8();
-		if (options.use_pseudo_ops() && imm < pseudo_ops_->size()) {
+		if (options.use_pseudo_ops() && imm < pseudo_ops_.size()) {
 			remove_first_imm8_operand(info);
-			info.mnemonic = &(*pseudo_ops_)[imm];
+			info.mnemonic = pseudo_ops_[imm];
 		}
 		return info;
 	}
 
 private:
 	FormatterString mnemonic_;
-	const std::vector<FormatterString>* pseudo_ops_;
+	PseudoOps pseudo_ops_;
 	bool can_use_sae_;
 };
 
-class SimpleInstrInfo_pclmulqdq final : public InstrInfo {
+class SimpleInstrInfo_pclmulqdq final {
 public:
-	SimpleInstrInfo_pclmulqdq(std::string mnemonic, const std::vector<FormatterString>& pseudo_ops)
-		: mnemonic_(std::move(mnemonic)), pseudo_ops_(&pseudo_ops) {}
+	explicit SimpleInstrInfo_pclmulqdq(const InstrInfo& e) noexcept
+		: mnemonic_(str(e.mnemonic)), pseudo_ops_(get_pseudo_ops(static_cast<PseudoOpsKind>(e.arg3))) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		InstrOpInfo info(mnemonic_, instruction, InstrOpInfoFlags::NONE);
 		if (options.use_pseudo_ops()) {
 			std::int32_t index;
@@ -1042,8 +1007,7 @@ public:
 			}
 			if (index >= 0) {
 				remove_first_imm8_operand(info);
-				ICED_ASSERT(static_cast<std::size_t>(index) < pseudo_ops_->size());
-				info.mnemonic = &(*pseudo_ops_)[static_cast<std::size_t>(index)];
+				info.mnemonic = pseudo_ops_[static_cast<std::size_t>(index)];
 			}
 		}
 		return info;
@@ -1051,14 +1015,14 @@ public:
 
 private:
 	FormatterString mnemonic_;
-	const std::vector<FormatterString>* pseudo_ops_;
+	PseudoOps pseudo_ops_;
 };
 
-class SimpleInstrInfo_imul final : public InstrInfo {
+class SimpleInstrInfo_imul final {
 public:
-	SimpleInstrInfo_imul(std::string mnemonic, std::string mnemonic_suffix) : mnemonic_(std::move(mnemonic)), mnemonic_suffix_(std::move(mnemonic_suffix)) {}
+	explicit SimpleInstrInfo_imul(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)), mnemonic_suffix_(str(e.arg1)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		InstrOpInfo info(get_mnemonic(options, instruction, mnemonic_, mnemonic_suffix_, FLAGS), instruction, FLAGS);
 		ICED_DEBUG_ASSERT(info.op_count == 3);
@@ -1076,11 +1040,11 @@ private:
 	FormatterString mnemonic_suffix_;
 };
 
-class SimpleInstrInfo_Reg32 final : public InstrInfo {
+class SimpleInstrInfo_Reg32 final {
 public:
-	explicit SimpleInstrInfo_Reg32(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_Reg32(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
 		constexpr std::uint32_t FLAGS = InstrOpInfoFlags::NONE;
 		InstrOpInfo info(mnemonic_, instruction, FLAGS);
@@ -1094,12 +1058,13 @@ private:
 	FormatterString mnemonic_;
 };
 
-class SimpleInstrInfo_DeclareData final : public InstrInfo {
+class SimpleInstrInfo_DeclareData final {
 public:
-	SimpleInstrInfo_DeclareData(Code code, std::string mnemonic) : mnemonic_(std::move(mnemonic)), op_kind_(get_op_kind(code)) {}
+	explicit SimpleInstrInfo_DeclareData(const InstrInfo& e) noexcept : mnemonic_(str(e.mnemonic)) {}
 
-	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
+	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept {
 		static_cast<void>(options);
+		const InstrOpKind op_kind_ = get_op_kind(instruction.code());
 		InstrOpInfo info(mnemonic_, instruction, InstrOpInfoFlags::KEEP_OPERAND_ORDER | InstrOpInfoFlags::MNEMONIC_IS_DIRECTIVE);
 		info.op_count = static_cast<std::uint8_t>(instruction.declare_data_len());
 		info.op_kinds[0] = op_kind_;
@@ -1132,471 +1097,75 @@ private:
 	}
 
 	FormatterString mnemonic_;
-	InstrOpKind op_kind_;
-};
-
-// Not inlined so the (big) table reader function's stack frame stays small
-template <typename T, typename... Args>
-ICED_NOINLINE std::unique_ptr<InstrInfo> make_info(Args&&... args) {
-	return std::make_unique<T>(std::forward<Args>(args)...);
-}
-
-// dst = s + c (c is ignored if it's 0)
-void add_suffix(std::string& dst, const std::string& s, char c) {
-	dst.assign(s);
-	if (c != '\0')
-		dst.push_back(c);
-}
-
-// Table reader state (heap allocated: it's only used once)
-struct TblReader {
-	DataReader reader;
-	std::vector<std::string_view> strings;
-	// Reused by all iterations
-	std::string s, s2, s3, s4, s5, s6;
-	std::vector<std::string> mnemonics;
-	std::vector<std::string> mnemonics_suffix;
-
-	TblReader() : reader(FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE), strings(get_strings_table_ref()) {}
-
-	std::string_view read_string() noexcept {
-		const std::size_t index = reader.read_compressed_u32();
-		ICED_ASSERT(index < strings.size());
-		return strings[index];
-	}
-
-	char read_char() noexcept { return static_cast<char>(static_cast<std::uint8_t>(reader.read_u8())); }
-};
-
-// Creates the InstrInfo or returns nullptr if it's created by create_info_b() (the switch is split in two functions to keep the stack frames small)
-std::unique_ptr<InstrInfo> create_info_a(TblReader& r, CtorKind ctor_kind, std::size_t i) {
-	DataReader& reader = r.reader;
-	std::string& s = r.s;
-	std::string& s2 = r.s2;
-	std::string& s3 = r.s3;
-	std::string& s4 = r.s4;
-	const auto read_string = [&r]() { return r.read_string(); };
-	const auto read_char = [&r]() { return r.read_char(); };
-	char c;
-	std::uint32_t v;
-	std::uint32_t v2;
-	std::uint32_t v3;
-	std::unique_ptr<InstrInfo> info;
-	switch (ctor_kind) {
-		case CtorKind::Normal_1:
-			info = make_info<SimpleInstrInfo>(std::string(s), std::move(s), InstrOpInfoFlags::NONE);
-			break;
-
-		case CtorKind::Normal_2a: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			info = make_info<SimpleInstrInfo>(std::move(s), std::move(s2), InstrOpInfoFlags::NONE);
-			break;
-		}
-
-		case CtorKind::Normal_2b:
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo>(std::string(s), std::move(s), v);
-			break;
-
-		case CtorKind::Normal_2c:
-			c = read_char();
-			if (c != '\0')
-				s.push_back(c);
-			info = make_info<SimpleInstrInfo>(std::string(s), std::move(s), InstrOpInfoFlags::NONE);
-			break;
-
-		case CtorKind::Normal_3: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo>(std::move(s), std::move(s2), v);
-			break;
-		}
-
-		case CtorKind::AamAad:
-			info = make_info<SimpleInstrInfo_AamAad>(std::move(s));
-			break;
-
-		case CtorKind::asz:
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_as>(v, std::move(s));
-			break;
-
-		case CtorKind::bnd: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_bnd>(std::move(s), std::move(s2), v);
-			break;
-		}
-
-		case CtorKind::DeclareData:
-			info = make_info<SimpleInstrInfo_DeclareData>(static_cast<Code>(i), std::move(s));
-			break;
-
-		case CtorKind::er_2:
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_er>(v, std::move(s));
-			break;
-
-		case CtorKind::er_4: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			v2 = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_er>(v, std::move(s), std::move(s2), v2);
-			break;
-		}
-
-		case CtorKind::far: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_far>(v, std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::imul: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			info = make_info<SimpleInstrInfo_imul>(std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::maskmovq:
-			info = make_info<SimpleInstrInfo_maskmovq>(std::move(s));
-			break;
-
-		case CtorKind::movabs: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			s3.assign(read_string());
-			add_suffix(s4, s3, c);
-			info = make_info<SimpleInstrInfo_movabs>(std::move(s), std::move(s2), std::move(s3), std::move(s4));
-			break;
-		}
-
-		case CtorKind::nop:
-			v = reader.read_compressed_u32();
-			v2 = static_cast<std::uint32_t>(reader.read_u8());
-			info = make_info<SimpleInstrInfo_nop>(v, std::move(s), static_cast<Register>(v2));
-			break;
-
-		case CtorKind::OpSize: {
-			v = static_cast<std::uint32_t>(reader.read_u8());
-			add_suffix(s2, s, 'w');
-			add_suffix(s3, s, 'l');
-			add_suffix(s4, s, 'q');
-			info = make_info<SimpleInstrInfo_OpSize>(static_cast<CodeSize>(v), std::move(s), std::move(s2), std::move(s3), std::move(s4));
-			break;
-		}
-
-		case CtorKind::OpSize2_bnd: {
-			s2.assign(read_string());
-			s3.assign(read_string());
-			s4.assign(read_string());
-			info = make_info<SimpleInstrInfo_OpSize2_bnd>(std::move(s), std::move(s2), std::move(s3), std::move(s4));
-			break;
-		}
-
-		case CtorKind::OpSize3: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_OpSize3>(v, std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::os:
-			v = reader.read_compressed_u32();
-			v2 = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v2 <= 1);
-			v3 = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_os>(v, std::move(s), v2 != 0, v3);
-			break;
-
-	default:
-		break;
-	}
-	return info;
-}
-
-// Creates the InstrInfo (second half of the ctor kinds)
-std::unique_ptr<InstrInfo> create_info_b(TblReader& r, CtorKind ctor_kind) {
-	DataReader& reader = r.reader;
-	std::string& s = r.s;
-	std::string& s2 = r.s2;
-	std::string& s3 = r.s3;
-	std::string& s4 = r.s4;
-	std::string& s5 = r.s5;
-	std::string& s6 = r.s6;
-	std::vector<std::string>& mnemonics = r.mnemonics;
-	std::vector<std::string>& mnemonics_suffix = r.mnemonics_suffix;
-	const auto read_string = [&r]() { return r.read_string(); };
-	const auto read_char = [&r]() { return r.read_char(); };
-	char c;
-	std::uint32_t v;
-	std::uint32_t v2;
-	std::uint32_t v3;
-	std::unique_ptr<InstrInfo> info;
-	switch (ctor_kind) {
-		case CtorKind::CC_1: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics_suffix.clear();
-			mnemonics_suffix.push_back(std::move(s2));
-			info = make_info<SimpleInstrInfo_cc>(v, std::move(mnemonics), std::move(mnemonics_suffix));
-			break;
-		}
-
-		case CtorKind::CC_2: {
-			s2.assign(read_string());
-			c = read_char();
-			add_suffix(s3, s, c);
-			add_suffix(s4, s2, c);
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics.push_back(std::move(s2));
-			mnemonics_suffix.clear();
-			mnemonics_suffix.push_back(std::move(s3));
-			mnemonics_suffix.push_back(std::move(s4));
-			info = make_info<SimpleInstrInfo_cc>(v, std::move(mnemonics), std::move(mnemonics_suffix));
-			break;
-		}
-
-		case CtorKind::CC_3: {
-			s2.assign(read_string());
-			s3.assign(read_string());
-			c = read_char();
-			add_suffix(s4, s, c);
-			add_suffix(s5, s2, c);
-			add_suffix(s6, s3, c);
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics.push_back(std::move(s2));
-			mnemonics.push_back(std::move(s3));
-			mnemonics_suffix.clear();
-			mnemonics_suffix.push_back(std::move(s4));
-			mnemonics_suffix.push_back(std::move(s5));
-			mnemonics_suffix.push_back(std::move(s6));
-			info = make_info<SimpleInstrInfo_cc>(v, std::move(mnemonics), std::move(mnemonics_suffix));
-			break;
-		}
-
-		case CtorKind::os_jcc_1: {
-			v2 = reader.read_compressed_u32();
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			info = make_info<SimpleInstrInfo_os_jcc>(v, v2, std::move(mnemonics));
-			break;
-		}
-
-		case CtorKind::os_jcc_2: {
-			s2.assign(read_string());
-			v2 = reader.read_compressed_u32();
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics.push_back(std::move(s2));
-			info = make_info<SimpleInstrInfo_os_jcc>(v, v2, std::move(mnemonics));
-			break;
-		}
-
-		case CtorKind::os_jcc_3: {
-			s2.assign(read_string());
-			s3.assign(read_string());
-			v2 = reader.read_compressed_u32();
-			v = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics.push_back(std::move(s2));
-			mnemonics.push_back(std::move(s3));
-			info = make_info<SimpleInstrInfo_os_jcc>(v, v2, std::move(mnemonics));
-			break;
-		}
-
-		case CtorKind::os_loopcc: {
-			s2.assign(read_string());
-			c = read_char();
-			add_suffix(s3, s, c);
-			add_suffix(s4, s2, c);
-			v3 = reader.read_compressed_u32();
-			v = reader.read_compressed_u32();
-			v2 = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics.push_back(std::move(s2));
-			mnemonics_suffix.clear();
-			mnemonics_suffix.push_back(std::move(s3));
-			mnemonics_suffix.push_back(std::move(s4));
-			info = make_info<SimpleInstrInfo_os_loop>(v, v2, v3, std::move(mnemonics), std::move(mnemonics_suffix));
-			break;
-		}
-
-		case CtorKind::os_loop: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			v2 = reader.read_compressed_u32();
-			mnemonics.clear();
-			mnemonics.push_back(std::move(s));
-			mnemonics_suffix.clear();
-			mnemonics_suffix.push_back(std::move(s2));
-			info = make_info<SimpleInstrInfo_os_loop>(v, v2, NO_CC_INDEX, std::move(mnemonics), std::move(mnemonics_suffix));
-			break;
-		}
-
-		case CtorKind::os_mem: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_os_mem>(v, std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::Reg16: {
-			add_suffix(s2, s, 'w');
-			info = make_info<SimpleInstrInfo_Reg16>(std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::os_mem2: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_os_mem2>(v, std::move(s), std::move(s2));
-			break;
-		}
-
-		case CtorKind::os2_3: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			v2 = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v2 <= 1);
-			info = make_info<SimpleInstrInfo_os2>(v, std::move(s), std::move(s2), v2 != 0, 0);
-			break;
-		}
-
-		case CtorKind::os2_4: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			v = reader.read_compressed_u32();
-			v2 = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v2 <= 1);
-			v3 = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_os2>(v, std::move(s), std::move(s2), v2 != 0, v3);
-			break;
-		}
-
-		case CtorKind::pblendvb:
-			info = make_info<SimpleInstrInfo_pblendvb>(std::move(s));
-			break;
-
-		case CtorKind::pclmulqdq:
-			v = static_cast<std::uint32_t>(reader.read_u8());
-			info = make_info<SimpleInstrInfo_pclmulqdq>(std::move(s), get_pseudo_ops(static_cast<PseudoOpsKind>(v)));
-			break;
-
-		case CtorKind::pops:
-			v = static_cast<std::uint32_t>(reader.read_u8());
-			v2 = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v2 <= 1);
-			info = make_info<SimpleInstrInfo_pops>(std::move(s), get_pseudo_ops(static_cast<PseudoOpsKind>(v)), v2 != 0);
-			break;
-
-		case CtorKind::mem16: {
-			c = read_char();
-			add_suffix(s2, s, c);
-			add_suffix(s3, s, 'w');
-			info = make_info<SimpleInstrInfo_mem16>(std::move(s), std::move(s2), std::move(s3));
-			break;
-		}
-
-		case CtorKind::Reg32:
-			info = make_info<SimpleInstrInfo_Reg32>(std::move(s));
-			break;
-
-		case CtorKind::sae:
-			v = reader.read_compressed_u32();
-			info = make_info<SimpleInstrInfo_sae>(v, std::move(s));
-			break;
-
-		case CtorKind::ST_STi:
-			info = make_info<SimpleInstrInfo_ST_STi>(std::move(s));
-			break;
-
-		case CtorKind::STi_ST:
-			v = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v <= 1);
-			info = make_info<SimpleInstrInfo_STi_ST>(std::move(s), v != 0);
-			break;
-
-		case CtorKind::STIG1:
-			v = static_cast<std::uint32_t>(reader.read_u8());
-			ICED_DEBUG_ASSERT(v <= 1);
-			info = make_info<SimpleInstrInfo_STIG1>(std::move(s), v != 0);
-			break;
-
-	default:
-		ICED_UNREACHABLE();
-	}
-	return info;
-}
-
-struct InstrInfosHolder {
-	InstrInfos infos;
-
-	InstrInfosHolder() {
-		const auto r = std::make_unique<TblReader>();
-		DataReader& reader = r->reader;
-		std::size_t prev_index = 0;
-		bool has_prev_index = false;
-		for (std::size_t i = 0; i < infos.size(); i++) {
-			const std::size_t f = reader.read_u8();
-			auto ctor_kind = static_cast<CtorKind>(f & 0x7F);
-			std::size_t current_index = 0;
-			bool restore_index = false;
-			if (ctor_kind == CtorKind::Previous) {
-				ICED_ASSERT(has_prev_index);
-				current_index = reader.index();
-				restore_index = true;
-				reader.set_index(prev_index);
-				ctor_kind = static_cast<CtorKind>(reader.read_u8() & 0x7F);
-			} else {
-				prev_index = reader.index() - 1;
-				has_prev_index = true;
-			}
-			if ((f & 0x80) != 0) {
-				r->s.assign(1, 'v');
-				r->s.append(r->read_string());
-			} else
-				r->s.assign(r->read_string());
-
-			std::unique_ptr<InstrInfo> info = create_info_a(*r, ctor_kind, i);
-			if (!info)
-				info = create_info_b(*r, ctor_kind);
-
-			infos[i] = std::move(info);
-			if (restore_index)
-				reader.set_index(current_index);
-		}
-		ICED_DEBUG_ASSERT(!reader.can_read());
-	}
 };
 
 } // namespace
 
-const InstrInfos& get_all_infos() {
-	static const InstrInfosHolder holder;
-	return holder.infos;
+InstrOpInfo get_op_info(const FormatterOptions& options, const Instruction& instruction) noexcept {
+	const InstrInfo& info = INSTR_INFOS[static_cast<std::size_t>(instruction.code())];
+	switch (info.kind) {
+	case InstrInfoKind::Simple:
+		return SimpleInstrInfo(info).op_info(options, instruction);
+	case InstrInfoKind::cc:
+		return SimpleInstrInfo_cc(info).op_info(options, instruction);
+	case InstrInfoKind::AamAad:
+		return SimpleInstrInfo_AamAad(info).op_info(options, instruction);
+	case InstrInfoKind::nop:
+		return SimpleInstrInfo_nop(info).op_info(options, instruction);
+	case InstrInfoKind::STIG1:
+		return SimpleInstrInfo_STIG1(info).op_info(options, instruction);
+	case InstrInfoKind::STi_ST:
+		return SimpleInstrInfo_STi_ST(info).op_info(options, instruction);
+	case InstrInfoKind::ST_STi:
+		return SimpleInstrInfo_ST_STi(info).op_info(options, instruction);
+	case InstrInfoKind::as:
+		return SimpleInstrInfo_as(info).op_info(options, instruction);
+	case InstrInfoKind::maskmovq:
+		return SimpleInstrInfo_maskmovq(info).op_info(options, instruction);
+	case InstrInfoKind::pblendvb:
+		return SimpleInstrInfo_pblendvb(info).op_info(options, instruction);
+	case InstrInfoKind::OpSize:
+		return SimpleInstrInfo_OpSize(info).op_info(options, instruction);
+	case InstrInfoKind::OpSize2_bnd:
+		return SimpleInstrInfo_OpSize2_bnd(info).op_info(options, instruction);
+	case InstrInfoKind::OpSize3:
+		return SimpleInstrInfo_OpSize3(info).op_info(options, instruction);
+	case InstrInfoKind::os2:
+		return SimpleInstrInfo_os2(info).op_info(options, instruction);
+	case InstrInfoKind::os:
+		return SimpleInstrInfo_os(info).op_info(options, instruction);
+	case InstrInfoKind::os_mem2:
+		return SimpleInstrInfo_os_mem2(info).op_info(options, instruction);
+	case InstrInfoKind::Reg16:
+		return SimpleInstrInfo_Reg16(info).op_info(options, instruction);
+	case InstrInfoKind::mem16:
+		return SimpleInstrInfo_mem16(info).op_info(options, instruction);
+	case InstrInfoKind::os_loop:
+		return SimpleInstrInfo_os_loop(info).op_info(options, instruction);
+	case InstrInfoKind::os_jcc:
+		return SimpleInstrInfo_os_jcc(info).op_info(options, instruction);
+	case InstrInfoKind::movabs:
+		return SimpleInstrInfo_movabs(info).op_info(options, instruction);
+	case InstrInfoKind::er:
+		return SimpleInstrInfo_er(info).op_info(options, instruction);
+	case InstrInfoKind::sae:
+		return SimpleInstrInfo_sae(info).op_info(options, instruction);
+	case InstrInfoKind::far:
+		return SimpleInstrInfo_far(info).op_info(options, instruction);
+	case InstrInfoKind::bnd:
+		return SimpleInstrInfo_bnd(info).op_info(options, instruction);
+	case InstrInfoKind::pops:
+		return SimpleInstrInfo_pops(info).op_info(options, instruction);
+	case InstrInfoKind::pclmulqdq:
+		return SimpleInstrInfo_pclmulqdq(info).op_info(options, instruction);
+	case InstrInfoKind::imul:
+		return SimpleInstrInfo_imul(info).op_info(options, instruction);
+	case InstrInfoKind::Reg32:
+		return SimpleInstrInfo_Reg32(info).op_info(options, instruction);
+	case InstrInfoKind::DeclareData:
+		return SimpleInstrInfo_DeclareData(info).op_info(options, instruction);
+	}
+	ICED_UNREACHABLE();
 }
 
 } // namespace iced_x86::internal::gas

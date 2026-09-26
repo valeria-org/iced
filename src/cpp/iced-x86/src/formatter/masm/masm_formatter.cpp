@@ -102,7 +102,7 @@ struct MasmFormatterImpl {
 				output.write(" ", FormatterTextKind::Text);
 				column++;
 			}
-			const auto& mnemonic = *op_info.mnemonic;
+			const FormatterString mnemonic = op_info.mnemonic;
 			if ((op_info.flags & InstrOpInfoFlags::MNEMONIC_IS_DIRECTIVE) != 0)
 				output.write(mnemonic.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Directive);
 			else
@@ -1101,8 +1101,7 @@ struct MasmFormatterImpl {
 	}
 
 	static InstrOpInfo get_op_info(const MasmFormatter& self, const Instruction& instruction) noexcept {
-		const auto* instr_info = self.instr_infos_[static_cast<std::size_t>(instruction.code())];
-		return instr_info->op_info(self.options_, instruction);
+		return internal::masm::get_op_info(self.options_, instruction);
 	}
 };
 
@@ -1118,7 +1117,6 @@ MasmFormatter::MasmFormatter() : MasmFormatter(nullptr, nullptr) {}
 MasmFormatter::MasmFormatter(std::unique_ptr<SymbolResolver> symbol_resolver, std::unique_ptr<FormatterOptionsProvider> options_provider)
 	: options_(FormatterOptions::with_masm())
 	, all_registers_(internal::get_regs_tbl().data())
-	, instr_infos_(internal::masm::get_all_infos())
 	, all_memory_sizes_(internal::masm::get_mem_size_tbl())
 	, str_(&internal::get_formatter_constants())
 	, vec_(&internal::get_array_constants())

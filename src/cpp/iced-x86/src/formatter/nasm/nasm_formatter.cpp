@@ -111,7 +111,7 @@ struct NasmFormatterImpl {
 				output.write(" ", FormatterTextKind::Text);
 				column++;
 			}
-			const auto& mnemonic = *op_info.mnemonic;
+			const FormatterString mnemonic = op_info.mnemonic;
 			if ((op_info.flags & InstrOpInfoFlags::MNEMONIC_IS_DIRECTIVE) != 0)
 				output.write(mnemonic.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Directive);
 			else
@@ -1128,8 +1128,7 @@ struct NasmFormatterImpl {
 	}
 
 	static InstrOpInfo get_op_info(const NasmFormatter& self, const Instruction& instruction) noexcept {
-		const auto* instr_info = self.instr_infos_[static_cast<std::size_t>(instruction.code())];
-		return instr_info->op_info(self.options_, instruction);
+		return internal::nasm::get_op_info(self.options_, instruction);
 	}
 };
 
@@ -1145,7 +1144,6 @@ NasmFormatter::NasmFormatter() : NasmFormatter(nullptr, nullptr) {}
 NasmFormatter::NasmFormatter(std::unique_ptr<SymbolResolver> symbol_resolver, std::unique_ptr<FormatterOptionsProvider> options_provider)
 	: options_(FormatterOptions::with_nasm())
 	, all_registers_(internal::nasm::get_all_registers())
-	, instr_infos_(internal::nasm::get_all_infos())
 	, all_memory_sizes_(internal::nasm::get_mem_size_tbl())
 	, str_(&internal::get_formatter_constants())
 	, vec_(&internal::get_array_constants())

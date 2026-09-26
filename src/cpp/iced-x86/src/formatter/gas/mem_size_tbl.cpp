@@ -7,6 +7,7 @@
 
 #include <cstddef>
 
+#include "internal/encoder/const_init.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/gas/mem_size_tbl_data.hpp"
 #include "internal/iced_assert.hpp"
@@ -19,8 +20,8 @@ namespace {
 struct MemSizeTblHolder {
 	MemSizeTbl tbl;
 
-	MemSizeTblHolder() {
-		const FormatterConstants& c = get_formatter_constants();
+	constexpr MemSizeTblHolder() noexcept : tbl{} {
+		const FormatterConstants& c = FORMATTER_CONSTANTS;
 		std::size_t i = 0;
 		for (; i < static_cast<std::size_t>(IcedConstants::FIRST_BROADCAST_MEMORY_SIZE); i++)
 			tbl[i] = &c.empty;
@@ -29,11 +30,11 @@ struct MemSizeTblHolder {
 		ICED_ASSERT(i == tbl.size());
 	}
 };
+ICED_CONSTINIT const MemSizeTblHolder HOLDER;
 } // namespace
 
-const MemSizeTbl& get_mem_size_tbl() {
-	static const MemSizeTblHolder holder;
-	return holder.tbl;
+const MemSizeTbl& get_mem_size_tbl() noexcept {
+	return HOLDER.tbl;
 }
 
 } // namespace iced_x86::internal::gas

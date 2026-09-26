@@ -28,7 +28,6 @@ struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace intel {
-class InstrInfo;
 struct MemSizeInfo;
 struct IntelFormatterCommon;
 template <typename TOutput>
@@ -344,9 +343,8 @@ private:
 	friend struct internal::intel::IntelFormatterImpl;
 
 	FormatterOptions options_;
-	// Read-only static data (created the first time a formatter is created)
+	// Read-only tables (constant data)
 	const internal::FormatterString* all_registers_;
-	const std::unique_ptr<internal::intel::InstrInfo>* instr_infos_;
 	const internal::intel::MemSizeInfo* all_memory_sizes_;
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;

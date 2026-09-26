@@ -41,31 +41,6 @@ namespace Generator.Formatters.Cpp {
 		}
 	}
 
-	sealed class CppFormatterTableSerializer : FormatterTableSerializer {
-		readonly GenTypes genTypes;
-		readonly string syntax;
-
-		public CppFormatterTableSerializer(GenTypes genTypes, string syntax, FmtInstructionDef[] defs, EnumType ctorKindEnum)
-			: base(defs, CppIdentifierConverter.Create(), ctorKindEnum["Previous"]) {
-			this.genTypes = genTypes;
-			this.syntax = syntax;
-		}
-
-		public string DataFilename => CppFormatterTableSerializerUtils.GetDataFilename(genTypes, syntax);
-		public string HeaderFilename => CppFormatterTableSerializerUtils.GetHeaderFilename(genTypes, syntax);
-		public override string GetFilename(GenTypes genTypes) => DataFilename;
-
-		public void SerializeData(FileWriter writer, StringsTable stringsTable) {
-			CppFormatterTableSerializerUtils.WriteDataFileStart(writer, syntax);
-			using (writer.Indent())
-				SerializeTable(new TextFileByteTableWriter(writer), stringsTable);
-			CppFormatterTableSerializerUtils.WriteDataFileEnd(writer, syntax);
-		}
-
-		public void SerializeHeader(FileWriter writer) =>
-			CppFormatterTableSerializerUtils.WriteHeader(writer, syntax);
-	}
-
 	sealed class CppFastFormatterTableSerializer : FastFormatterTableSerializer {
 		readonly GenTypes genTypes;
 		readonly string syntax;

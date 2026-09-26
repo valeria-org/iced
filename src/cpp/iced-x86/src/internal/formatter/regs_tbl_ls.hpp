@@ -14,7 +14,10 @@ namespace iced_x86::internal {
 
 using RegsTbl = std::array<FormatterString, IcedConstants::REGISTER_ENUM_COUNT>;
 
-/// Gets the lowercase/uppercase register names (index = `Register` value). It's created the first time it's called.
-const RegsTbl& get_regs_tbl();
+/// The lowercase/uppercase register names (index = `Register` value). Generated constant data (src/formatter/regs_tbl_ls.cpp)
+extern const RegsTbl REGS_TBL;
+
+/// Gets the lowercase/uppercase register names (index = `Register` value)
+inline const RegsTbl& get_regs_tbl() noexcept { return REGS_TBL; }
 
 } // namespace iced_x86::internal

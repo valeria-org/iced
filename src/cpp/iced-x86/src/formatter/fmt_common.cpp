@@ -76,8 +76,7 @@ void FormatterOutputMethods::write2(FormatterOutput& output, const Instruction& 
 	}
 }
 
-const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const FormatterString* mnemonics,
-									   std::size_t mnemonics_size) noexcept {
+std::size_t get_mnemonic_cc_index(const FormatterOptions& options, std::uint32_t cc_index, std::size_t mnemonics_size) noexcept {
 	std::size_t index;
 	switch (cc_index) {
 	// o
@@ -164,7 +163,7 @@ const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uin
 		ICED_UNREACHABLE();
 	}
 	ICED_ASSERT(index < mnemonics_size);
-	return mnemonics[index];
+	return index;
 }
 
 } // namespace iced_x86::internal

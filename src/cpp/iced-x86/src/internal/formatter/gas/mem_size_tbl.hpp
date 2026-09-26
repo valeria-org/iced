@@ -15,7 +15,7 @@ namespace iced_x86::internal::gas {
 /// The broadcast decorator (eg. `1to8`) of each `MemorySize` (the empty string if it's not a broadcast memory size)
 using MemSizeTbl = std::array<const FormatterString*, IcedConstants::MEMORY_SIZE_ENUM_COUNT>;
 
-/// Gets the broadcast decorator of each `MemorySize` (Rust: `MEM_SIZE_TBL`). It's created the first time it's called.
-const MemSizeTbl& get_mem_size_tbl();
+/// Gets the broadcast decorator of each `MemorySize` (Rust: `MEM_SIZE_TBL`). It's constant data.
+const MemSizeTbl& get_mem_size_tbl() noexcept;
 
 } // namespace iced_x86::internal::gas
