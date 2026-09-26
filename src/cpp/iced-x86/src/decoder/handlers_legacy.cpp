@@ -7,7 +7,7 @@
 
 namespace iced_x86::internal {
 
-void OpCodeHandler_VEX2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VEX2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VEX2>(self_ptr);
 	if (decoder.state.mod_ == 3 || decoder.is64b_mode) {
 		decoder.vex2(instruction);
@@ -18,7 +18,7 @@ void OpCodeHandler_VEX2::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_VEX3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VEX3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VEX3>(self_ptr);
 	if (decoder.state.mod_ == 3 || decoder.is64b_mode) {
 		decoder.vex3(instruction);
@@ -29,7 +29,7 @@ void OpCodeHandler_VEX3::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_XOP::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_XOP::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_XOP>(self_ptr);
 	if ((decoder.state.modrm & 0x1F) < 8) {
 		const OpCodeHandler* handler = this_.handler_reg0;
@@ -40,7 +40,7 @@ void OpCodeHandler_XOP::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_EVEX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX>(self_ptr);
 	if (decoder.state.mod_ == 3 || decoder.is64b_mode) {
 		decoder.evex_mvex(instruction);
@@ -51,7 +51,7 @@ void OpCodeHandler_EVEX::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_PrefixEsCsSsDs::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixEsCsSsDs::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PrefixEsCsSsDs>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
@@ -63,7 +63,7 @@ void OpCodeHandler_PrefixEsCsSsDs::decode(const OpCodeHandler* self_ptr, Decoder
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_PrefixFsGs::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixFsGs::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PrefixFsGs>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
@@ -74,7 +74,7 @@ void OpCodeHandler_PrefixFsGs::decode(const OpCodeHandler* self_ptr, DecoderCore
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_Prefix66::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Prefix66::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
 	decoder.state.flags |= StateFlags::HAS66;
@@ -87,7 +87,7 @@ void OpCodeHandler_Prefix66::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_Prefix67::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Prefix67::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
 	decoder.state.address_size = decoder.default_inverted_address_size;
@@ -96,7 +96,7 @@ void OpCodeHandler_Prefix67::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_PrefixF0::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixF0::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
 	instruction.set_has_lock_prefix(true);
@@ -106,7 +106,7 @@ void OpCodeHandler_PrefixF0::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_PrefixF2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixF2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
 	InstructionInternal::internal_set_has_repne_prefix(instruction);
@@ -116,7 +116,7 @@ void OpCodeHandler_PrefixF2::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_PrefixF3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixF3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
 	InstructionInternal::internal_set_has_repe_prefix(instruction);
@@ -126,7 +126,7 @@ void OpCodeHandler_PrefixF3::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	decoder.call_opcode_handlers_map0_table(instruction);
 }
 
-void OpCodeHandler_PrefixREX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PrefixREX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PrefixREX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
@@ -158,14 +158,14 @@ void OpCodeHandler_PrefixREX::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
 	instruction.set_op0_register(this_.reg);
 }
 
-void OpCodeHandler_RegIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RegIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RegIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -174,7 +174,7 @@ void OpCodeHandler_RegIb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_IbReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_IbReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_IbReg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -183,7 +183,7 @@ void OpCodeHandler_IbReg::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_AL_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_AL_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_AL_DX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -191,7 +191,7 @@ void OpCodeHandler_AL_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	instruction.set_op1_register(Register::DX);
 }
 
-void OpCodeHandler_DX_AL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_DX_AL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_DX_AL>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -199,7 +199,7 @@ void OpCodeHandler_DX_AL::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	instruction.set_op1_register(Register::AL);
 }
 
-void OpCodeHandler_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -207,7 +207,7 @@ void OpCodeHandler_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Ib3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ib3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ib3>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -215,7 +215,7 @@ void OpCodeHandler_Ib3::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_MandatoryPrefix::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MandatoryPrefix::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MandatoryPrefix>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.clear_mandatory_prefix(instruction);
@@ -223,7 +223,7 @@ void OpCodeHandler_MandatoryPrefix::decode(const OpCodeHandler* self_ptr, Decode
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_MandatoryPrefix3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MandatoryPrefix3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MandatoryPrefix3>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	const MandatoryPrefix3Info& info = decoder.state.mod_ == 3 ? this_.handlers_reg[static_cast<std::size_t>(decoder.state.mandatory_prefix)]
@@ -235,7 +235,7 @@ void OpCodeHandler_MandatoryPrefix3::decode(const OpCodeHandler* self_ptr, Decod
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_MandatoryPrefix4::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MandatoryPrefix4::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MandatoryPrefix4>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	static_assert(static_cast<std::uint32_t>(DecoderMandatoryPrefix::PNP) == 0, "");
@@ -271,7 +271,7 @@ void OpCodeHandler_MandatoryPrefix4::decode(const OpCodeHandler* self_ptr, Decod
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_NIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_NIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_NIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -285,7 +285,7 @@ void OpCodeHandler_NIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Reservednop::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reservednop::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reservednop>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	const OpCodeHandler* handler =
@@ -293,7 +293,7 @@ void OpCodeHandler_Reservednop::decode(const OpCodeHandler* self_ptr, DecoderCor
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Iz>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -321,7 +321,7 @@ void OpCodeHandler_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -339,7 +339,7 @@ void OpCodeHandler_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Ev_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Ib2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op1_kind(OpKind::Immediate8);
@@ -357,7 +357,7 @@ void OpCodeHandler_Ev_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Ev_1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_1>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -375,7 +375,7 @@ void OpCodeHandler_Ev_1::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Ev_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_CL>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -391,7 +391,7 @@ void OpCodeHandler_Ev_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -407,7 +407,7 @@ void OpCodeHandler_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Rv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Rv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Rv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	ICED_DEBUG_ASSERT(decoder.state.mod_ == 3);
@@ -417,7 +417,7 @@ void OpCodeHandler_Rv::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	write_op0_reg(instruction, reg_base + decoder.state.rm + decoder.state.extra_base_register_base);
 }
 
-void OpCodeHandler_Rv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Rv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Rv_32_64>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -432,7 +432,7 @@ void OpCodeHandler_Rv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_Rq::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Rq::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Rq>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -440,7 +440,7 @@ void OpCodeHandler_Rq::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	write_op0_reg(instruction, decoder.state.rm + decoder.state.extra_base_register_base + reg_u32(Register::RAX));
 }
 
-void OpCodeHandler_Ev_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_REXW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -473,7 +473,7 @@ void OpCodeHandler_Ev_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Evj::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Evj::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Evj>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -517,7 +517,7 @@ void OpCodeHandler_Evj::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Ep::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ep::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ep>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.operand_size == OpSize::Size64 && (decoder.options & DecoderOptions::AMD) == 0) {
@@ -538,7 +538,7 @@ void OpCodeHandler_Ep::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Evw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Evw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Evw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -553,7 +553,7 @@ void OpCodeHandler_Evw::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ew>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -568,7 +568,7 @@ void OpCodeHandler_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Ms::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ms::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ms>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.mod_ < 3) {
@@ -589,7 +589,7 @@ void OpCodeHandler_Ms::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Gv_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -605,7 +605,7 @@ void OpCodeHandler_Gv_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gd_Rd::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gd_Rd::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gd_Rd>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -618,7 +618,7 @@ void OpCodeHandler_Gd_Rd::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gv_M_as::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_M_as::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_M_as>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize address_size = decoder.state.address_size;
@@ -634,7 +634,7 @@ void OpCodeHandler_Gv_M_as::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Gdq_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gdq_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gdq_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -655,7 +655,7 @@ void OpCodeHandler_Gdq_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Gv_Ev3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev3>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -671,7 +671,7 @@ void OpCodeHandler_Gv_Ev3::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Gv_Ev2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -693,7 +693,7 @@ void OpCodeHandler_Gv_Ev2::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_R_C::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_R_C::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_R_C>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -734,7 +734,7 @@ void OpCodeHandler_R_C::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	write_op1_reg(instruction, reg + reg_u32(this_.base_reg));
 }
 
-void OpCodeHandler_C_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_C_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_C_R>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -775,7 +775,7 @@ void OpCodeHandler_C_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	write_op0_reg(instruction, reg + reg_u32(this_.base_reg));
 }
 
-void OpCodeHandler_Jb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Jb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Jb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.state.flags |= StateFlags::BRANCH_IMM8;
@@ -809,7 +809,7 @@ void OpCodeHandler_Jb::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Jx::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Jx::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Jx>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.state.flags |= StateFlags::XBEGIN;
@@ -851,7 +851,7 @@ void OpCodeHandler_Jx::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Jz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Jz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Jz>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -891,7 +891,7 @@ void OpCodeHandler_Jz::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Jb2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Jb2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Jb2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.state.flags |= StateFlags::BRANCH_IMM8;
@@ -945,7 +945,7 @@ void OpCodeHandler_Jb2::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Jdisp::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Jdisp::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Jdisp>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	ICED_DEBUG_ASSERT(!decoder.is64b_mode);
@@ -961,7 +961,7 @@ void OpCodeHandler_Jdisp::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_PushOpSizeReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushOpSizeReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushOpSizeReg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_register(this_.reg);
@@ -983,7 +983,7 @@ void OpCodeHandler_PushOpSizeReg::decode(const OpCodeHandler* self_ptr, DecoderC
 	}
 }
 
-void OpCodeHandler_PushEv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushEv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushEv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -1027,7 +1027,7 @@ void OpCodeHandler_PushEv::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Ev_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1043,7 +1043,7 @@ void OpCodeHandler_Ev_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Ev_Gv_flags::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv_flags::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv_flags>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1060,7 +1060,7 @@ void OpCodeHandler_Ev_Gv_flags::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_Ev_Gv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv_32_64>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register base_reg;
@@ -1082,7 +1082,7 @@ void OpCodeHandler_Ev_Gv_32_64::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_Ev_Gv_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1100,7 +1100,7 @@ void OpCodeHandler_Ev_Gv_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Ev_Gv_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv_CL>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1117,7 +1117,7 @@ void OpCodeHandler_Ev_Gv_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_Gv_Mp::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Mp::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Mp>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.operand_size == OpSize::Size64 && (decoder.options & DecoderOptions::AMD) == 0) {
@@ -1141,7 +1141,7 @@ void OpCodeHandler_Gv_Mp::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gv_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Eb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1161,7 +1161,7 @@ void OpCodeHandler_Gv_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gv_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ew>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1177,7 +1177,7 @@ void OpCodeHandler_Gv_Ew::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_PushSimple2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushSimple2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushSimple2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -1198,13 +1198,13 @@ void OpCodeHandler_PushSimple2::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_Simple2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.operand_size)]);
 }
 
-void OpCodeHandler_Simple2Iw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple2Iw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple2Iw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_kind(OpKind::Immediate16);
@@ -1212,7 +1212,7 @@ void OpCodeHandler_Simple2Iw::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.operand_size)]);
 }
 
-void OpCodeHandler_Simple3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple3>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -1233,13 +1233,13 @@ void OpCodeHandler_Simple3::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Simple5::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple5::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple5>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.address_size)]);
 }
 
-void OpCodeHandler_Simple5_a32::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple5_a32::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple5_a32>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.address_size != OpSize::Size32 && decoder.invalid_check_mask != 0) {
@@ -1248,7 +1248,7 @@ void OpCodeHandler_Simple5_a32::decode(const OpCodeHandler* self_ptr, DecoderCor
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.address_size)]);
 }
 
-void OpCodeHandler_Simple5_ModRM_as::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple5_ModRM_as::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple5_ModRM_as>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize address_size = decoder.state.address_size;
@@ -1257,7 +1257,7 @@ void OpCodeHandler_Simple5_ModRM_as::decode(const OpCodeHandler* self_ptr, Decod
 	write_op0_reg(instruction, reg_base + decoder.state.rm + decoder.state.extra_base_register_base);
 }
 
-void OpCodeHandler_Simple4::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple4::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple4>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -1268,7 +1268,7 @@ void OpCodeHandler_Simple4::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_PushSimpleReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushSimpleReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushSimpleReg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -1293,7 +1293,7 @@ void OpCodeHandler_PushSimpleReg::decode(const OpCodeHandler* self_ptr, DecoderC
 	}
 }
 
-void OpCodeHandler_SimpleReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_SimpleReg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_SimpleReg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	static_assert(static_cast<std::uint32_t>(OpSize::Size16) == 0, "");
@@ -1359,7 +1359,7 @@ static constexpr Code XCHG_REG_RAX_CODES[3 * 16] = {
 	Code::Xchg_r64_RAX,
 };
 
-void OpCodeHandler_Xchg_Reg_rAX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Xchg_Reg_rAX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Xchg_Reg_rAX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 
@@ -1386,7 +1386,7 @@ void OpCodeHandler_Xchg_Reg_rAX::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_Reg_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Iz>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1427,7 +1427,7 @@ static constexpr Register WITH_REX_PREFIX_MOV_REGISTERS[16] = {
 	Register::R15L,
 };
 
-void OpCodeHandler_RegIb3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RegIb3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RegIb3>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(Code::Mov_r8_imm8);
@@ -1444,7 +1444,7 @@ void OpCodeHandler_RegIb3::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_RegIz2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RegIz2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RegIz2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.operand_size == OpSize::Size32) {
@@ -1469,7 +1469,7 @@ void OpCodeHandler_RegIz2::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_PushIb2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushIb2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushIb2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
@@ -1495,7 +1495,7 @@ void OpCodeHandler_PushIb2::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_PushIz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_PushIz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_PushIz>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -1524,7 +1524,7 @@ void OpCodeHandler_PushIz::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Gv_Ma::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ma::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ma>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.operand_size != OpSize::Size16) {
@@ -1544,7 +1544,7 @@ void OpCodeHandler_Gv_Ma::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_RvMw_Gw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RvMw_Gw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RvMw_Gw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register base_reg;
@@ -1567,7 +1567,7 @@ void OpCodeHandler_RvMw_Gw::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Gv_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1593,7 +1593,7 @@ void OpCodeHandler_Gv_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_Gv_Ev_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev_Ib_REX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	ICED_DEBUG_ASSERT(decoder.state.mod_ == 3);
@@ -1610,7 +1610,7 @@ void OpCodeHandler_Gv_Ev_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_Gv_Ev_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev_32_64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev_32_64>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register base_reg;
@@ -1638,7 +1638,7 @@ void OpCodeHandler_Gv_Ev_32_64::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_Gv_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev_Iz>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1666,7 +1666,7 @@ void OpCodeHandler_Gv_Ev_Iz::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_Yb_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Yb_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Yb_Reg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1682,7 +1682,7 @@ void OpCodeHandler_Yb_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Yv_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Yv_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Yv_Reg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.address_size == OpSize::Size64) {
@@ -1706,7 +1706,7 @@ void OpCodeHandler_Yv_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Yv_Reg2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Yv_Reg2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Yv_Reg2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op1_register(Register::DX);
@@ -1727,7 +1727,7 @@ void OpCodeHandler_Yv_Reg2::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Reg_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Xb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1743,7 +1743,7 @@ void OpCodeHandler_Reg_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Reg_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Xv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.address_size == OpSize::Size64) {
@@ -1767,7 +1767,7 @@ void OpCodeHandler_Reg_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Reg_Xv2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Xv2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Xv2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_register(Register::DX);
@@ -1788,7 +1788,7 @@ void OpCodeHandler_Reg_Xv2::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_Reg_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Yb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1804,7 +1804,7 @@ void OpCodeHandler_Reg_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Reg_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Yv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.address_size == OpSize::Size64) {
@@ -1828,7 +1828,7 @@ void OpCodeHandler_Reg_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Yb_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Yb_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Yb_Xb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1846,7 +1846,7 @@ void OpCodeHandler_Yb_Xb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Yv_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Yv_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Yv_Xv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.operand_size)]);
@@ -1864,7 +1864,7 @@ void OpCodeHandler_Yv_Xv::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Xb_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Xb_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Xb_Yb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1882,7 +1882,7 @@ void OpCodeHandler_Xb_Yb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Xv_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Xv_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Xv_Yv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code[static_cast<std::size_t>(decoder.state.operand_size)]);
@@ -1900,7 +1900,7 @@ void OpCodeHandler_Xv_Yv::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Ev_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Sw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1917,7 +1917,7 @@ void OpCodeHandler_Ev_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_M_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_M_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_M_Sw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1932,7 +1932,7 @@ void OpCodeHandler_M_Sw::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Gv_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_M>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1948,7 +1948,7 @@ void OpCodeHandler_Gv_M::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Sw_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Sw_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Sw_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -1968,7 +1968,7 @@ void OpCodeHandler_Sw_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Sw_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Sw_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Sw_M>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -1983,7 +1983,7 @@ void OpCodeHandler_Sw_M::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Ap::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ap::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ap>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.operand_size != OpSize::Size16) {
@@ -2001,7 +2001,7 @@ void OpCodeHandler_Ap::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Reg_Ob::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Ob::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Ob>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2026,7 +2026,7 @@ void OpCodeHandler_Reg_Ob::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Ob_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ob_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ob_Reg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2051,7 +2051,7 @@ void OpCodeHandler_Ob_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Reg_Ov::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Ov::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Ov>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.displ_index = static_cast<std::uint8_t>(decoder.data_ptr);
@@ -2084,7 +2084,7 @@ void OpCodeHandler_Reg_Ov::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Ov_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ov_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ov_Reg>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	decoder.displ_index = static_cast<std::uint8_t>(decoder.data_ptr);
@@ -2117,7 +2117,7 @@ void OpCodeHandler_Ov_Reg::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_BranchIw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_BranchIw::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_BranchIw>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_kind(OpKind::Immediate16);
@@ -2141,7 +2141,7 @@ void OpCodeHandler_BranchIw::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_BranchSimple::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_BranchSimple::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_BranchSimple>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.is64b_mode) {
@@ -2163,7 +2163,7 @@ void OpCodeHandler_BranchSimple::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_Iw_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Iw_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Iw_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_kind(OpKind::Immediate16);
@@ -2188,7 +2188,7 @@ void OpCodeHandler_Iw_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Reg_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Reg_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Reg_Ib2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op1_kind(OpKind::Immediate8);
@@ -2203,7 +2203,7 @@ void OpCodeHandler_Reg_Ib2::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_IbReg2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_IbReg2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_IbReg2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_kind(OpKind::Immediate8);
@@ -2218,7 +2218,7 @@ void OpCodeHandler_IbReg2::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_eAX_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_eAX_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_eAX_DX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op1_register(Register::DX);
@@ -2232,7 +2232,7 @@ void OpCodeHandler_eAX_DX::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_DX_eAX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_DX_eAX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_DX_eAX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_op0_register(Register::DX);
@@ -2246,7 +2246,7 @@ void OpCodeHandler_DX_eAX::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_Eb_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Eb_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Eb_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2266,7 +2266,7 @@ void OpCodeHandler_Eb_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Eb_1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Eb_1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Eb_1>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2286,7 +2286,7 @@ void OpCodeHandler_Eb_1::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Eb_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Eb_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Eb_CL>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2304,7 +2304,7 @@ void OpCodeHandler_Eb_CL::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Eb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2322,7 +2322,7 @@ void OpCodeHandler_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Eb_Gb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Eb_Gb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Eb_Gb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2345,7 +2345,7 @@ void OpCodeHandler_Eb_Gb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gb_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gb_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gb_Eb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2368,7 +2368,7 @@ void OpCodeHandler_Gb_Eb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_M>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -2386,7 +2386,7 @@ void OpCodeHandler_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder
 	}
 }
 
-void OpCodeHandler_M_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_M_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_M_REXW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -2409,7 +2409,7 @@ void OpCodeHandler_M_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_MemBx::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MemBx::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MemBx>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2423,7 +2423,7 @@ void OpCodeHandler_MemBx::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	write_base_reg(instruction, static_cast<std::uint32_t>(decoder.state.address_size) * 16 + reg_u32(Register::BX));
 }
 
-void OpCodeHandler_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	write_op0_reg(instruction, decoder.state.reg + decoder.state.extra_register_base + reg_u32(Register::XMM0));
@@ -2438,7 +2438,7 @@ void OpCodeHandler_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_WV>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2452,7 +2452,7 @@ void OpCodeHandler_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_rDI_VX_RX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_rDI_VX_RX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_rDI_VX_RX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2474,7 +2474,7 @@ void OpCodeHandler_rDI_VX_RX::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_rDI_P_N::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_rDI_P_N::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_rDI_P_N>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2496,7 +2496,7 @@ void OpCodeHandler_rDI_P_N::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VM>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2510,7 +2510,7 @@ void OpCodeHandler_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MV>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2524,7 +2524,7 @@ void OpCodeHandler_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_VQ::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VQ::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VQ>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2538,7 +2538,7 @@ void OpCodeHandler_VQ::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_P_Q::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_Q::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_Q>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2552,7 +2552,7 @@ void OpCodeHandler_P_Q::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Q_P::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Q_P::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Q_P>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2566,7 +2566,7 @@ void OpCodeHandler_Q_P::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_MP::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MP::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MP>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2580,7 +2580,7 @@ void OpCodeHandler_MP::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_P_Q_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_Q_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_Q_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2596,7 +2596,7 @@ void OpCodeHandler_P_Q_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_P_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_W>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2610,7 +2610,7 @@ void OpCodeHandler_P_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_P_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_R>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2623,7 +2623,7 @@ void OpCodeHandler_P_R::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_P_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2645,7 +2645,7 @@ void OpCodeHandler_P_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_P_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_P_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_P_Ev_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2669,7 +2669,7 @@ void OpCodeHandler_P_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Ev_P::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_P::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_P>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2691,7 +2691,7 @@ void OpCodeHandler_Ev_P::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Gv_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_W>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -2711,7 +2711,7 @@ void OpCodeHandler_Gv_W::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_V_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_V_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_V_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2733,7 +2733,7 @@ void OpCodeHandler_V_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VWIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -2754,7 +2754,7 @@ void OpCodeHandler_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_VRIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VRIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VRIbIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2772,7 +2772,7 @@ void OpCodeHandler_VRIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_RIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RIbIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2789,7 +2789,7 @@ void OpCodeHandler_RIbIb::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_RIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -2803,7 +2803,7 @@ void OpCodeHandler_RIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decod
 	}
 }
 
-void OpCodeHandler_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ed_V_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	write_op1_reg(instruction, decoder.state.reg + decoder.state.extra_register_base + reg_u32(Register::XMM0));
@@ -2827,7 +2827,7 @@ void OpCodeHandler_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VX_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2849,7 +2849,7 @@ void OpCodeHandler_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_VX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2871,7 +2871,7 @@ void OpCodeHandler_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_VX_E_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VX_E_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VX_E_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	Register gpr;
@@ -2895,7 +2895,7 @@ void OpCodeHandler_VX_E_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Gv_RX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_RX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_RX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -2918,7 +2918,7 @@ void OpCodeHandler_Gv_RX::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_B_MIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_B_MIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_B_MIB>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.reg > 3 || (decoder.state.extra_register_base & decoder.invalid_check_mask) != 0) {
@@ -2939,7 +2939,7 @@ void OpCodeHandler_B_MIB::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_MIB_B::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MIB_B::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MIB_B>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.reg > 3 || (decoder.state.extra_register_base & decoder.invalid_check_mask) != 0) {
@@ -2960,7 +2960,7 @@ void OpCodeHandler_MIB_B::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_B_BM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_B_BM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_B_BM>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.reg > 3 || (decoder.state.extra_register_base & decoder.invalid_check_mask) != 0) {
@@ -2985,7 +2985,7 @@ void OpCodeHandler_B_BM::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_BM_B::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_BM_B::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_BM_B>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.reg > 3 || (decoder.state.extra_register_base & decoder.invalid_check_mask) != 0) {
@@ -3010,7 +3010,7 @@ void OpCodeHandler_BM_B::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_B_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_B_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_B_Ev>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if (decoder.state.reg > 3 || (decoder.state.extra_register_base & decoder.invalid_check_mask) != 0) {
@@ -3039,7 +3039,7 @@ void OpCodeHandler_B_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_Mv_Gv_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Mv_Gv_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Mv_Gv_REXW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3059,7 +3059,7 @@ void OpCodeHandler_Mv_Gv_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore
 	}
 }
 
-void OpCodeHandler_Gv_N_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_N_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_N_Ib_REX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3084,7 +3084,7 @@ void OpCodeHandler_Gv_N_Ib_REX::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_Gv_N::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_N::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_N>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3107,7 +3107,7 @@ void OpCodeHandler_Gv_N::decode(const OpCodeHandler* self_ptr, DecoderCore& deco
 	}
 }
 
-void OpCodeHandler_VN::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VN::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VN>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	instruction.set_code(this_.code);
@@ -3120,7 +3120,7 @@ void OpCodeHandler_VN::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 	}
 }
 
-void OpCodeHandler_Gv_Mv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Mv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Mv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -3136,7 +3136,7 @@ void OpCodeHandler_Gv_Mv::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Mv_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Mv_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Mv_Gv>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	OpSize operand_size = decoder.state.operand_size;
@@ -3152,7 +3152,7 @@ void OpCodeHandler_Mv_Gv::decode(const OpCodeHandler* self_ptr, DecoderCore& dec
 	}
 }
 
-void OpCodeHandler_Gv_Eb_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Eb_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Eb_REX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3176,7 +3176,7 @@ void OpCodeHandler_Gv_Eb_REX::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_Gv_Ev_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Gv_Ev_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Gv_Ev_REX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3201,7 +3201,7 @@ void OpCodeHandler_Gv_Ev_REX::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_Ev_Gv_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Ev_Gv_REX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Ev_Gv_REX>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.state.flags & StateFlags::W) != 0) {
@@ -3221,7 +3221,7 @@ void OpCodeHandler_Ev_Gv_REX::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_GvM_VX_Ib>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	write_op1_reg(instruction, decoder.state.reg + decoder.state.extra_register_base + reg_u32(Register::XMM0));
@@ -3245,7 +3245,7 @@ void OpCodeHandler_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_Wbinvd::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Wbinvd::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	if ((decoder.options & DecoderOptions::NO_WBNOINVD) != 0 || decoder.state.mandatory_prefix != DecoderMandatoryPrefix::PF3) {
 		instruction.set_code(Code::Wbinvd);

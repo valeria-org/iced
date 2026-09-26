@@ -16,7 +16,7 @@ namespace iced_x86::internal {
 // Arrays of handlers passed to the ctors (Rust: `Vec<(OpCodeHandlerDecodeFn, &'static OpCodeHandler)>`)
 using HandlerVec = std::vector<const OpCodeHandler*>;
 
-#define ICED_DECODE_FN_DECL static void decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction)
+#define ICED_DECODE_FN_DECL static void decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept
 
 struct OpCodeHandler_Invalid : OpCodeHandler {
 	explicit constexpr OpCodeHandler_Invalid(bool has_modrm_) noexcept : OpCodeHandler(&decode, has_modrm_) {}
@@ -38,6 +38,12 @@ inline void copy_handlers(const OpCodeHandler* (&dest)[N], const HandlerVec& han
 	ICED_ASSERT(handlers.size() == N);
 	for (std::size_t i = 0; i < N; i++)
 		dest[i] = handlers[i];
+}
+template <std::size_t N>
+inline void copy_handlers(HandlerEntry (&dest)[N], const HandlerVec& handlers) noexcept {
+	ICED_ASSERT(handlers.size() == N);
+	for (std::size_t i = 0; i < N; i++)
+		dest[i] = to_handler_entry(handlers[i]);
 }
 
 struct OpCodeHandler_Simple : OpCodeHandler {
@@ -72,7 +78,7 @@ struct OpCodeHandler_Group8x64 : OpCodeHandler {
 };
 
 struct OpCodeHandler_Group : OpCodeHandler {
-	const OpCodeHandler* group_handlers[8];
+	HandlerEntry group_handlers[8];
 	explicit OpCodeHandler_Group(const HandlerVec& group_handlers_) noexcept : OpCodeHandler(&decode, true) {
 		copy_handlers(group_handlers, group_handlers_);
 	}
@@ -80,7 +86,7 @@ struct OpCodeHandler_Group : OpCodeHandler {
 };
 
 struct OpCodeHandler_AnotherTable : OpCodeHandler {
-	const OpCodeHandler* handlers[0x100];
+	HandlerEntry handlers[0x100];
 	explicit OpCodeHandler_AnotherTable(const HandlerVec& handlers_) noexcept : OpCodeHandler(&decode, false) { copy_handlers(handlers, handlers_); }
 	ICED_DECODE_FN_DECL;
 };

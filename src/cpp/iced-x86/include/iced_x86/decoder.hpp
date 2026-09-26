@@ -7,14 +7,18 @@
 #include "iced_x86/constant_offsets.hpp"
 #include "iced_x86/decoder_error.hpp"
 #include "iced_x86/decoder_options.hpp"
+#include "iced_x86/iced_constants.hpp"
 #include "iced_x86/iced_error.hpp"
 #include "iced_x86/instruction.hpp"
+#include "iced_x86/internal/macros.hpp"
 #include "iced_x86/register.hpp"
 #include "iced_x86/tuple_type.hpp"
 
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iterator>
 #include <type_traits>
 #include <vector>
@@ -29,7 +33,24 @@ struct OpCodeHandler;
 class DecoderCore;
 
 // Same as Rust's `OpCodeHandlerDecodeFn`. The first arg is always the handler itself.
-using OpCodeHandlerDecodeFn = void (*)(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction);
+using OpCodeHandlerDecodeFn = void (*)(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept;
+
+// All handlers derive from this struct. Rust stores `(decode_fn, &handler)` tuples in the tables (`HandlerEntry`); here the
+// decode fn is also the first field of the handler.
+struct OpCodeHandler {
+	OpCodeHandlerDecodeFn decode;
+	bool has_modrm;
+
+	constexpr OpCodeHandler(OpCodeHandlerDecodeFn decode_fn, bool has_modrm_) noexcept : decode(decode_fn), has_modrm(has_modrm_) {}
+};
+
+// A handler and its decode fn (same as Rust's `(OpCodeHandlerDecodeFn, &'static OpCodeHandler)` tuples). The decode fn is
+// stored next to the handler pointer (it's also `handler->decode`) so the indirect call target doesn't depend on a load
+// from the handler.
+struct HandlerEntry {
+	OpCodeHandlerDecodeFn decode;
+	const OpCodeHandler* handler;
+};
 
 // Opaque declarations of the generated internal enums (src/internal/decoder/op_size.hpp, src/internal/vector_length.hpp)
 enum class OpSize : std::uint8_t;
@@ -85,34 +106,32 @@ class DecoderCore {
 
 public:
 	static constexpr std::size_t MAX_READ_SIZE = 8;
+	// Copies of the `StateFlags` (src/internal/decoder/state_flags.hpp) used by the inline code in this header
+	static constexpr std::uint32_t SF_IP_REL64 = 0x0000'0001;
+	static constexpr std::uint32_t SF_IP_REL32 = 0x0000'0002;
+	static constexpr std::uint32_t SF_HAS_REX = 0x0000'0008;
+	static constexpr std::uint32_t SF_IS_INVALID = 0x0000'0040;
+	static constexpr std::uint32_t SF_W = 0x0000'0080;
+	static constexpr std::uint32_t SF_LOCK = 0x0000'1000;
+	static constexpr std::uint32_t SF_NO_MORE_BYTES = 0x0000'4000;
+	// `OpSize::Size64`
+	static constexpr std::uint8_t OP_SIZE64 = 2;
 
-	// Current RIP value
-	std::uint64_t ip;
+	// The hot fields are first so most accesses (`this` + offset) only need an 8-bit displacement
+
+	DecoderState state;
 
 	// Next bytes to read if there's enough bytes left to read.
 	// This can be 1 byte past the last byte of `data`.
 	// Invariant: data <= data_ptr <= max_data_ptr <= data + data_len == data_ptr_end
 	// Invariant: {data_ptr,max_data_ptr,data_ptr_end} + max(MAX_READ_SIZE, MAX_INSTRUCTION_LENGTH) doesn't overflow
 	std::uintptr_t data_ptr;
-	// This is `data + data_len` (1 byte past the last valid byte).
-	// This is guaranteed to be >= data_ptr (see the ctor), in other words, it can't overflow to 0
-	std::uintptr_t data_ptr_end;
 	// Set to min(data_ptr + IcedConstants::MAX_INSTRUCTION_LENGTH, data_ptr_end) and is guaranteed to not overflow
 	// Initialized in decode_out() to at most 15 bytes after data_ptr so read_uXX() fails quickly after at most 15 read bytes
 	// (1MB prefixes won't cause it to read 1MB prefixes, it will stop after at most 15).
 	std::uintptr_t max_data_ptr;
-	// Initialized to start of data (data_ptr) when decode_out() is called. Used to calculate current IP/offset (when decoding) if needed.
-	std::uintptr_t instr_start_data_ptr;
+	const HandlerEntry* handlers_map0;
 
-	const OpCodeHandler* const* handlers_map0;
-	// MAP0 is only used by MVEX
-	const OpCodeHandler* const* handlers_vex_map0;
-	const OpCodeHandler* const* handlers_vex[3];
-	const OpCodeHandler* const* handlers_evex[6];
-	const OpCodeHandler* const* handlers_xop[3];
-	const OpCodeHandler* const* handlers_mvex[3];
-
-	DecoderState state;
 	// DecoderOptions
 	std::uint32_t options;
 	// All 1s if we should check for invalid instructions, else 0
@@ -124,7 +143,6 @@ public:
 	// 0 in 16/32-bit mode, 0E0h in 64-bit mode
 	std::uint32_t mask_e0;
 	std::uint32_t rex_mask;
-	std::uint32_t bitness;
 	// The order of these 4 fields is important. They're accessed as a u32 (decode_out()) so should be 4 byte aligned.
 	OpSize default_address_size;
 	OpSize default_operand_size;
@@ -138,6 +156,22 @@ public:
 	CodeSize default_code_size;
 	// Offset of displacement in the instruction. Only used by get_constant_offsets() to return the offset of the displ
 	std::uint8_t displ_index;
+	std::uint32_t bitness;
+
+	// Current RIP value
+	std::uint64_t ip;
+	// This is `data + data_len` (1 byte past the last valid byte).
+	// This is guaranteed to be >= data_ptr (see the ctor), in other words, it can't overflow to 0
+	std::uintptr_t data_ptr_end;
+	// Initialized to start of data (data_ptr) when decode_out() is called. Used to calculate current IP/offset (when decoding) if needed.
+	std::uintptr_t instr_start_data_ptr;
+
+	// MAP0 is only used by MVEX
+	const HandlerEntry* handlers_vex_map0;
+	const HandlerEntry* handlers_vex[3];
+	const HandlerEntry* handlers_evex[6];
+	const HandlerEntry* handlers_xop[3];
+	const HandlerEntry* handlers_mvex[3];
 
 	// Input data provided by the user. When there's no more bytes left to read we'll return a NoMoreBytes error
 	const std::uint8_t* data;
@@ -164,7 +198,7 @@ public:
 	inline void clear_mandatory_prefix_f3(Instruction& instruction) const noexcept;
 	inline void clear_mandatory_prefix_f2(Instruction& instruction) const noexcept;
 	inline void set_invalid_instruction() noexcept;
-	inline void decode_table2(const OpCodeHandler* handler, Instruction& instruction) noexcept;
+	inline void decode_table2(HandlerEntry entry, Instruction& instruction) noexcept;
 	inline void read_modrm() noexcept;
 	void vex2(Instruction& instruction) noexcept;
 	void vex3(Instruction& instruction) noexcept;
@@ -198,13 +232,112 @@ public:
 	static bool read_op_mem_vsib_2(DecoderCore& self, Instruction& instruction, Register index_reg, TupleType tuple_type, bool is_vsib) noexcept;
 	static bool read_op_mem_vsib_2_4(DecoderCore& self, Instruction& instruction, Register index_reg, TupleType tuple_type, bool is_vsib) noexcept;
 
+	// The hot part of decode_out() (inlined into the caller, like Rust's decode_out() gets inlined with LTO).
+	// Only the table dispatch is inline, the handlers are out of line. Rarely used code is in decode_out_slow().
+	ICED_X86_INTERNAL_HOT_INLINE void decode_out_inline(Instruction& instruction) noexcept;
+	void decode_out_slow(Instruction& instruction, std::uintptr_t instr_start, std::uint64_t orig_ip) noexcept;
+
 protected:
 	DecoderCore() noexcept = default;
-	void decode_out_impl(Instruction& instruction) noexcept;
 	ConstantOffsets get_constant_offsets_impl(const Instruction& instruction) const noexcept;
 	static const char* init(DecoderCore& self, std::uint32_t bitness, const std::uint8_t* data, std::size_t data_len, std::uint64_t ip,
 							std::uint32_t options) noexcept;
 };
+
+ICED_X86_INTERNAL_ALWAYS_INLINE std::size_t DecoderCore::read_u8() noexcept {
+	const std::uintptr_t ptr = data_ptr;
+	// This doesn't overflow data_ptr (verified in ctor)
+	if (ICED_X86_INTERNAL_LIKELY(ptr < max_data_ptr)) {
+		std::size_t result = *reinterpret_cast<const std::uint8_t*>(ptr);
+		data_ptr = ptr + 1;
+		return result;
+	}
+	state.flags |= SF_IS_INVALID | SF_NO_MORE_BYTES;
+	return 0;
+}
+
+ICED_X86_INTERNAL_ALWAYS_INLINE void DecoderCore::read_modrm() noexcept {
+	std::uint32_t m = static_cast<std::uint32_t>(read_u8());
+	state.modrm = m;
+#if defined(__GNUC__) && !defined(__clang__)
+	// GCC's SLP vectorizer (-O3) merges the modrm/reg/mod/rm stores into SIMD shuffles + one 16-byte store which is
+	// slower. This empty asm reads and writes `modrm` so the stores can't be merged. (The library is also compiled with
+	// -fno-tree-slp-vectorize but this code is inlined into the caller.)
+	__asm__("" : "+m"(state.modrm));
+#endif
+	state.reg = (m >> 3) & 7;
+	state.mod_ = m >> 6;
+	state.rm = m & 7;
+	state.mem_index = (state.mod_ << 3) | state.rm;
+}
+
+ICED_X86_INTERNAL_ALWAYS_INLINE void DecoderCore::decode_table2(HandlerEntry entry, Instruction& instruction) noexcept {
+	if (entry.handler->has_modrm)
+		read_modrm();
+	entry.decode(entry.handler, *this, instruction);
+}
+
+// Same as Rust's `decode_out_ptr()` (the rarely used code is in `decode_out_slow()`)
+ICED_X86_INTERNAL_HOT_INLINE void DecoderCore::decode_out_inline(Instruction& instruction) noexcept {
+	instruction = Instruction();
+
+	state.extra_register_base = 0;
+	state.extra_index_register_base = 0;
+	state.extra_base_register_base = 0;
+	state.extra_index_register_base_vsib = 0;
+	state.flags = 0;
+	state.mandatory_prefix = DecoderMandatoryPrefix::PNP;
+	// These don't need to be cleared, but they're here so the compiler can re-use the
+	// same XMM reg to clear the previous 2 u32s (including these 2 u32s).
+	state.vvvv = 0;
+	state.vvvv_invalid_check = 0;
+
+	// We only need to write addr/op size fields and init segment_prio to 0.
+	// The fields are consecutive so we can read all 4 fields (including dummy) and write all 4 fields at the same time.
+	std::memcpy(&state.address_size, &default_address_size, 4);
+
+	const std::uintptr_t instr_start = data_ptr;
+	instr_start_data_ptr = instr_start;
+	// The ctor has verified that the two expressions used in min() don't overflow and are >= data_ptr.
+	// The calculated value is a valid pointer in `data` or at most 1 byte past the last valid byte.
+	const std::uintptr_t max_ptr = instr_start + IcedConstants::MAX_INSTRUCTION_LENGTH;
+	max_data_ptr = max_ptr < data_ptr_end ? max_ptr : data_ptr_end;
+
+	std::size_t b = read_u8();
+	HandlerEntry handler = handlers_map0[b];
+	if ((static_cast<std::uint32_t>(b) & rex_mask) == 0x40) {
+		assert(is64b_mode);
+		handler = handlers_map0[read_u8()];
+		std::uint32_t flags = state.flags | SF_HAS_REX;
+		if ((b & 8) != 0) {
+			flags |= SF_W;
+			state.operand_size = static_cast<OpSize>(OP_SIZE64);
+		}
+		state.flags = flags;
+		state.extra_register_base = (static_cast<std::uint32_t>(b) & 4) << 1;
+		state.extra_index_register_base = (static_cast<std::uint32_t>(b) & 2) << 2;
+		state.extra_base_register_base = (static_cast<std::uint32_t>(b) & 1) << 3;
+	}
+	decode_table2(handler, instruction);
+
+	std::uint32_t instr_len = static_cast<std::uint32_t>(data_ptr) - static_cast<std::uint32_t>(instr_start);
+	assert(instr_len <= IcedConstants::MAX_INSTRUCTION_LENGTH); // Could be 0 if there were no bytes available
+	instruction.len_ = static_cast<std::uint8_t>(instr_len);
+	std::uint64_t orig_ip = ip;
+	std::uint64_t ip_ = orig_ip + instr_len;
+	ip = ip_;
+	instruction.next_rip_ = ip_;
+	instruction.flags1_ |= static_cast<std::uint32_t>(default_code_size) << Instruction::F1_CODE_SIZE_SHIFT;
+
+	std::uint32_t flags = state.flags;
+	if ((flags & (SF_IS_INVALID | SF_LOCK | SF_IP_REL64 | SF_IP_REL32)) != 0) {
+		// RIP rel ops are common, but invalid/lock bits are usually never set
+		if ((flags & (SF_IP_REL64 | SF_IS_INVALID | SF_LOCK)) == SF_IP_REL64)
+			instruction.mem_displ_ += ip_;
+		else
+			decode_out_slow(instruction, instr_start, orig_ip);
+	}
+}
 
 // Used by the `Decoder` C array (`std::uint8_t[N]`) and `std::array<std::uint8_t, N>` overloads
 template <typename T>
@@ -599,9 +732,9 @@ public:
 	/// assert(instr.has_lock_prefix());
 	/// assert(instr.has_xrelease_prefix());
 	/// ```
-	Instruction decode() noexcept {
+	ICED_X86_INTERNAL_HOT_INLINE Instruction decode() noexcept {
 		Instruction instruction;
-		decode_out_impl(instruction);
+		decode_out_inline(instruction);
 		return instruction;
 	}
 
@@ -627,7 +760,7 @@ public:
 	/// assert(instr.has_lock_prefix());
 	/// assert(instr.has_xrelease_prefix());
 	/// ```
-	void decode_out(Instruction& instruction) noexcept { decode_out_impl(instruction); }
+	ICED_X86_INTERNAL_HOT_INLINE void decode_out(Instruction& instruction) noexcept { decode_out_inline(instruction); }
 
 	/// Gets the offsets of the constants (memory displacement and immediate) in the decoded instruction.
 	/// The caller can check if there are any relocations at those addresses.

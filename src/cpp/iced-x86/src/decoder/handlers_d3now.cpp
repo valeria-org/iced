@@ -9,7 +9,7 @@ namespace iced_x86::internal {
 
 static_assert(sizeof(D3NOW_CODE_VALUES) / sizeof(D3NOW_CODE_VALUES[0]) == 0x100, "");
 
-void OpCodeHandler_D3NOW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_D3NOW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::Legacy));
 	static_assert(static_cast<std::uint32_t>(OpKind::Register) == 0, "");
 	//instruction.set_op0_kind(OpKind::Register);

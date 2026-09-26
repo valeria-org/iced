@@ -21,14 +21,14 @@ static_assert(static_cast<std::uint32_t>(RoundingControl::RoundTowardZero) == 4,
 
 #define ICED_ASSERT_EVEX() ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::EVEX))
 
-void OpCodeHandler_VectorLength_EVEX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VectorLength_EVEX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VectorLength_EVEX>(self_ptr);
 	ICED_ASSERT_EVEX();
 	const OpCodeHandler* handler = this_.handlers[static_cast<std::size_t>(decoder.state.vector_length)];
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_VectorLength_EVEX_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_VectorLength_EVEX_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_VectorLength_EVEX_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	VectorLength index = decoder.state.vector_length;
@@ -40,7 +40,7 @@ void OpCodeHandler_VectorLength_EVEX_er::decode(const OpCodeHandler* self_ptr, D
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_EVEX_V_H_Ev_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_V_H_Ev_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_V_H_Ev_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::Z) | decoder.state.aaa) & decoder.invalid_check_mask) != 0)
@@ -75,7 +75,7 @@ void OpCodeHandler_EVEX_V_H_Ev_er::decode(const OpCodeHandler* self_ptr, Decoder
 	}
 }
 
-void OpCodeHandler_EVEX_V_H_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_V_H_Ev_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_V_H_Ev_Ib>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.aaa) & decoder.invalid_check_mask) != 0)
@@ -105,7 +105,7 @@ void OpCodeHandler_EVEX_V_H_Ev_Ib::decode(const OpCodeHandler* self_ptr, Decoder
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_Ed_V_Ib>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -135,7 +135,7 @@ void OpCodeHandler_EVEX_Ed_V_Ib::decode(const OpCodeHandler* self_ptr, DecoderCo
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VkHW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHW_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -166,7 +166,7 @@ void OpCodeHandler_EVEX_VkHW_er::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_EVEX_VkHW_er_ur::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHW_er_ur::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHW_er_ur>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -198,7 +198,7 @@ void OpCodeHandler_EVEX_VkHW_er_ur::decode(const OpCodeHandler* self_ptr, Decode
 	}
 }
 
-void OpCodeHandler_EVEX_VkW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkW_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -230,7 +230,7 @@ void OpCodeHandler_EVEX_VkW_er::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_EVEX_VkWIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkWIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkWIb_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -253,7 +253,7 @@ void OpCodeHandler_EVEX_VkWIb_er::decode(const OpCodeHandler* self_ptr, DecoderC
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VkW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -279,7 +279,7 @@ void OpCodeHandler_EVEX_VkW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_EVEX_WkV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_WkV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_WkV>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::B) | decoder.state.vvvv_invalid_check) & decoder.invalid_check_mask) != 0)
@@ -300,7 +300,7 @@ void OpCodeHandler_EVEX_WkV::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_EVEX_VkM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkM>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::B) | decoder.state.vvvv_invalid_check) & decoder.invalid_check_mask) != 0)
@@ -317,7 +317,7 @@ void OpCodeHandler_EVEX_VkM::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_EVEX_VkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -345,7 +345,7 @@ void OpCodeHandler_EVEX_VkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_WkVIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_WkVIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_WkVIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::B) | decoder.state.vvvv_invalid_check) & decoder.invalid_check_mask) != 0)
@@ -365,7 +365,7 @@ void OpCodeHandler_EVEX_WkVIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_HkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_HkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_HkWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -390,7 +390,7 @@ void OpCodeHandler_EVEX_HkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_HWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -411,7 +411,7 @@ void OpCodeHandler_EVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_WkVIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_WkVIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_WkVIb_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -435,7 +435,7 @@ void OpCodeHandler_EVEX_WkVIb_er::decode(const OpCodeHandler* self_ptr, DecoderC
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VW_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VW_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -457,7 +457,7 @@ void OpCodeHandler_EVEX_VW_er::decode(const OpCodeHandler* self_ptr, DecoderCore
 	}
 }
 
-void OpCodeHandler_EVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::Z | StateFlags::B)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -478,7 +478,7 @@ void OpCodeHandler_EVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_EVEX_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_WV>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::Z | StateFlags::B)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -499,7 +499,7 @@ void OpCodeHandler_EVEX_WV::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_EVEX_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VM>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::Z | StateFlags::B)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -517,7 +517,7 @@ void OpCodeHandler_EVEX_VM::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_EVEX_VK::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VK::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VK>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -533,7 +533,7 @@ void OpCodeHandler_EVEX_VK::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 		decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_EVEX_KR::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KR::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KR>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa |
@@ -549,7 +549,7 @@ void OpCodeHandler_EVEX_KR::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 		decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_EVEX_KkHWIb_sae::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KkHWIb_sae::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KkHWIb_sae>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::Z) | decoder.state.extra_register_base | decoder.state.extra_register_base_evex) &
@@ -578,7 +578,7 @@ void OpCodeHandler_EVEX_KkHWIb_sae::decode(const OpCodeHandler* self_ptr, Decode
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VkHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -603,7 +603,7 @@ void OpCodeHandler_EVEX_VkHW::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_EVEX_VkHM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHM>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -621,7 +621,7 @@ void OpCodeHandler_EVEX_VkHM::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_EVEX_VkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -648,7 +648,7 @@ void OpCodeHandler_EVEX_VkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCor
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VkHWIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkHWIb_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkHWIb_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -675,7 +675,7 @@ void OpCodeHandler_EVEX_VkHWIb_er::decode(const OpCodeHandler* self_ptr, Decoder
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_KkHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KkHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KkHW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -702,7 +702,7 @@ void OpCodeHandler_EVEX_KkHW::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_EVEX_KP1HW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KP1HW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KP1HW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -725,7 +725,7 @@ void OpCodeHandler_EVEX_KP1HW::decode(const OpCodeHandler* self_ptr, DecoderCore
 	}
 }
 
-void OpCodeHandler_EVEX_KkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KkHWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -754,7 +754,7 @@ void OpCodeHandler_EVEX_KkHWIb::decode(const OpCodeHandler* self_ptr, DecoderCor
 		decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_EVEX_WkHV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_WkHV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_WkHV>(self_ptr);
 	ICED_ASSERT_EVEX();
 	instruction.set_code(this_.code);
@@ -768,7 +768,7 @@ void OpCodeHandler_EVEX_WkHV::decode(const OpCodeHandler* self_ptr, DecoderCore&
 		decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_EVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VHWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.aaa) & decoder.invalid_check_mask) != 0)
@@ -788,7 +788,7 @@ void OpCodeHandler_EVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VHW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.aaa) & decoder.invalid_check_mask) != 0)
@@ -808,7 +808,7 @@ void OpCodeHandler_EVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_EVEX_VHM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VHM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VHM>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.aaa) & decoder.invalid_check_mask) != 0)
@@ -826,7 +826,7 @@ void OpCodeHandler_EVEX_VHM::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_EVEX_Gv_W_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_Gv_W_er::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_Gv_W_er>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::Z) | decoder.state.vvvv_invalid_check | decoder.state.aaa | decoder.state.extra_register_base_evex) &
@@ -859,7 +859,7 @@ void OpCodeHandler_EVEX_Gv_W_er::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_EVEX_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VX_Ev>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -887,7 +887,7 @@ void OpCodeHandler_EVEX_VX_Ev::decode(const OpCodeHandler* self_ptr, DecoderCore
 	}
 }
 
-void OpCodeHandler_EVEX_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_Ev_VX>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -915,7 +915,7 @@ void OpCodeHandler_EVEX_Ev_VX::decode(const OpCodeHandler* self_ptr, DecoderCore
 	}
 }
 
-void OpCodeHandler_EVEX_Ev_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_Ev_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_Ev_VX_Ib>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa |
@@ -936,7 +936,7 @@ void OpCodeHandler_EVEX_Ev_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderC
 	}
 }
 
-void OpCodeHandler_EVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_MV>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -953,7 +953,7 @@ void OpCodeHandler_EVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_EVEX_VkEv_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VkEv_REXW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VkEv_REXW>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::B) | decoder.state.vvvv_invalid_check) & decoder.invalid_check_mask) != 0)
@@ -977,7 +977,7 @@ void OpCodeHandler_EVEX_VkEv_REXW::decode(const OpCodeHandler* self_ptr, Decoder
 		decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_EVEX_Vk_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_Vk_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_Vk_VSIB>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if (decoder.invalid_check_mask != 0 &&
@@ -999,7 +999,7 @@ void OpCodeHandler_EVEX_Vk_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_EVEX_VSIB_k1_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VSIB_k1_VX::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VSIB_k1_VX>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if (decoder.invalid_check_mask != 0 &&
@@ -1017,7 +1017,7 @@ void OpCodeHandler_EVEX_VSIB_k1_VX::decode(const OpCodeHandler* self_ptr, Decode
 	}
 }
 
-void OpCodeHandler_EVEX_VSIB_k1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_VSIB_k1::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_VSIB_k1>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if (decoder.invalid_check_mask != 0 &&
@@ -1033,7 +1033,7 @@ void OpCodeHandler_EVEX_VSIB_k1::decode(const OpCodeHandler* self_ptr, DecoderCo
 	}
 }
 
-void OpCodeHandler_EVEX_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_GvM_VX_Ib>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & (StateFlags::B | StateFlags::Z)) | decoder.state.vvvv_invalid_check | decoder.state.aaa) &
@@ -1063,7 +1063,7 @@ void OpCodeHandler_EVEX_GvM_VX_Ib::decode(const OpCodeHandler* self_ptr, Decoder
 	InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint32_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_EVEX_KkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EVEX_KkWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EVEX_KkWIb>(self_ptr);
 	ICED_ASSERT_EVEX();
 	if ((((decoder.state.flags & StateFlags::Z) | decoder.state.vvvv_invalid_check | decoder.state.extra_register_base |
