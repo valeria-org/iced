@@ -142,13 +142,69 @@ public:
 	/// Appends `text` to the string
 	void write(std::string_view text, FormatterTextKind kind) override {
 		static_cast<void>(kind);
-		output_->append(text.data(), text.size());
+		append(text);
+	}
+
+	// The other methods are overridden so they append the text directly (no second virtual call to `write()`),
+	// same as the Rust `impl FormatterOutput for String` (the default trait methods are monomorphized).
+
+	/// Appends `text` to the string
+	void write_prefix(const Instruction& instruction, std::string_view text, PrefixKind prefix) override {
+		static_cast<void>(instruction);
+		static_cast<void>(prefix);
+		append(text);
+	}
+
+	/// Appends `text` to the string
+	void write_mnemonic(const Instruction& instruction, std::string_view text) override {
+		static_cast<void>(instruction);
+		append(text);
+	}
+
+	/// Appends `text` to the string
+	void write_number(const Instruction& instruction, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::string_view text,
+					  std::uint64_t value, NumberKind number_kind, FormatterTextKind kind) override {
+		static_cast<void>(instruction);
+		static_cast<void>(operand);
+		static_cast<void>(instruction_operand);
+		static_cast<void>(value);
+		static_cast<void>(number_kind);
+		static_cast<void>(kind);
+		append(text);
+	}
+
+	/// Appends `text` to the string
+	void write_decorator(const Instruction& instruction, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::string_view text,
+						 DecoratorKind decorator) override {
+		static_cast<void>(instruction);
+		static_cast<void>(operand);
+		static_cast<void>(instruction_operand);
+		static_cast<void>(decorator);
+		append(text);
+	}
+
+	/// Appends `text` to the string
+	void write_register(const Instruction& instruction, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::string_view text,
+						Register register_) override {
+		static_cast<void>(instruction);
+		static_cast<void>(operand);
+		static_cast<void>(instruction_operand);
+		static_cast<void>(register_);
+		append(text);
 	}
 
 	/// Gets the string
 	std::string& output() noexcept { return *output_; }
 
 private:
+	void append(std::string_view text) {
+		// Most strings are 1 char long (eg. `,`, `[`, `]`, ` `) and `push_back()` is faster than `append()` (which isn't inlined)
+		if (text.size() == 1)
+			output_->push_back(text[0]);
+		else
+			output_->append(text.data(), text.size());
+	}
+
 	std::string* output_;
 };
 

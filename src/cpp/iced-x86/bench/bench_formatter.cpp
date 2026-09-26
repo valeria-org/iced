@@ -11,6 +11,8 @@
 #include "iced_x86/fast_formatter.hpp"
 #include "iced_x86/gas_formatter.hpp"
 #include "iced_x86/intel_formatter.hpp"
+#include "iced_x86/masm_formatter.hpp"
+#include "iced_x86/nasm_formatter.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -158,6 +160,14 @@ int main(int argc, char** argv) {
 	IntelFormatter intel_formatter;
 	bench("IntelFormatter:", code, text_address, loops,
 		  [&intel_formatter](const Instruction& instruction, std::string& output) { intel_formatter.format(instruction, output); });
+
+	MasmFormatter masm_formatter;
+	bench("MasmFormatter:", code, text_address, loops,
+		  [&masm_formatter](const Instruction& instruction, std::string& output) { masm_formatter.format(instruction, output); });
+
+	NasmFormatter nasm_formatter;
+	bench("NasmFormatter:", code, text_address, loops,
+		  [&nasm_formatter](const Instruction& instruction, std::string& output) { nasm_formatter.format(instruction, output); });
 
 	return 0;
 }

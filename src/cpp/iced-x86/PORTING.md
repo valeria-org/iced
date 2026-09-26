@@ -151,6 +151,9 @@ API notes:
 - Rust methods returning `&str` (`format_register()`, `format_i8()`, ...) return `std::string_view`; it's valid until the next call.
 - Every `FormatterOutput&` method of `Formatter` also has a `std::string&` overload (appends to the string). Derived classes must add
   `ICED_X86_FORMATTER_USING_BASE_METHODS;` (defined in `formatter.hpp`) to their public section or the overloads get hidden.
+  `format(const Instruction&, std::string&)` is virtual: a formatter can override it with a faster version, eg. the masm/nasm formatters
+  instantiate their (templated) formatter code with `StringFormatterOutput` (final class) so all writes are inlined (Rust gets the same
+  result with LTO, the C++ compilers don't devirtualize it even with LTO). The masm/nasm `format(..., std::string&)` is ~5% faster.
 - `Box<dyn SymbolResolver>` / `Box<dyn FormatterOptionsProvider>` -> `std::unique_ptr<...>` (the formatter owns them, `nullptr` = `None`).
   `SymbolResolver::symbol()` returns `std::optional<SymbolResult>`; borrowed strings in it are only valid until the resolver is called
   again, so if the formatter calls the resolver again before it has used a result, it must copy it first (`internal::to_owned()`,
