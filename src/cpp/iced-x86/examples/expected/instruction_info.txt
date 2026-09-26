@@ -1,0 +1,205 @@
+00007FFAC46ACDA4 mov [rsp+10h],rbx
+    OpCode: o64 89 /r
+    Instruction: MOV r/m64, r64
+    Encoding: Legacy
+    Mnemonic: Mov
+    Code: Mov_rm64_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 4, size = 1
+    Memory size: 8
+    Op0Access: Write
+    Op1Access: Read
+    Op0: r64_or_mem
+    Op1: r64_reg
+    Used reg: RSP:Read
+    Used reg: RBX:Read
+    Used mem: [SS:RSP+0x10;UInt64;Write]
+00007FFAC46ACDA9 mov [rsp+18h],rsi
+    OpCode: o64 89 /r
+    Instruction: MOV r/m64, r64
+    Encoding: Legacy
+    Mnemonic: Mov
+    Code: Mov_rm64_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 4, size = 1
+    Memory size: 8
+    Op0Access: Write
+    Op1Access: Read
+    Op0: r64_or_mem
+    Op1: r64_reg
+    Used reg: RSP:Read
+    Used reg: RSI:Read
+    Used mem: [SS:RSP+0x18;UInt64;Write]
+00007FFAC46ACDAE push rbp
+    OpCode: o64 50+ro
+    Instruction: PUSH r64
+    Encoding: Legacy
+    Mnemonic: Push
+    Code: Push_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    SP Increment: -8
+    Op0Access: Read
+    Op0: r64_opcode
+    Used reg: RBP:Read
+    Used reg: RSP:ReadWrite
+    Used mem: [SS:RSP+0xFFFFFFFFFFFFFFF8;UInt64;Write]
+00007FFAC46ACDAF push rdi
+    OpCode: o64 50+ro
+    Instruction: PUSH r64
+    Encoding: Legacy
+    Mnemonic: Push
+    Code: Push_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    SP Increment: -8
+    Op0Access: Read
+    Op0: r64_opcode
+    Used reg: RDI:Read
+    Used reg: RSP:ReadWrite
+    Used mem: [SS:RSP+0xFFFFFFFFFFFFFFF8;UInt64;Write]
+00007FFAC46ACDB0 push r14
+    OpCode: o64 50+ro
+    Instruction: PUSH r64
+    Encoding: Legacy
+    Mnemonic: Push
+    Code: Push_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    SP Increment: -8
+    Op0Access: Read
+    Op0: r64_opcode
+    Used reg: R14:Read
+    Used reg: RSP:ReadWrite
+    Used mem: [SS:RSP+0xFFFFFFFFFFFFFFF8;UInt64;Write]
+00007FFAC46ACDB2 lea rbp,[rsp-100h]
+    OpCode: o64 8D /r
+    Instruction: LEA r64, m
+    Encoding: Legacy
+    Mnemonic: Lea
+    Code: Lea_r64_m
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 4, size = 4
+    Op0Access: Write
+    Op1Access: NoMemAccess
+    Op0: r64_reg
+    Op1: mem
+    Used reg: RBP:Write
+    Used reg: RSP:Read
+00007FFAC46ACDBA sub rsp,200h
+    OpCode: o64 81 /5 id
+    Instruction: SUB r/m64, imm32
+    Encoding: Legacy
+    Mnemonic: Sub
+    Code: Sub_rm64_imm32
+    CpuidFeature: X64
+    FlowControl: Next
+    Immediate offset = 3, size = 4
+    RFLAGS Written: OF, SF, ZF, AF, CF, PF
+    RFLAGS Modified: OF, SF, ZF, AF, CF, PF
+    Op0Access: ReadWrite
+    Op1Access: Read
+    Op0: r64_or_mem
+    Op1: imm32sex64
+    Used reg: RSP:ReadWrite
+00007FFAC46ACDC1 mov rax,[7FFAC47524E0h]
+    OpCode: o64 8B /r
+    Instruction: MOV r64, r/m64
+    Encoding: Legacy
+    Mnemonic: Mov
+    Code: Mov_r64_rm64
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 3, size = 4
+    Memory size: 8
+    Op0Access: Write
+    Op1Access: Read
+    Op0: r64_reg
+    Op1: r64_or_mem
+    Used reg: RAX:Write
+    Used mem: [DS:0x7FFAC47524E0;UInt64;Read]
+00007FFAC46ACDC8 xor rax,rsp
+    OpCode: o64 33 /r
+    Instruction: XOR r64, r/m64
+    Encoding: Legacy
+    Mnemonic: Xor
+    Code: Xor_r64_rm64
+    CpuidFeature: X64
+    FlowControl: Next
+    RFLAGS Written: SF, ZF, PF
+    RFLAGS Cleared: OF, CF
+    RFLAGS Undefined: AF
+    RFLAGS Modified: OF, SF, ZF, AF, CF, PF
+    Op0Access: ReadWrite
+    Op1Access: Read
+    Op0: r64_reg
+    Op1: r64_or_mem
+    Used reg: RAX:ReadWrite
+    Used reg: RSP:Read
+00007FFAC46ACDCB mov [rbp+0F0h],rax
+    OpCode: o64 89 /r
+    Instruction: MOV r/m64, r64
+    Encoding: Legacy
+    Mnemonic: Mov
+    Code: Mov_rm64_r64
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 3, size = 4
+    Memory size: 8
+    Op0Access: Write
+    Op1Access: Read
+    Op0: r64_or_mem
+    Op1: r64_reg
+    Used reg: RBP:Read
+    Used reg: RAX:Read
+    Used mem: [SS:RBP+0xF0;UInt64;Write]
+00007FFAC46ACDD2 mov r8,[7FFAC474F208h]
+    OpCode: o64 8B /r
+    Instruction: MOV r64, r/m64
+    Encoding: Legacy
+    Mnemonic: Mov
+    Code: Mov_r64_rm64
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 3, size = 4
+    Memory size: 8
+    Op0Access: Write
+    Op1Access: Read
+    Op0: r64_reg
+    Op1: r64_or_mem
+    Used reg: R8:Write
+    Used mem: [DS:0x7FFAC474F208;UInt64;Read]
+00007FFAC46ACDD9 lea rax,[7FFAC46F4A58h]
+    OpCode: o64 8D /r
+    Instruction: LEA r64, m
+    Encoding: Legacy
+    Mnemonic: Lea
+    Code: Lea_r64_m
+    CpuidFeature: X64
+    FlowControl: Next
+    Displacement offset = 3, size = 4
+    Op0Access: Write
+    Op1Access: NoMemAccess
+    Op0: r64_reg
+    Op1: mem
+    Used reg: RAX:Write
+00007FFAC46ACDE0 xor edi,edi
+    OpCode: o32 33 /r
+    Instruction: XOR r32, r/m32
+    Encoding: Legacy
+    Mnemonic: Xor
+    Code: Xor_r32_rm32
+    CpuidFeature: INTEL386
+    FlowControl: Next
+    RFLAGS Cleared: OF, SF, CF
+    RFLAGS Set: ZF, PF
+    RFLAGS Undefined: AF
+    RFLAGS Modified: OF, SF, ZF, AF, CF, PF
+    Op0Access: Write
+    Op1Access: None
+    Op0: r32_reg
+    Op1: r32_or_mem
+    Used reg: RDI:Write
