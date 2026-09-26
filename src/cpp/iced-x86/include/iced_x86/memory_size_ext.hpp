@@ -87,10 +87,10 @@ inline std::size_t size(MemorySize memory_size) noexcept { return info(memory_si
 /// Gets the size in bytes of the packed element. If it's not a packed data type, it's equal to `size()`.
 inline std::size_t element_size(MemorySize memory_size) noexcept { return info(memory_size).element_size(); }
 
-/// Gets the element type if it's packed data or `self` if it's not packed data
+/// Gets the element type if it's packed data or `memory_size` if it's not packed data
 inline MemorySize element_type(MemorySize memory_size) noexcept { return info(memory_size).element_type(); }
 
-/// Gets the element type info if it's packed data or `self` if it's not packed data
+/// Gets the element type info if it's packed data or `memory_size` if it's not packed data
 inline const MemorySizeInfo& element_type_info(MemorySize memory_size) noexcept { return info(info(memory_size).element_type()); }
 
 /// `true` if it's signed data (signed integer or a floating point value)

@@ -166,25 +166,25 @@ inline Register register_sub(Register register_, std::uint32_t rhs) noexcept {
 }
 } // namespace internal
 
-/// `Register + i32`. Aborts if the result isn't a valid `Register` value.
+/// `Register + std::int32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register operator+(Register lhs, std::int32_t rhs) noexcept { return internal::register_add(lhs, static_cast<std::uint32_t>(rhs)); }
-/// `Register + u32`. Aborts if the result isn't a valid `Register` value.
+/// `Register + std::uint32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register operator+(Register lhs, std::uint32_t rhs) noexcept { return internal::register_add(lhs, rhs); }
-/// `i32 + Register`. Aborts if the result isn't a valid `Register` value.
+/// `std::int32_t + Register`. Aborts if the result isn't a valid `Register` value.
 inline Register operator+(std::int32_t lhs, Register rhs) noexcept { return internal::register_add(rhs, static_cast<std::uint32_t>(lhs)); }
-/// `u32 + Register`. Aborts if the result isn't a valid `Register` value.
+/// `std::uint32_t + Register`. Aborts if the result isn't a valid `Register` value.
 inline Register operator+(std::uint32_t lhs, Register rhs) noexcept { return internal::register_add(rhs, lhs); }
-/// `Register += i32`. Aborts if the result isn't a valid `Register` value.
+/// `Register += std::int32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register& operator+=(Register& lhs, std::int32_t rhs) noexcept { return lhs = internal::register_add(lhs, static_cast<std::uint32_t>(rhs)); }
-/// `Register += u32`. Aborts if the result isn't a valid `Register` value.
+/// `Register += std::uint32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register& operator+=(Register& lhs, std::uint32_t rhs) noexcept { return lhs = internal::register_add(lhs, rhs); }
-/// `Register - i32`. Aborts if the result isn't a valid `Register` value.
+/// `Register - std::int32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register operator-(Register lhs, std::int32_t rhs) noexcept { return internal::register_sub(lhs, static_cast<std::uint32_t>(rhs)); }
-/// `Register - u32`. Aborts if the result isn't a valid `Register` value.
+/// `Register - std::uint32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register operator-(Register lhs, std::uint32_t rhs) noexcept { return internal::register_sub(lhs, rhs); }
-/// `Register -= i32`. Aborts if the result isn't a valid `Register` value.
+/// `Register -= std::int32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register& operator-=(Register& lhs, std::int32_t rhs) noexcept { return lhs = internal::register_sub(lhs, static_cast<std::uint32_t>(rhs)); }
-/// `Register -= u32`. Aborts if the result isn't a valid `Register` value.
+/// `Register -= std::uint32_t`. Aborts if the result isn't a valid `Register` value.
 inline Register& operator-=(Register& lhs, std::uint32_t rhs) noexcept { return lhs = internal::register_sub(lhs, rhs); }
 
 } // namespace iced_x86
