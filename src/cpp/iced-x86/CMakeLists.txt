@@ -12,6 +12,7 @@ endif()
 
 option(ICED_X86_BUILD_TESTS "Build the iced_x86 unit tests" ${ICED_X86_IS_TOP_LEVEL})
 option(ICED_X86_BUILD_BENCH "Build the iced_x86 benchmarks" ${ICED_X86_IS_TOP_LEVEL})
+option(ICED_X86_BUILD_EXAMPLES "Build the iced_x86 examples (and a test per example)" ${ICED_X86_IS_TOP_LEVEL})
 # The library never uses exceptions or RTTI, so it can always be compiled with -fno-exceptions -fno-rtti.
 # It's OFF by default so the library uses the same flags as the rest of the program: mixing RTTI and
 # non-RTTI code creates two different vtables for the header-only polymorphic classes (ODR violation).
@@ -80,8 +81,11 @@ if(NOT MSVC)
 	endif()
 endif()
 
-if(ICED_X86_BUILD_TESTS)
+if(ICED_X86_BUILD_TESTS OR ICED_X86_BUILD_EXAMPLES)
 	enable_testing()
+endif()
+
+if(ICED_X86_BUILD_TESTS)
 	file(GLOB_RECURSE ICED_X86_TEST_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
 	add_executable(iced_x86_tests ${ICED_X86_TEST_SOURCES})
 	target_link_libraries(iced_x86_tests PRIVATE iced_x86)
@@ -101,7 +105,16 @@ if(ICED_X86_BUILD_BENCH AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bench/CMakeLists
 	add_subdirectory(bench)
 endif()
 
+if(ICED_X86_BUILD_EXAMPLES)
+	add_subdirectory(examples)
+endif()
+
 include(GNUInstallDirs)
 install(TARGETS iced_x86 EXPORT iced_x86Targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/iced_x86 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT iced_x86Targets NAMESPACE iced_x86:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/iced_x86)
+# find_package(iced_x86) support
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/iced_x86ConfigVersion.cmake" VERSION ${iced_x86_VERSION} COMPATIBILITY SameMajorVersion)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/iced_x86Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/iced_x86ConfigVersion.cmake"
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/iced_x86)

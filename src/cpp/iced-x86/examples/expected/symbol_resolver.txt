@@ -1,0 +1,1 @@
+mov rcx,[rdx+my_data]

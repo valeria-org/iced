@@ -1,0 +1,13 @@
+[91mmov[0m[37m     [0m[37m[[0m[94mrsp[0m[37m+[0m[96m10h[0m[37m][0m[37m,[0m[94mrbx[0m
+[91mmov[0m[37m     [0m[37m[[0m[94mrsp[0m[37m+[0m[96m18h[0m[37m][0m[37m,[0m[94mrsi[0m
+[91mpush[0m[37m    [0m[94mrbp[0m
+[91mpush[0m[37m    [0m[94mrdi[0m
+[91mpush[0m[37m    [0m[94mr14[0m
+[91mlea[0m[37m     [0m[94mrbp[0m[37m,[0m[37m[[0m[94mrsp[0m[37m-[0m[96m100h[0m[37m][0m
+[91msub[0m[37m     [0m[94mrsp[0m[37m,[0m[96m200h[0m
+[91mmov[0m[37m     [0m[94mrax[0m[37m,[0m[37m[[0m[96m7FFAC47524E0h[0m[37m][0m
+[91mxor[0m[37m     [0m[94mrax[0m[37m,[0m[94mrsp[0m
+[91mmov[0m[37m     [0m[37m[[0m[94mrbp[0m[37m+[0m[96m0F0h[0m[37m][0m[37m,[0m[94mrax[0m
+[91mmov[0m[37m     [0m[94mr8[0m[37m,[0m[37m[[0m[96m7FFAC474F208h[0m[37m][0m
+[91mlea[0m[37m     [0m[94mrax[0m[37m,[0m[37m[[0m[96m7FFAC46F4A58h[0m[37m][0m
+[91mxor[0m[37m     [0m[94medi[0m[37m,[0m[94medi[0m

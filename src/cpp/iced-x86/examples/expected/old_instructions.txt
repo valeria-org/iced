@@ -1,0 +1,9 @@
+731E0A03 bndmov bnd1, [eax]
+731E0A07 mov tr3, esi
+731E0A0A rdshr [eax]
+731E0A0D dmint
+731E0A0F svdc [eax], cs
+731E0A12 cpu_read
+731E0A14 pmvzb mm1, [eax]
+731E0A17 frinear
+731E0A19 altinst
