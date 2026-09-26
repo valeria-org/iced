@@ -407,7 +407,11 @@ template <typename TraitOptions>
 class SpecializedFormatter {
 public:
 	/// Creates a new instance of this formatter
-	SpecializedFormatter() : SpecializedFormatter(nullptr, 0) {}
+	SpecializedFormatter()
+		: options_()
+		, tables_(&internal::fast::get_fast_fmt_tables())
+		, symbol_resolver_()
+		, buffer_(new std::uint8_t[internal::fast::OUTPUT_BUFFER_SIZE]) {}
 
 	/// Creates a new instance of this formatter
 	///
@@ -460,12 +464,6 @@ private:
 	using FastStringRegister = internal::fast::FastStringRegister;
 
 	static constexpr bool SHOW_USELESS_PREFIXES = true;
-
-	SpecializedFormatter(std::nullptr_t, int)
-		: options_()
-		, tables_(&internal::fast::get_fast_fmt_tables())
-		, symbol_resolver_()
-		, buffer_(new std::uint8_t[internal::fast::OUTPUT_BUFFER_SIZE]) {}
 
 	std::uint8_t* buffer_begin() const noexcept { return buffer_.get(); }
 	std::uint8_t* buffer_end() const noexcept { return buffer_.get() + internal::fast::OUTPUT_BUFFER_SIZE; }
