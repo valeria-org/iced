@@ -14,7 +14,8 @@ crate (`src/rust/iced-x86`). When in doubt, do what the Rust code does.
 ## Language / build rules
 
 - C++17, no compiler extensions required. Must compile warning-free with GCC and Clang (`-Wall -Wextra -Wshadow=local`), should compile with MSVC.
-- The library must compile with `-fno-exceptions -fno-rtti` (this is the default CMake config). No `throw`, `try`,
+- The library must compile with `-fno-exceptions -fno-rtti` (CMake option `ICED_X86_NO_EXCEPTIONS_RTTI`, used by
+  `build/build-cpp`; it's `OFF` by default so the library uses the same flags as the rest of the program). No `throw`, `try`,
   `dynamic_cast`, `typeid`. Errors are returned with `iced_x86::Result<T>` / `iced_x86::IcedError` (`include/iced_x86/iced_error.hpp`),
   which mirror Rust's `Result<T, IcedError>`. Where Rust panics (`iced_assert!`, `unreachable!`, index out of bounds on
   internal tables) use `ICED_ASSERT(x)`, `ICED_UNREACHABLE()`, `ICED_DEBUG_ASSERT(x)` from `src/internal/iced_assert.hpp`.
