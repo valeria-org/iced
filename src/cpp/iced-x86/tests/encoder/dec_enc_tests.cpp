@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -1471,6 +1472,871 @@ TEST_CASE("encoder/test_vsib_props") {
 	}
 }
 
-// DEC_ENC_PART4
+namespace {
+
+struct TestedInfo {
+	// VEX/XOP.L and EVEX.L'L values
+	std::uint32_t l_bits = 0; // bit 0 = L0/L128, bit 1 = L1/L256, etc
+	std::uint32_t vex2_l_bits = 0;
+
+	// REX/VEX/XOP/EVEX/MVEX: W values
+	std::uint32_t w_bits = 0; // bit 0 = W0, bit 1 = W1
+
+	// REX/VEX/XOP/EVEX/MVEX.R
+	std::uint32_t r_bits = 0;
+	std::uint32_t vex2_r_bits = 0;
+	// REX/VEX/XOP/EVEX/MVEX.X
+	std::uint32_t x_bits = 0;
+	// REX/VEX/XOP/EVEX/MVEX.B
+	std::uint32_t b_bits = 0;
+	// EVEX/MVEX.R'
+	std::uint32_t r2_bits = 0;
+	// EVEX/MVEX.V'
+	std::uint32_t v2_bits = 0;
+
+	// mod=11
+	bool reg_reg = false;
+	// mod=00,01,10
+	bool reg_mem = false;
+
+	// EVEX/MVEX only
+	bool mem_disp8 = false;
+
+	// Tested vex2 prefix
+	bool vex2 = false;
+	// Tested vex3 prefix
+	bool vex3 = false;
+
+	// EVEX/MVEX: tested opmask
+	bool op_mask = false;
+	// EVEX/MVEX: tested no opmask
+	bool no_op_mask = false;
+
+	bool prefix_xacquire = false;
+	bool prefix_no_xacquire = false;
+	bool prefix_xrelease = false;
+	bool prefix_no_xrelease = false;
+	bool prefix_lock = false;
+	bool prefix_no_lock = false;
+	bool prefix_hnt = false;
+	bool prefix_no_hnt = false;
+	bool prefix_ht = false;
+	bool prefix_no_ht = false;
+	bool prefix_rep = false;
+	bool prefix_no_rep = false;
+	bool prefix_repne = false;
+	bool prefix_no_repne = false;
+	bool prefix_notrack = false;
+	bool prefix_no_notrack = false;
+	bool prefix_bnd = false;
+	bool prefix_no_bnd = false;
+};
+
+bool can_use_modrm_rm_reg(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::r8_or_mem:
+		case OpCodeOperandKind::r16_or_mem:
+		case OpCodeOperandKind::r32_or_mem:
+		case OpCodeOperandKind::r32_or_mem_mpx:
+		case OpCodeOperandKind::r64_or_mem:
+		case OpCodeOperandKind::r64_or_mem_mpx:
+		case OpCodeOperandKind::mm_or_mem:
+		case OpCodeOperandKind::xmm_or_mem:
+		case OpCodeOperandKind::ymm_or_mem:
+		case OpCodeOperandKind::zmm_or_mem:
+		case OpCodeOperandKind::bnd_or_mem_mpx:
+		case OpCodeOperandKind::k_or_mem:
+		case OpCodeOperandKind::r16_rm:
+		case OpCodeOperandKind::r32_rm:
+		case OpCodeOperandKind::r64_rm:
+		case OpCodeOperandKind::k_rm:
+		case OpCodeOperandKind::mm_rm:
+		case OpCodeOperandKind::xmm_rm:
+		case OpCodeOperandKind::ymm_rm:
+		case OpCodeOperandKind::zmm_rm:
+		case OpCodeOperandKind::tmm_rm:
+			return true;
+		default:
+			break;
+		}
+	}
+	return false;
+}
+
+bool can_use_modrm_rm_mem(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::mem:
+		case OpCodeOperandKind::sibmem:
+		case OpCodeOperandKind::mem_mpx:
+		case OpCodeOperandKind::mem_mib:
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib32z:
+		case OpCodeOperandKind::mem_vsib64z:
+		case OpCodeOperandKind::r8_or_mem:
+		case OpCodeOperandKind::r16_or_mem:
+		case OpCodeOperandKind::r32_or_mem:
+		case OpCodeOperandKind::r32_or_mem_mpx:
+		case OpCodeOperandKind::r64_or_mem:
+		case OpCodeOperandKind::r64_or_mem_mpx:
+		case OpCodeOperandKind::mm_or_mem:
+		case OpCodeOperandKind::xmm_or_mem:
+		case OpCodeOperandKind::ymm_or_mem:
+		case OpCodeOperandKind::zmm_or_mem:
+		case OpCodeOperandKind::bnd_or_mem_mpx:
+		case OpCodeOperandKind::k_or_mem:
+			return true;
+		default:
+			break;
+		}
+	}
+	return false;
+}
+
+bool can_use_vex2(const OpCodeInfo& op_code) { return op_code.table() == OpCodeTableKind::T0F && op_code.w() == 0; }
+
+bool can_use_b(std::uint32_t bitness, const OpCodeInfo& op_code) {
+	switch (op_code.code()) {
+	case Code::Nopw:
+	case Code::Nopd:
+	case Code::Nopq:
+	case Code::Bndmov_bnd_bndm128:
+	case Code::Bndmov_bndm128_bnd:
+		return false;
+	default:
+		break;
+	}
+
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::mem:
+		case OpCodeOperandKind::sibmem:
+		case OpCodeOperandKind::mem_mpx:
+		case OpCodeOperandKind::mem_mib:
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib32z:
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib64z:
+			// The memory test tests all combinations
+			return false;
+		default:
+			break;
+		}
+	}
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::tmm_rm:
+			return false;
+		case OpCodeOperandKind::k_rm:
+		case OpCodeOperandKind::mm_rm:
+		case OpCodeOperandKind::r16_rm:
+		case OpCodeOperandKind::r32_rm:
+		case OpCodeOperandKind::r64_rm:
+		case OpCodeOperandKind::xmm_rm:
+		case OpCodeOperandKind::ymm_rm:
+		case OpCodeOperandKind::zmm_rm:
+		case OpCodeOperandKind::bnd_or_mem_mpx:
+		case OpCodeOperandKind::k_or_mem:
+		case OpCodeOperandKind::mm_or_mem:
+		case OpCodeOperandKind::r16_or_mem:
+		case OpCodeOperandKind::r32_or_mem:
+		case OpCodeOperandKind::r32_or_mem_mpx:
+		case OpCodeOperandKind::r64_or_mem:
+		case OpCodeOperandKind::r64_or_mem_mpx:
+		case OpCodeOperandKind::r8_or_mem:
+		case OpCodeOperandKind::xmm_or_mem:
+		case OpCodeOperandKind::ymm_or_mem:
+		case OpCodeOperandKind::zmm_or_mem:
+			if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW)
+				return bitness == 64;
+			return true;
+		default:
+			break;
+		}
+	}
+	if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW)
+		return bitness == 64;
+	return true;
+}
+
+bool can_use_x(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::k_rm:
+		case OpCodeOperandKind::mm_rm:
+		case OpCodeOperandKind::r16_rm:
+		case OpCodeOperandKind::r32_rm:
+		case OpCodeOperandKind::r64_rm:
+		case OpCodeOperandKind::xmm_rm:
+		case OpCodeOperandKind::ymm_rm:
+		case OpCodeOperandKind::zmm_rm:
+		case OpCodeOperandKind::tmm_rm:
+		case OpCodeOperandKind::bnd_or_mem_mpx:
+		case OpCodeOperandKind::k_or_mem:
+		case OpCodeOperandKind::mm_or_mem:
+		case OpCodeOperandKind::r16_or_mem:
+		case OpCodeOperandKind::r32_or_mem:
+		case OpCodeOperandKind::r32_or_mem_mpx:
+		case OpCodeOperandKind::r64_or_mem:
+		case OpCodeOperandKind::r64_or_mem_mpx:
+		case OpCodeOperandKind::r8_or_mem:
+		case OpCodeOperandKind::xmm_or_mem:
+		case OpCodeOperandKind::ymm_or_mem:
+		case OpCodeOperandKind::zmm_or_mem:
+			return true;
+		case OpCodeOperandKind::mem:
+		case OpCodeOperandKind::sibmem:
+		case OpCodeOperandKind::mem_mpx:
+		case OpCodeOperandKind::mem_mib:
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib32z:
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib64z:
+			// The memory test tests all combinations
+			return false;
+		default:
+			break;
+		}
+	}
+	return true;
+}
+
+bool can_use_r(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::k_reg:
+		case OpCodeOperandKind::kp1_reg:
+		case OpCodeOperandKind::tr_reg:
+		case OpCodeOperandKind::bnd_reg:
+		case OpCodeOperandKind::tmm_reg:
+			return false;
+		case OpCodeOperandKind::cr_reg:
+		case OpCodeOperandKind::dr_reg:
+		case OpCodeOperandKind::mm_reg:
+		case OpCodeOperandKind::r16_reg:
+		case OpCodeOperandKind::r32_reg:
+		case OpCodeOperandKind::r64_reg:
+		case OpCodeOperandKind::r8_reg:
+		case OpCodeOperandKind::seg_reg:
+		case OpCodeOperandKind::xmm_reg:
+		case OpCodeOperandKind::ymm_reg:
+		case OpCodeOperandKind::zmm_reg:
+			return true;
+		default:
+			break;
+		}
+	}
+	return true;
+}
+
+bool can_use_r2(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::k_reg:
+		case OpCodeOperandKind::kp1_reg:
+		case OpCodeOperandKind::tr_reg:
+		case OpCodeOperandKind::bnd_reg:
+		case OpCodeOperandKind::cr_reg:
+		case OpCodeOperandKind::dr_reg:
+		case OpCodeOperandKind::mm_reg:
+		case OpCodeOperandKind::r16_reg:
+		case OpCodeOperandKind::r32_reg:
+		case OpCodeOperandKind::r64_reg:
+		case OpCodeOperandKind::r8_reg:
+		case OpCodeOperandKind::seg_reg:
+		case OpCodeOperandKind::tmm_reg:
+			return false;
+		case OpCodeOperandKind::xmm_reg:
+		case OpCodeOperandKind::ymm_reg:
+		case OpCodeOperandKind::zmm_reg:
+			return true;
+		default:
+			break;
+		}
+	}
+	return true;
+}
+
+bool can_use_v2(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::k_vvvv:
+		case OpCodeOperandKind::r32_vvvv:
+		case OpCodeOperandKind::r64_vvvv:
+		case OpCodeOperandKind::tmm_vvvv:
+			return false;
+		case OpCodeOperandKind::xmm_vvvv:
+		case OpCodeOperandKind::xmmp3_vvvv:
+		case OpCodeOperandKind::ymm_vvvv:
+		case OpCodeOperandKind::zmm_vvvv:
+		case OpCodeOperandKind::zmmp3_vvvv:
+			return true;
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib32z:
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib64z:
+			// The memory test tests all combinations
+			return false;
+		default:
+			break;
+		}
+	}
+	return false;
+}
+
+bool has_modrm(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::mem:
+		case OpCodeOperandKind::sibmem:
+		case OpCodeOperandKind::mem_mpx:
+		case OpCodeOperandKind::mem_mib:
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib32z:
+		case OpCodeOperandKind::mem_vsib64z:
+		case OpCodeOperandKind::r8_or_mem:
+		case OpCodeOperandKind::r16_or_mem:
+		case OpCodeOperandKind::r32_or_mem:
+		case OpCodeOperandKind::r32_or_mem_mpx:
+		case OpCodeOperandKind::r64_or_mem:
+		case OpCodeOperandKind::r64_or_mem_mpx:
+		case OpCodeOperandKind::mm_or_mem:
+		case OpCodeOperandKind::xmm_or_mem:
+		case OpCodeOperandKind::ymm_or_mem:
+		case OpCodeOperandKind::zmm_or_mem:
+		case OpCodeOperandKind::bnd_or_mem_mpx:
+		case OpCodeOperandKind::k_or_mem:
+		case OpCodeOperandKind::r8_reg:
+		case OpCodeOperandKind::r16_reg:
+		case OpCodeOperandKind::r16_rm:
+		case OpCodeOperandKind::r32_reg:
+		case OpCodeOperandKind::r32_rm:
+		case OpCodeOperandKind::r64_reg:
+		case OpCodeOperandKind::r64_rm:
+		case OpCodeOperandKind::seg_reg:
+		case OpCodeOperandKind::k_reg:
+		case OpCodeOperandKind::kp1_reg:
+		case OpCodeOperandKind::k_rm:
+		case OpCodeOperandKind::mm_reg:
+		case OpCodeOperandKind::mm_rm:
+		case OpCodeOperandKind::xmm_reg:
+		case OpCodeOperandKind::xmm_rm:
+		case OpCodeOperandKind::ymm_reg:
+		case OpCodeOperandKind::ymm_rm:
+		case OpCodeOperandKind::zmm_reg:
+		case OpCodeOperandKind::zmm_rm:
+		case OpCodeOperandKind::tmm_reg:
+		case OpCodeOperandKind::tmm_rm:
+		case OpCodeOperandKind::cr_reg:
+		case OpCodeOperandKind::dr_reg:
+		case OpCodeOperandKind::tr_reg:
+		case OpCodeOperandKind::bnd_reg:
+			return true;
+		default:
+			break;
+		}
+	}
+	return false;
+}
+
+} // namespace
+
+TEST_CASE("encoder/verify_that_test_cases_test_enough_bits") {
+	std::vector<TestedInfo> tested_infos_16(IcedConstants::CODE_ENUM_COUNT);
+	std::vector<TestedInfo> tested_infos_32(IcedConstants::CODE_ENUM_COUNT);
+	std::vector<TestedInfo> tested_infos_64(IcedConstants::CODE_ENUM_COUNT);
+
+	std::vector<bool> can_use_w(IcedConstants::CODE_ENUM_COUNT, false);
+	{
+		std::unordered_set<std::uint64_t> uses_w;
+		const auto key = [](const OpCodeInfo& op_code) {
+			return (static_cast<std::uint64_t>(op_code.table()) << 32) | op_code.op_code();
+		};
+		for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
+			const OpCodeInfo& op_code = code_ext::op_code(static_cast<Code>(i));
+			if (op_code.encoding() != EncodingKind::Legacy)
+				continue;
+			if (op_code.operand_size() != 0)
+				uses_w.insert(key(op_code));
+		}
+		for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
+			const OpCodeInfo& op_code = code_ext::op_code(static_cast<Code>(i));
+			switch (op_code.encoding()) {
+			case EncodingKind::Legacy:
+			case EncodingKind::D3NOW:
+				can_use_w[i] = uses_w.count(key(op_code)) == 0;
+				break;
+			case EncodingKind::VEX:
+			case EncodingKind::EVEX:
+			case EncodingKind::XOP:
+			case EncodingKind::MVEX:
+				break;
+			}
+		}
+	}
+
+	for (const auto& info : decoder_tests(false, false)) {
+		if ((info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) != 0)
+			continue;
+		std::vector<TestedInfo>* tested_infos;
+		switch (info.bitness()) {
+		case 16:
+			tested_infos = &tested_infos_16;
+			break;
+		case 32:
+			tested_infos = &tested_infos_32;
+			break;
+		case 64:
+			tested_infos = &tested_infos_64;
+			break;
+		default:
+			FAIL("unreachable");
+		}
+
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		TestedInfo& tested = (*tested_infos)[static_cast<std::size_t>(info.code())];
+
+		const auto bytes = to_vec_u8(info.hex_bytes());
+		const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+		CHECK_EQ(instruction.code(), info.code());
+
+		if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX) {
+			const std::size_t evex_index = get_evex_index(bytes);
+
+			if (op_code.encoding() == EncodingKind::EVEX) {
+				if (instruction.rounding_control() == RoundingControl::None)
+					tested.l_bits |= 1U << ((bytes[evex_index + 3] >> 5) & 3);
+
+				const std::uint32_t ll = (bytes[evex_index + 3] >> 5) & 3;
+				const bool invalid = (info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) == 0 && ll == 3 &&
+					(bytes[evex_index + 5] < 0xC0 || (bytes[evex_index + 3] & 0x10) == 0);
+				if (!invalid)
+					tested.l_bits |= 1U << 3;
+			}
+
+			tested.w_bits |= 1U << (bytes[evex_index + 2] >> 7);
+			tested.r_bits |= 1U << ((bytes[evex_index + 1] >> 7) ^ 1);
+			tested.x_bits |= 1U << (((bytes[evex_index + 1] >> 6) & 1) ^ 1);
+			tested.b_bits |= 1U << (((bytes[evex_index + 1] >> 5) & 1) ^ 1);
+			tested.r2_bits |= 1U << (((bytes[evex_index + 1] >> 4) & 1) ^ 1);
+			tested.v2_bits |= 1U << (((bytes[evex_index + 3] >> 3) & 1) ^ 1);
+			if ((bytes[evex_index + 5] >> 6) != 3) {
+				tested.reg_mem = true;
+				if (instruction.memory_displ_size() == 1 && instruction.memory_displacement64() != 0)
+					tested.mem_disp8 = true;
+			}
+			else
+				tested.reg_reg = true;
+			if (instruction.op_mask() != Register::None)
+				tested.op_mask = true;
+			else
+				tested.no_op_mask = true;
+		}
+		else if (op_code.encoding() == EncodingKind::VEX || op_code.encoding() == EncodingKind::XOP) {
+			const std::size_t vex_index = get_vex_xop_index(bytes);
+			std::size_t mrmi;
+			if (bytes[vex_index] == 0xC5) {
+				mrmi = vex_index + 3;
+				tested.vex2 = true;
+				tested.vex2_r_bits |= 1U << ((bytes[vex_index + 1] >> 7) ^ 1);
+				tested.vex2_l_bits |= 1U << ((bytes[vex_index + 1] >> 2) & 1);
+			}
+			else {
+				mrmi = vex_index + 4;
+				if (op_code.encoding() == EncodingKind::VEX)
+					tested.vex3 = true;
+				tested.r_bits |= 1U << ((bytes[vex_index + 1] >> 7) ^ 1);
+				tested.x_bits |= 1U << (((bytes[vex_index + 1] >> 6) & 1) ^ 1);
+				tested.b_bits |= 1U << (((bytes[vex_index + 1] >> 5) & 1) ^ 1);
+				tested.w_bits |= 1U << (bytes[vex_index + 2] >> 7);
+				tested.l_bits |= 1U << ((bytes[vex_index + 2] >> 2) & 1);
+			}
+			if (has_modrm(op_code)) {
+				if ((bytes[mrmi] >> 6) != 3)
+					tested.reg_mem = true;
+				else
+					tested.reg_reg = true;
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW) {
+			auto [i, rex] = skip_prefixes(bytes, info.bitness());
+			if (info.bitness() == 64) {
+				tested.w_bits |= 1U << ((rex >> 3) & 1);
+				tested.r_bits |= 1U << ((rex >> 2) & 1);
+				tested.x_bits |= 1U << ((rex >> 1) & 1);
+				tested.b_bits |= 1U << (rex & 1);
+				// Can't access regs dr8-dr15
+				if (info.code() == Code::Mov_r64_dr || info.code() == Code::Mov_dr_r64)
+					tested.r_bits |= 1U << 1;
+			}
+			else {
+				tested.w_bits |= 1;
+				tested.r_bits |= 1;
+				tested.x_bits |= 1;
+				tested.b_bits |= 1;
+			}
+			if (has_modrm(op_code)) {
+				switch (op_code.table()) {
+				case OpCodeTableKind::Normal:
+					break;
+				case OpCodeTableKind::T0F:
+					REQUIRE(bytes[i] == 0x0F);
+					i++;
+					break;
+				case OpCodeTableKind::T0F38:
+					REQUIRE(bytes[i] == 0x0F);
+					i++;
+					REQUIRE(bytes[i] == 0x38);
+					i++;
+					break;
+				case OpCodeTableKind::T0F3A:
+					REQUIRE(bytes[i] == 0x0F);
+					i++;
+					REQUIRE(bytes[i] == 0x3A);
+					i++;
+					break;
+				default:
+					break;
+				}
+				i++;
+				if ((bytes[i] >> 6) != 3)
+					tested.reg_mem = true;
+				else
+					tested.reg_reg = true;
+			}
+			if (op_code.can_use_xacquire_prefix()) {
+				if (instruction.has_xacquire_prefix())
+					tested.prefix_xacquire = true;
+				else
+					tested.prefix_no_xacquire = true;
+			}
+			if (op_code.can_use_xrelease_prefix()) {
+				if (instruction.has_xrelease_prefix())
+					tested.prefix_xrelease = true;
+				else
+					tested.prefix_no_xrelease = true;
+			}
+			if (op_code.can_use_lock_prefix()) {
+				if (instruction.has_lock_prefix())
+					tested.prefix_lock = true;
+				else
+					tested.prefix_no_lock = true;
+			}
+			if (op_code.can_use_hint_taken_prefix()) {
+				if (instruction.segment_prefix() == Register::CS)
+					tested.prefix_hnt = true;
+				else
+					tested.prefix_no_hnt = true;
+			}
+			if (op_code.can_use_hint_taken_prefix()) {
+				if (instruction.segment_prefix() == Register::DS)
+					tested.prefix_ht = true;
+				else
+					tested.prefix_no_ht = true;
+			}
+			if (op_code.can_use_rep_prefix()) {
+				if (instruction.has_rep_prefix())
+					tested.prefix_rep = true;
+				else
+					tested.prefix_no_rep = true;
+			}
+			if (op_code.can_use_repne_prefix()) {
+				if (instruction.has_repne_prefix())
+					tested.prefix_repne = true;
+				else
+					tested.prefix_no_repne = true;
+			}
+			if (op_code.can_use_notrack_prefix()) {
+				if (instruction.segment_prefix() == Register::DS)
+					tested.prefix_notrack = true;
+				else
+					tested.prefix_no_notrack = true;
+			}
+			if (op_code.can_use_bnd_prefix()) {
+				if (instruction.has_repne_prefix())
+					tested.prefix_bnd = true;
+				else
+					tested.prefix_no_bnd = true;
+			}
+		}
+		else
+			FAIL("unreachable");
+	}
+
+	// Rust uses one Vec<Code> per name, eg. `wig32_16`. Key = name, eg. "wig32_16"
+	std::unordered_map<std::string, std::vector<Code>> lists;
+	const auto add = [&lists](const char* name, std::uint32_t bitness, Code code) {
+		lists[std::string(name) + "_" + std::to_string(bitness)].push_back(code);
+	};
+
+	const auto names = code_names();
+	for (std::uint32_t bitness : {16U, 32U, 64U}) {
+		const std::vector<TestedInfo>* tested_infos;
+		switch (bitness) {
+		case 16:
+			tested_infos = &tested_infos_16;
+			break;
+		case 32:
+			tested_infos = &tested_infos_32;
+			break;
+		default:
+			tested_infos = &tested_infos_64;
+			break;
+		}
+
+		for (std::size_t ci = 0; ci < IcedConstants::CODE_ENUM_COUNT; ci++) {
+			const Code code = static_cast<Code>(ci);
+			if (is_ignored_code(names[ci]))
+				continue;
+			if (code == Code::Montmul_16 || code == Code::Montmul_64)
+				continue;
+			const OpCodeInfo& op_code = code_ext::op_code(code);
+			if (!op_code.is_instruction() || op_code.code() == Code::Popw_CS)
+				continue;
+			if (op_code.fwait())
+				continue;
+
+			if (!op_code.is_available_in_mode(bitness))
+				continue;
+
+			const TestedInfo& tested = (*tested_infos)[ci];
+
+			if ((bitness == 16 || bitness == 32) && op_code.is_wig32()) {
+				if (tested.w_bits != 3)
+					add("wig32", bitness, code);
+			}
+			if (op_code.is_wig()) {
+				if (tested.w_bits != 3)
+					add("wig", bitness, code);
+			}
+			if (bitness == 64 && op_code.mode64() && (op_code.encoding() == EncodingKind::Legacy || op_code.encoding() == EncodingKind::D3NOW)) {
+				CHECK(!op_code.is_wig());
+				CHECK(!op_code.is_wig32());
+				if (can_use_w[ci] && tested.w_bits != 3)
+					add("w", bitness, code);
+			}
+			if (op_code.is_lig()) {
+				std::uint32_t all_l_bits;
+				switch (op_code.encoding()) {
+				case EncodingKind::VEX:
+				case EncodingKind::XOP:
+					all_l_bits = 3; // 1 bit = 2 values
+					break;
+				case EncodingKind::EVEX:
+					all_l_bits = 0xF; // 2 bits = 4 values
+					break;
+				default:
+					FAIL("unreachable");
+				}
+				if (tested.l_bits != all_l_bits)
+					add("lig", bitness, code);
+			}
+			if (op_code.is_lig() && op_code.encoding() == EncodingKind::VEX) {
+				if (tested.vex2_l_bits != 3 && can_use_vex2(op_code))
+					add("vex2_lig", bitness, code);
+			}
+			if (can_use_modrm_rm_mem(op_code)) {
+				if (!tested.reg_mem)
+					add("rm", bitness, code);
+			}
+			if (can_use_modrm_rm_reg(op_code)) {
+				if (!tested.reg_reg)
+					add("rr", bitness, code);
+			}
+			switch (op_code.encoding()) {
+			case EncodingKind::Legacy:
+			case EncodingKind::VEX:
+			case EncodingKind::XOP:
+			case EncodingKind::D3NOW:
+				break;
+			case EncodingKind::EVEX:
+			case EncodingKind::MVEX:
+				if (!tested.mem_disp8 && can_use_modrm_rm_mem(op_code))
+					add("disp8", bitness, code);
+				break;
+			}
+			if (op_code.encoding() == EncodingKind::VEX) {
+				if (!tested.vex3)
+					add("vex3", bitness, code);
+				if (!tested.vex2 && can_use_vex2(op_code))
+					add("vex2", bitness, code);
+			}
+			if (op_code.can_use_op_mask_register()) {
+				if (!tested.op_mask)
+					add("opmask", bitness, code);
+				if (!tested.no_op_mask && !op_code.require_op_mask_register())
+					add("noopmask", bitness, code);
+			}
+			if (can_use_b(bitness, op_code)) {
+				if (tested.b_bits != 3)
+					add("b", bitness, code);
+			}
+			else {
+				if ((tested.b_bits & 1) == 0)
+					add("b", bitness, code);
+			}
+			switch (op_code.encoding()) {
+			case EncodingKind::EVEX:
+			case EncodingKind::MVEX:
+				if (can_use_r2(op_code)) {
+					if (tested.r2_bits != 3)
+						add("r2", bitness, code);
+				}
+				else {
+					if ((tested.r2_bits & 1) == 0)
+						add("r2", bitness, code);
+				}
+				break;
+			case EncodingKind::Legacy:
+			case EncodingKind::VEX:
+			case EncodingKind::XOP:
+			case EncodingKind::D3NOW:
+				break;
+			}
+			if (bitness == 64 && op_code.mode64()) {
+				if (tested.vex2_r_bits != 3 && op_code.encoding() == EncodingKind::VEX && can_use_vex2(op_code) && can_use_r(op_code))
+					add("vex2_r", bitness, code);
+				if (can_use_r(op_code)) {
+					if (tested.r_bits != 3)
+						add("r", bitness, code);
+				}
+				else {
+					if ((tested.r_bits & 1) == 0)
+						add("r", bitness, code);
+				}
+				if (is_vsib(op_code)) {
+					// The memory tests test vsib memory operands
+				}
+				else if (can_use_x(op_code)) {
+					if (tested.x_bits != 3)
+						add("x", bitness, code);
+				}
+				else {
+					if ((tested.x_bits & 1) == 0)
+						add("x", bitness, code);
+				}
+				switch (op_code.encoding()) {
+				case EncodingKind::EVEX:
+				case EncodingKind::MVEX:
+					if (is_vsib(op_code)) {
+						// The memory tests test vsib memory operands
+					}
+					else if (can_use_v2(op_code)) {
+						if (tested.v2_bits != 3)
+							add("v2", bitness, code);
+					}
+					else {
+						if ((tested.v2_bits & 1) == 0)
+							add("v2", bitness, code);
+					}
+					break;
+				case EncodingKind::Legacy:
+				case EncodingKind::VEX:
+				case EncodingKind::XOP:
+				case EncodingKind::D3NOW:
+					break;
+				}
+			}
+			if (op_code.can_use_xacquire_prefix()) {
+				if (!tested.prefix_xacquire)
+					add("pfx_xacquire", bitness, code);
+				if (!tested.prefix_no_xacquire)
+					add("pfx_no_xacquire", bitness, code);
+			}
+			if (op_code.can_use_xrelease_prefix()) {
+				if (!tested.prefix_xrelease)
+					add("pfx_xrelease", bitness, code);
+				if (!tested.prefix_no_xrelease)
+					add("pfx_no_xrelease", bitness, code);
+			}
+			if (op_code.can_use_lock_prefix()) {
+				if (!tested.prefix_lock)
+					add("pfx_lock", bitness, code);
+				if (!tested.prefix_no_lock)
+					add("pfx_no_lock", bitness, code);
+			}
+			if (op_code.can_use_hint_taken_prefix()) {
+				if (!tested.prefix_hnt)
+					add("pfx_hnt", bitness, code);
+				if (!tested.prefix_no_hnt)
+					add("pfx_no_hnt", bitness, code);
+			}
+			if (op_code.can_use_hint_taken_prefix()) {
+				if (!tested.prefix_ht)
+					add("pfx_ht", bitness, code);
+				if (!tested.prefix_no_ht)
+					add("pfx_no_ht", bitness, code);
+			}
+			if (op_code.can_use_rep_prefix()) {
+				if (!tested.prefix_rep)
+					add("pfx_rep", bitness, code);
+				if (!tested.prefix_no_rep)
+					add("pfx_no_rep", bitness, code);
+			}
+			if (op_code.can_use_repne_prefix()) {
+				if (!tested.prefix_repne)
+					add("pfx_repne", bitness, code);
+				if (!tested.prefix_no_repne)
+					add("pfx_no_repne", bitness, code);
+			}
+			if (op_code.can_use_notrack_prefix()) {
+				if (!tested.prefix_notrack)
+					add("pfx_notrack", bitness, code);
+				if (!tested.prefix_no_notrack)
+					add("pfx_no_notrack", bitness, code);
+			}
+			if (op_code.can_use_bnd_prefix()) {
+				if (!tested.prefix_bnd)
+					add("pfx_bnd", bitness, code);
+				if (!tested.prefix_no_bnd)
+					add("pfx_no_bnd", bitness, code);
+			}
+		}
+	}
+
+	static const char* const LIST_NAMES[] = {
+		"wig32_16", "wig32_32", "wig_16", "wig_32", "wig_64", "w_64", "lig_16", "lig_32", "lig_64", "vex2_lig_16", "vex2_lig_32", "vex2_lig_64",
+		"rr_16", "rr_32", "rr_64", "rm_16", "rm_32", "rm_64", "disp8_16", "disp8_32", "disp8_64", "vex2_16", "vex2_32", "vex2_64", "vex3_16",
+		"vex3_32", "vex3_64", "opmask_16", "opmask_32", "opmask_64", "noopmask_16", "noopmask_32", "noopmask_64", "b_16", "b_32", "b_64", "r2_16",
+		"r2_32", "r2_64", "r_64", "vex2_r_64", "x_64", "v2_64", "pfx_xacquire_16", "pfx_xacquire_32", "pfx_xacquire_64", "pfx_xrelease_16",
+		"pfx_xrelease_32", "pfx_xrelease_64", "pfx_lock_16", "pfx_lock_32", "pfx_lock_64", "pfx_hnt_16", "pfx_hnt_32", "pfx_hnt_64", "pfx_ht_16",
+		"pfx_ht_32", "pfx_ht_64", "pfx_rep_16", "pfx_rep_32", "pfx_rep_64", "pfx_repne_16", "pfx_repne_32", "pfx_repne_64", "pfx_notrack_16",
+		"pfx_notrack_32", "pfx_notrack_64", "pfx_bnd_16", "pfx_bnd_32", "pfx_bnd_64", "pfx_no_xacquire_16", "pfx_no_xacquire_32",
+		"pfx_no_xacquire_64", "pfx_no_xrelease_16", "pfx_no_xrelease_32", "pfx_no_xrelease_64", "pfx_no_lock_16", "pfx_no_lock_32",
+		"pfx_no_lock_64", "pfx_no_hnt_16", "pfx_no_hnt_32", "pfx_no_hnt_64", "pfx_no_ht_16", "pfx_no_ht_32", "pfx_no_ht_64", "pfx_no_rep_16",
+		"pfx_no_rep_32", "pfx_no_rep_64", "pfx_no_repne_16", "pfx_no_repne_32", "pfx_no_repne_64", "pfx_no_notrack_16", "pfx_no_notrack_32",
+		"pfx_no_notrack_64", "pfx_no_bnd_16", "pfx_no_bnd_32", "pfx_no_bnd_64",
+	};
+	for (const char* list_name : LIST_NAMES) {
+		std::string s = std::string(list_name) + ":";
+		const auto it = lists.find(list_name);
+		if (it != lists.end()) {
+			for (std::size_t i = 0; i < it->second.size(); i++) {
+				if (i > 0)
+					s.push_back(',');
+				s.append(to_string(it->second[i]));
+			}
+		}
+		CHECK_EQ(s, std::string(list_name) + ":");
+	}
+	// Make sure all lists are checked
+	for (const auto& kv : lists)
+		CHECK(std::find_if(std::begin(LIST_NAMES), std::end(LIST_NAMES), [&kv](const char* n) { return kv.first == n; }) != std::end(LIST_NAMES));
+}
+
+// DEC_ENC_PART5
 
 } // namespace iced_x86::tests
