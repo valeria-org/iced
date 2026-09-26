@@ -59,6 +59,12 @@ function(iced_x86_set_warnings target)
 endfunction()
 
 iced_x86_set_warnings(iced_x86)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	# GCC's SLP vectorizer merges the decoder's modrm/reg/mod/rm state stores into SIMD shuffles + one 16-byte store,
+	# which makes the decoder ~4% slower. Clang doesn't do it.
+	file(GLOB ICED_X86_DECODER_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/decoder/*.cpp")
+	set_source_files_properties(${ICED_X86_DECODER_SOURCES} PROPERTIES COMPILE_OPTIONS "-fno-tree-slp-vectorize")
+endif()
 if(NOT MSVC)
 	# Separate sections so unused code/data can be removed by the linker (--gc-sections)
 	target_compile_options(iced_x86 PRIVATE -ffunction-sections -fdata-sections)

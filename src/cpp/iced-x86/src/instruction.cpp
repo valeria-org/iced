@@ -47,83 +47,20 @@ Result<void> Instruction::try_set_op_kind(std::uint32_t operand, OpKind op_kind)
 }
 
 Result<std::uint64_t> Instruction::try_immediate(std::uint32_t operand) const noexcept {
-	static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
 	if (operand > 4)
 		return IcedError(INVALID_OPERAND);
-	switch (op_kind(operand)) {
-	case OpKind::Immediate8:
-		return static_cast<std::uint64_t>(immediate8());
-	case OpKind::Immediate8_2nd:
-		return static_cast<std::uint64_t>(immediate8_2nd());
-	case OpKind::Immediate16:
-		return static_cast<std::uint64_t>(immediate16());
-	case OpKind::Immediate32:
-		return static_cast<std::uint64_t>(immediate32());
-	case OpKind::Immediate64:
-		return immediate64();
-	case OpKind::Immediate8to16:
-		return static_cast<std::uint64_t>(static_cast<std::int64_t>(immediate8to16()));
-	case OpKind::Immediate8to32:
-		return static_cast<std::uint64_t>(static_cast<std::int64_t>(immediate8to32()));
-	case OpKind::Immediate8to64:
-		return static_cast<std::uint64_t>(immediate8to64());
-	case OpKind::Immediate32to64:
-		return static_cast<std::uint64_t>(immediate32to64());
-	default:
-		return IcedError(NOT_AN_IMMEDIATE_OPERAND);
-	}
-}
-
-std::uint64_t Instruction::immediate(std::uint32_t operand) const noexcept {
-	auto result = try_immediate(operand);
-	if (result.is_ok())
-		return result.value();
-	ICED_DEBUG_ASSERT(false);
-	return 0;
-}
-
-void Instruction::set_immediate_u64(std::uint32_t operand, std::uint64_t new_value) noexcept {
-	const auto result = try_set_immediate_u64(operand, new_value);
-	(void)result;
-	ICED_DEBUG_ASSERT(result.is_ok());
+	std::uint64_t value;
+	if (get_immediate_core(operand, value))
+		return value;
+	return IcedError(NOT_AN_IMMEDIATE_OPERAND);
 }
 
 Result<void> Instruction::try_set_immediate_u64(std::uint32_t operand, std::uint64_t new_value) noexcept {
-	static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
 	if (operand > 4)
 		return IcedError(INVALID_OPERAND);
-	switch (op_kind(operand)) {
-	case OpKind::Immediate8:
-		set_immediate8(static_cast<std::uint8_t>(new_value));
-		break;
-	case OpKind::Immediate8to16:
-		set_immediate8to16(static_cast<std::int16_t>(new_value));
-		break;
-	case OpKind::Immediate8to32:
-		set_immediate8to32(static_cast<std::int32_t>(new_value));
-		break;
-	case OpKind::Immediate8to64:
-		set_immediate8to64(static_cast<std::int64_t>(new_value));
-		break;
-	case OpKind::Immediate8_2nd:
-		set_immediate8_2nd(static_cast<std::uint8_t>(new_value));
-		break;
-	case OpKind::Immediate16:
-		set_immediate16(static_cast<std::uint16_t>(new_value));
-		break;
-	case OpKind::Immediate32to64:
-		set_immediate32to64(static_cast<std::int64_t>(new_value));
-		break;
-	case OpKind::Immediate32:
-		set_immediate32(static_cast<std::uint32_t>(new_value));
-		break;
-	case OpKind::Immediate64:
-		set_immediate64(new_value);
-		break;
-	default:
-		return IcedError(NOT_AN_IMMEDIATE_OPERAND);
-	}
-	return {};
+	if (set_immediate_core(operand, new_value))
+		return {};
+	return IcedError(NOT_AN_IMMEDIATE_OPERAND);
 }
 
 Result<void> Instruction::try_set_op4_register(Register new_value) noexcept {
@@ -545,14 +482,31 @@ std::optional<bool> Instruction::vsib() const noexcept {
 	}
 }
 
+namespace {
+// Not inlined in debug builds so the caller (virtual_address()) doesn't need stack space for each call's temporaries
+#ifdef NDEBUG
+inline
+#else
+ICED_NOINLINE
+#endif
+bool get_register_value_helper(Instruction::GetRegisterValueFn get_register_value, void* context, Register register_,
+	std::size_t element_index, std::size_t element_size, std::uint64_t& value) {
+	const std::optional<std::uint64_t> result = get_register_value(context, register_, element_index, element_size);
+	if (!result.has_value())
+		return false;
+	value = *result;
+	return true;
+}
+} // namespace
+
 std::optional<std::uint64_t> Instruction::virtual_address(std::uint32_t operand, std::size_t element_index, GetRegisterValueFn get_register_value,
 	void* context) const {
 	// Gets a register value or returns std::nullopt from this function
-#define ICED_GET_REG_VALUE(var, reg, elem_index, elem_size) \
-	const std::optional<std::uint64_t> var##_opt = get_register_value(context, (reg), (elem_index), (elem_size)); \
-	if (!var##_opt.has_value()) \
-		return std::nullopt; \
-	const std::uint64_t var = *var##_opt
+	std::uint64_t seg;
+	std::uint64_t reg;
+#define ICED_GET_REG_VALUE(var, register_, elem_index, elem_size) \
+	if (!get_register_value_helper(get_register_value, context, (register_), (elem_index), (elem_size), var)) \
+		return std::nullopt
 
 	switch (op_kind(operand)) {
 	case OpKind::Register:
@@ -641,8 +595,8 @@ std::optional<std::uint64_t> Instruction::virtual_address(std::uint32_t operand,
 		case Register::RIP:
 			break;
 		default: {
-			ICED_GET_REG_VALUE(base_value, base_reg, 0, 0);
-			offset += base_value;
+			ICED_GET_REG_VALUE(reg, base_reg, 0, 0);
+			offset += reg;
 			break;
 		}
 		}
@@ -652,17 +606,17 @@ std::optional<std::uint64_t> Instruction::virtual_address(std::uint32_t operand,
 			const std::optional<bool> is_vsib64 = vsib();
 			if (is_vsib64.has_value()) {
 				if (*is_vsib64) {
-					ICED_GET_REG_VALUE(index_value, index_reg, element_index, 8);
-					offset += index_value << scale;
+					ICED_GET_REG_VALUE(reg, index_reg, element_index, 8);
+					offset += reg << scale;
 				}
 				else {
-					ICED_GET_REG_VALUE(index_value, index_reg, element_index, 4);
-					offset += static_cast<std::uint64_t>(static_cast<std::int64_t>(static_cast<std::int32_t>(index_value))) << scale;
+					ICED_GET_REG_VALUE(reg, index_reg, element_index, 4);
+					offset += static_cast<std::uint64_t>(static_cast<std::int64_t>(static_cast<std::int32_t>(reg))) << scale;
 				}
 			}
 			else {
-				ICED_GET_REG_VALUE(index_value, index_reg, 0, 0);
-				offset += index_value << scale;
+				ICED_GET_REG_VALUE(reg, index_reg, 0, 0);
+				offset += reg << scale;
 			}
 		}
 		static_assert(static_cast<std::uint32_t>(Code::MVEX_Vloadunpackhd_zmm_k1_mt) + 1 == static_cast<std::uint32_t>(Code::MVEX_Vloadunpackhq_zmm_k1_mt), "");

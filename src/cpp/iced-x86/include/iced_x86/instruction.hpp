@@ -628,7 +628,13 @@ public:
 	/// # Arguments
 	///
 	/// * `operand`: Operand number, 0-4
-	std::uint64_t immediate(std::uint32_t operand) const noexcept;
+	std::uint64_t immediate(std::uint32_t operand) const noexcept {
+		std::uint64_t value;
+		if (get_immediate_core(operand, value))
+			return value;
+		assert(false && "Invalid operand");
+		return 0;
+	}
 
 	/// Sets an operand's immediate value
 	///
@@ -688,7 +694,11 @@ public:
 	///
 	/// * `operand`: Operand number, 0-4
 	/// * `new_value`: Immediate
-	void set_immediate_u64(std::uint32_t operand, std::uint64_t new_value) noexcept;
+	void set_immediate_u64(std::uint32_t operand, std::uint64_t new_value) noexcept {
+		const bool ok = set_immediate_core(operand, new_value);
+		(void)ok;
+		assert(ok && "Invalid operand");
+	}
 
 	/// Sets an operand's immediate value. Returns an error if it's not an immediate operand.
 	///
@@ -3443,6 +3453,82 @@ private:
 	static constexpr std::uint32_t MVEX_REG_MEM_CONV_SHIFT = 0x0000'0010;
 	static constexpr std::uint32_t MVEX_REG_MEM_CONV_MASK = 0x0000'001F;
 	static constexpr std::uint32_t MVEX_EVICTION_HINT = 0x8000'0000;
+
+	// Returns false if it's not an immediate operand
+	bool get_immediate_core(std::uint32_t operand, std::uint64_t& value) const noexcept {
+		static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
+		if (operand > 4)
+			return false;
+		switch (operand < 4 ? op_kinds_[operand] : op4_kind()) {
+		case OpKind::Immediate8:
+			value = immediate8();
+			return true;
+		case OpKind::Immediate8_2nd:
+			value = immediate8_2nd();
+			return true;
+		case OpKind::Immediate16:
+			value = immediate16();
+			return true;
+		case OpKind::Immediate32:
+			value = immediate32();
+			return true;
+		case OpKind::Immediate64:
+			value = immediate64();
+			return true;
+		case OpKind::Immediate8to16:
+			value = static_cast<std::uint64_t>(static_cast<std::int64_t>(immediate8to16()));
+			return true;
+		case OpKind::Immediate8to32:
+			value = static_cast<std::uint64_t>(static_cast<std::int64_t>(immediate8to32()));
+			return true;
+		case OpKind::Immediate8to64:
+			value = static_cast<std::uint64_t>(immediate8to64());
+			return true;
+		case OpKind::Immediate32to64:
+			value = static_cast<std::uint64_t>(immediate32to64());
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	// Returns false if it's not an immediate operand
+	bool set_immediate_core(std::uint32_t operand, std::uint64_t new_value) noexcept {
+		static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
+		if (operand > 4)
+			return false;
+		switch (operand < 4 ? op_kinds_[operand] : op4_kind()) {
+		case OpKind::Immediate8:
+			set_immediate8(static_cast<std::uint8_t>(new_value));
+			return true;
+		case OpKind::Immediate8to16:
+			set_immediate8to16(static_cast<std::int16_t>(new_value));
+			return true;
+		case OpKind::Immediate8to32:
+			set_immediate8to32(static_cast<std::int32_t>(new_value));
+			return true;
+		case OpKind::Immediate8to64:
+			set_immediate8to64(static_cast<std::int64_t>(new_value));
+			return true;
+		case OpKind::Immediate8_2nd:
+			set_immediate8_2nd(static_cast<std::uint8_t>(new_value));
+			return true;
+		case OpKind::Immediate16:
+			set_immediate16(static_cast<std::uint16_t>(new_value));
+			return true;
+		case OpKind::Immediate32to64:
+			set_immediate32to64(static_cast<std::int64_t>(new_value));
+			return true;
+		case OpKind::Immediate32:
+			set_immediate32(static_cast<std::uint32_t>(new_value));
+			return true;
+		case OpKind::Immediate64:
+			set_immediate64(new_value);
+			return true;
+		default:
+			return false;
+		}
+	}
 
 	void set_flags1_bit(std::uint32_t bit, bool value) noexcept {
 		if (value)

@@ -143,3 +143,22 @@ TEST_CASE("test_utils/str_utils") {
 	CHECK_EQ(to_ascii_lowercase("AbC1"), "abc1");
 	CHECK_EQ(to_ascii_uppercase("AbC1"), "ABC1");
 }
+
+TEST_CASE("test_utils/str_utils/splitn") {
+	using iced_x86::tests::splitn;
+	auto v = splitn("a,b,c,d", 3, ',');
+	REQUIRE_EQ(v.size(), std::size_t{3});
+	CHECK(v[0] == "a");
+	CHECK(v[1] == "b");
+	CHECK(v[2] == "c,d");
+	v = splitn("a,b", 5, ',');
+	REQUIRE_EQ(v.size(), std::size_t{2});
+	CHECK(v[1] == "b");
+	v = splitn("a,b", 1, ',');
+	REQUIRE_EQ(v.size(), std::size_t{1});
+	CHECK(v[0] == "a,b");
+	CHECK(splitn("a,b", 0, ',').empty());
+	v = splitn("", 2, ',');
+	REQUIRE_EQ(v.size(), std::size_t{1});
+	CHECK(v[0].empty());
+}
