@@ -119,6 +119,17 @@ iterator's instruction). Decoder test cases (used by the encoder/formatter/instr
 (`decoder_tests(include_other_tests, include_invalid)`, `encoder_tests(...)`, `get_test_cases(bitness)`, `create_decoder(...)`, ...).
 Rust `#[should_panic]` tests: `aborts([] { ... })` in `tests/test_utils/abort_utils.hpp`.
 
+## Code assembler
+
+`iced_x86::code_asm` (`include/iced_x86/code_asm.hpp`). `CodeAssembler a(64);` (or `CodeAssembler::create(64)` -> `Result`).
+Instruction methods are overloads (Rust traits/generics), C++ keywords get a `_` suffix (`a.xor_(rcx, rdx)`, `a.int_(3)`).
+Instruction/prefix/label/data methods return `CodeAssembler&` and errors are *sticky*: the first error is stored
+(`has_error()`, `error()`, `clear_error()`), later calls are ignored and `assemble()`/`assemble_options()` fail with it.
+Methods that return a value in Rust return `Result<T>` (`bwd()`, `fwd()`, `CodeAssemblerResult::label_ip()`).
+Registers are `constexpr` constants (`rax`, `xmm0.k1().z()`), memory operands: `dword_ptr(rax + rcx * 4 + 8).fs()`.
+The generated instruction methods are declared in several base classes (`code_assembler_fns.hpp`, GCC is quadratic in the
+number of class members) and implemented in `src/code_asm/fn_asm_impl_N.cpp`.
+
 ## Tests
 
 - Framework: `tests/test_framework.hpp` (`TEST_CASE("decoder/xxx")`, `CHECK`, `CHECK_EQ`, `REQUIRE`, ...). Tests
