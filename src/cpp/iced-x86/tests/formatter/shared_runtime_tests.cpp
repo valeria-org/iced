@@ -271,3 +271,38 @@ TEST_CASE("formatter/shared/symbol_result_to_owned") {
 	CHECK(owned2.text.text().text.as_str() == "sym");
 	CHECK_EQ(owned2.text.text().color, FormatterTextKind::Label);
 }
+
+TEST_CASE("formatter/shared/get_flow_control") {
+	const std::pair<Code, internal::FormatterFlowControl> test_cases[] = {
+		{Code::Jo_rel8_16, internal::FormatterFlowControl::ShortBranch},
+		{Code::Jmp_rel8_64, internal::FormatterFlowControl::ShortBranch},
+		{Code::Loop_rel8_64_RCX, internal::FormatterFlowControl::AlwaysShortBranch},
+		{Code::Jrcxz_rel8_64, internal::FormatterFlowControl::AlwaysShortBranch},
+		{Code::Call_rel32_64, internal::FormatterFlowControl::NearCall},
+		{Code::Jne_rel32_64, internal::FormatterFlowControl::NearBranch},
+		{Code::Jmpe_disp32, internal::FormatterFlowControl::NearBranch},
+		{Code::Call_ptr1632, internal::FormatterFlowControl::FarCall},
+		{Code::Jmp_ptr1616, internal::FormatterFlowControl::FarBranch},
+		{Code::Xbegin_rel32, internal::FormatterFlowControl::Xbegin},
+	};
+	for (const auto& [code, flow_control] : test_cases) {
+		Instruction instruction;
+		instruction.set_code(code);
+		CHECK_EQ(internal::get_flow_control(instruction), flow_control);
+	}
+	CHECK(internal::is_call(internal::FormatterFlowControl::NearCall));
+	CHECK(internal::is_call(internal::FormatterFlowControl::FarCall));
+	CHECK(!internal::is_call(internal::FormatterFlowControl::NearBranch));
+}
+
+TEST_CASE("formatter/shared/register_helpers") {
+	CHECK_EQ(internal::r_to_r16(Register::EAX), Register::AX);
+	CHECK_EQ(internal::r_to_r16(Register::R15D), Register::R15W);
+	CHECK_EQ(internal::r_to_r16(Register::RSP), Register::SP);
+	CHECK_EQ(internal::r_to_r16(Register::AL), Register::AL);
+	CHECK_EQ(internal::r64_to_r32(Register::RAX), Register::EAX);
+	CHECK_EQ(internal::r64_to_r32(Register::R15), Register::R15D);
+	CHECK_EQ(internal::r64_to_r32(Register::ECX), Register::ECX);
+	CHECK_EQ(internal::get_segment_register_prefix_kind(Register::ES), PrefixKind::ES);
+	CHECK_EQ(internal::get_segment_register_prefix_kind(Register::GS), PrefixKind::GS);
+}
