@@ -682,6 +682,8 @@ private:
 	}
 	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_far_branch_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
 																   std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm64);
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_far_branch_symbol2(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+																	std::uint32_t operand, std::uint64_t imm64, const SymbolResult& symbol);
 
 	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_imm(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
 														  std::uint32_t operand, std::uint64_t imm, std::uint32_t imm_size) {
@@ -1028,27 +1030,26 @@ std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_far_branch_symbol(std::str
 	// The resolver is called twice (the selector is resolved too) so the first symbol must be copied (its
 	// borrowed strings could be invalidated by the second call)
 	std::vector<SymResTextPart> vec;
-	std::optional<SymbolResult> symbol;
-	{
-		const auto tmp = symbol_resolver_->symbol(instruction, operand, operand, static_cast<std::uint32_t>(imm64), imm_size);
-		if (tmp)
-			symbol = tmp->to_owned(vec);
-	}
-	if (symbol) {
-		const auto selector_symbol = symbol_resolver_->symbol(instruction, operand + 1, operand, instruction.far_branch_selector(), 2);
-		if (selector_symbol)
-			dst_next_p = write_symbol(output, dst_next_p, instruction.far_branch_selector(), *selector_symbol);
-		else
-			dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
-		dst_next_p = write_fast_ascii_char<true>(dst_next_p, ':');
-		dst_next_p = write_symbol(output, dst_next_p, imm64, *symbol);
-	}
-	else {
+	auto symbol = symbol_resolver_->symbol(instruction, operand, operand, static_cast<std::uint32_t>(imm64), imm_size);
+	if (!symbol) {
 		dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
 		dst_next_p = write_fast_ascii_char<true>(dst_next_p, ':');
-		dst_next_p = format_number(dst_next_p, imm64);
+		return format_number(dst_next_p, imm64);
 	}
-	return dst_next_p;
+	symbol->text = symbol->text.to_owned(vec);
+	return fmt_far_branch_symbol2(output, dst_next_p, instruction, operand, imm64, *symbol);
+}
+
+template <typename TraitOptions>
+std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_far_branch_symbol2(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+																		 std::uint32_t operand, std::uint64_t imm64, const SymbolResult& symbol) {
+	const auto selector_symbol = symbol_resolver_->symbol(instruction, operand + 1, operand, instruction.far_branch_selector(), 2);
+	if (selector_symbol)
+		dst_next_p = write_symbol(output, dst_next_p, instruction.far_branch_selector(), *selector_symbol);
+	else
+		dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
+	dst_next_p = write_fast_ascii_char<true>(dst_next_p, ':');
+	return write_symbol(output, dst_next_p, imm64, symbol);
 }
 
 template <typename TraitOptions>

@@ -227,8 +227,6 @@ private:
 
 	std::uint64_t current_rip_;
 	std::vector<std::uint8_t> buffer_;
-	// Array with IcedConstants::CODE_ENUM_COUNT handlers
-	const internal::OpCodeHandler* handlers_;
 	const internal::OpCodeHandler* handler_;
 	std::string error_message_;
 	std::uint32_t bitness_;

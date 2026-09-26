@@ -173,10 +173,7 @@ FormatterArrayConstants::FormatterArrayConstants(const FormatterConstants& c)
 		&c.ru_sae,
 		&c.rz_sae,
 	}}
-	, intel_branch_infos{{
-		{},
-		{&c.short_},
-	}}
+	, intel_branch_infos()
 	, masm_rc_strings{{
 		&c.empty,
 		&c.rn,
@@ -203,16 +200,7 @@ FormatterArrayConstants::FormatterArrayConstants(const FormatterConstants& c)
 		&c.a32,
 		&c.a64,
 	}}
-	, nasm_branch_infos{{
-		{},
-		{&c.near},
-		{&c.near, &c.word},
-		{&c.near, &c.dword},
-		{&c.word},
-		{&c.dword},
-		{&c.short_},
-		{},
-	}}
+	, nasm_branch_infos()
 	, nasm_mem_size_infos{{
 		&c.empty,
 		&c.word,
@@ -262,7 +250,19 @@ FormatterArrayConstants::FormatterArrayConstants(const FormatterConstants& c)
 		&c.mvex.mem_sint8,
 		&c.mvex.mem_uint16,
 		&c.mvex.mem_sint16,
-	}} {}
+	}} {
+	// Not initialized with initializer lists which would use a lot of stack space
+	intel_branch_infos[1].push_back(&c.short_);
+
+	nasm_branch_infos[1].push_back(&c.near);
+	nasm_branch_infos[2].push_back(&c.near);
+	nasm_branch_infos[2].push_back(&c.word);
+	nasm_branch_infos[3].push_back(&c.near);
+	nasm_branch_infos[3].push_back(&c.dword);
+	nasm_branch_infos[4].push_back(&c.word);
+	nasm_branch_infos[5].push_back(&c.dword);
+	nasm_branch_infos[6].push_back(&c.short_);
+}
 // clang-format on
 
 const FormatterArrayConstants& get_array_constants() {

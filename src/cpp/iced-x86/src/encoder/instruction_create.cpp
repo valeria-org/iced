@@ -50,7 +50,7 @@ IcedError not_enough_operands_error(Code code, std::size_t operand) {
 	return IcedError(code_str(code) + " doesn't have at least " + std::to_string(operand + 1) + " operands");
 }
 
-const internal::OpCodeHandler& get_handler(Code code) noexcept { return internal::get_handlers_table()[static_cast<std::size_t>(code)]; }
+const internal::OpCodeHandler& get_handler(Code code) noexcept { return internal::OP_CODE_HANDLERS[static_cast<std::size_t>(code)]; }
 
 } // namespace
 
@@ -60,10 +60,10 @@ Result<OpKind> internal::InstructionInternal::get_immediate_op_kind(Code code, s
 	const internal::OpCodeHandler& handler = get_handler(code);
 	const std::size_t operands_len = handler.operands_len;
 	if (operand < operands_len) {
-		const auto op_kind = handler.operands[operand]->immediate_op_kind();
+		const auto op_kind = handler.operand(operand)->immediate_op_kind();
 		if (op_kind) {
 			if (*op_kind == OpKind::Immediate8 && operand > 0 && operand + 1 == operands_len) {
-				const auto op_kind_prev = handler.operands[operand - 1]->immediate_op_kind();
+				const auto op_kind_prev = handler.operand(operand - 1)->immediate_op_kind();
 				if (op_kind_prev && (*op_kind_prev == OpKind::Immediate8 || *op_kind_prev == OpKind::Immediate16))
 					return OpKind::Immediate8_2nd;
 			}
@@ -77,7 +77,7 @@ Result<OpKind> internal::InstructionInternal::get_immediate_op_kind(Code code, s
 Result<OpKind> internal::InstructionInternal::get_near_branch_op_kind(Code code, std::size_t operand) {
 	const internal::OpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
-		if (const auto op_kind = handler.operands[operand]->near_branch_op_kind())
+		if (const auto op_kind = handler.operand(operand)->near_branch_op_kind())
 			return *op_kind;
 		return IcedError(code_str(code) + "'s op" + std::to_string(operand) + " isn't a near branch operand");
 	}
@@ -87,7 +87,7 @@ Result<OpKind> internal::InstructionInternal::get_near_branch_op_kind(Code code,
 Result<OpKind> internal::InstructionInternal::get_far_branch_op_kind(Code code, std::size_t operand) {
 	const internal::OpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
-		if (const auto op_kind = handler.operands[operand]->far_branch_op_kind())
+		if (const auto op_kind = handler.operand(operand)->far_branch_op_kind())
 			return *op_kind;
 		return IcedError(code_str(code) + "'s op" + std::to_string(operand) + " isn't a far branch operand");
 	}
