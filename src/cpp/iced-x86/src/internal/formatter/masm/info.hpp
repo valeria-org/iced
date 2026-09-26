@@ -33,7 +33,8 @@ struct InstrInfoConstants {
 /// Formatter operands of an instruction (Rust: `InstrOpInfo`)
 struct InstrOpInfo {
 	const FormatterString* mnemonic;
-	std::uint16_t flags; // InstrOpInfoFlags
+	// It's a u16 in Rust but GCC can load 32 bits after a 16-bit store (store forwarding stall)
+	std::uint32_t flags; // InstrOpInfoFlags
 	std::uint8_t op_count;
 	InstrOpKind op_kinds[IcedConstants::MAX_OP_COUNT];
 	Register op_registers[IcedConstants::MAX_OP_COUNT];
@@ -123,7 +124,7 @@ struct InstrOpInfo {
 		static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
 		InstrOpInfo res;
 		res.mnemonic = &mnemonic;
-		res.flags = static_cast<std::uint16_t>(flags);
+		res.flags = flags;
 		res.op_kinds[0] = to_instr_op_kind(instruction.op0_kind());
 		res.op_kinds[1] = to_instr_op_kind(instruction.op1_kind());
 		res.op_kinds[2] = to_instr_op_kind(instruction.op2_kind());

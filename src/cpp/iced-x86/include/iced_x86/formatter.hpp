@@ -45,7 +45,7 @@ public:
 	///
 	/// - `instruction`: Instruction
 	/// - `output`: The formatted instruction is appended to this string
-	void format(const Instruction& instruction, std::string& output) {
+	virtual void format(const Instruction& instruction, std::string& output) {
 		StringFormatterOutput string_output(output);
 		format(instruction, string_output);
 	}

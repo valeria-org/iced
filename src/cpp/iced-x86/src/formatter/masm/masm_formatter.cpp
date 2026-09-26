@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -46,8 +47,11 @@ namespace iced_x86 {
 
 namespace internal::masm {
 
+// `TOutput` is `FormatterOutput` or `StringFormatterOutput`. The latter is used by `format(const Instruction&, std::string&)`:
+// all writes are inlined (Rust gets the same result with LTO since only one `FormatterOutput` is used)
+template <typename TOutput>
 struct MasmFormatterImpl {
-	static void format_mnemonic(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	static void format_mnemonic(MasmFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 								std::uint32_t& column, std::uint32_t mnemonic_options) {
 		const auto& options = self.options_;
 		const auto& str = *self.str_;
@@ -168,7 +172,7 @@ struct MasmFormatterImpl {
 		return self.options_.show_useless_prefixes();
 	}
 
-	static void format_prefix(const FormatterOptions& options, FormatterOutput& output, const Instruction& instruction, std::uint32_t& column,
+	static void format_prefix(const FormatterOptions& options, TOutput& output, const Instruction& instruction, std::uint32_t& column,
 							  const FormatterString& prefix, PrefixKind prefix_kind, bool& need_space) {
 		if (need_space) {
 			column++;
@@ -179,7 +183,7 @@ struct MasmFormatterImpl {
 		need_space = true;
 	}
 
-	static void format_operands(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info) {
+	static void format_operands(MasmFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info) {
 		for (std::uint32_t i = 0; i < op_info.op_count; i++) {
 			if (i > 0) {
 				output.write(",", FormatterTextKind::Punctuation);
@@ -190,7 +194,7 @@ struct MasmFormatterImpl {
 		}
 	}
 
-	ICED_NOINLINE static bool format_near_branch_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static bool format_near_branch_symbol(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 														std::optional<std::uint32_t> instruction_operand, std::uint64_t imm64, std::uint32_t imm_size) {
 		const auto& options = self.options_;
 		const std::optional<SymbolResult> symbol = self.symbol_resolver_->symbol(instruction, operand, instruction_operand, imm64, imm_size);
@@ -217,7 +221,7 @@ struct MasmFormatterImpl {
 		return symbol;
 	}
 
-	ICED_NOINLINE static void format_far_branch_selector_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output,
+	ICED_NOINLINE static void format_far_branch_selector_symbol(MasmFormatter& self, const Instruction& instruction, TOutput& output,
 																std::uint32_t operand, std::optional<std::uint32_t> instruction_operand,
 																const NumberFormattingOptions& number_options) {
 		const auto& options = self.options_;
@@ -235,7 +239,7 @@ struct MasmFormatterImpl {
 		}
 	}
 
-	ICED_NOINLINE static bool format_far_branch_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static bool format_far_branch_symbol(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 													   std::optional<std::uint32_t> instruction_operand, std::uint64_t imm64, std::uint32_t imm_size) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -258,7 +262,7 @@ struct MasmFormatterImpl {
 		return true;
 	}
 
-	ICED_NOINLINE static bool format_immediate_symbol(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static bool format_immediate_symbol(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 													  std::optional<std::uint32_t> instruction_operand, std::uint64_t imm, std::uint32_t imm_size) {
 		const auto& options = self.options_;
 		const std::optional<SymbolResult> symbol = self.symbol_resolver_->symbol(instruction, operand, instruction_operand, imm, imm_size);
@@ -277,7 +281,7 @@ struct MasmFormatterImpl {
 		return true;
 	}
 
-	ICED_NOINLINE static void format_near_branch(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_near_branch(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -319,7 +323,7 @@ struct MasmFormatterImpl {
 							is_call(flow_control) ? FormatterTextKind::FunctionAddress : FormatterTextKind::LabelAddress);
 	}
 
-	ICED_NOINLINE static void format_far_branch(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_far_branch(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -357,7 +361,7 @@ struct MasmFormatterImpl {
 							is_call(flow_control) ? FormatterTextKind::FunctionAddress : FormatterTextKind::LabelAddress);
 	}
 
-	ICED_NOINLINE static void format_immediate8(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_immediate8(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -394,7 +398,7 @@ struct MasmFormatterImpl {
 		output.write_number(instruction, operand, instruction_operand, s, imm64, number_kind, FormatterTextKind::Number);
 	}
 
-	ICED_NOINLINE static void format_immediate16(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_immediate16(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -429,7 +433,7 @@ struct MasmFormatterImpl {
 		output.write_number(instruction, operand, instruction_operand, s, imm64, number_kind, FormatterTextKind::Number);
 	}
 
-	ICED_NOINLINE static void format_immediate32(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_immediate32(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -464,7 +468,7 @@ struct MasmFormatterImpl {
 		output.write_number(instruction, operand, instruction_operand, s, imm64, number_kind, FormatterTextKind::Number);
 	}
 
-	ICED_NOINLINE static void format_immediate64(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_immediate64(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 											   std::optional<std::uint32_t> instruction_operand, InstrOpKind op_kind) {
 		const auto& options = self.options_;
 		auto& number_formatter = *self.number_formatter_;
@@ -498,7 +502,64 @@ struct MasmFormatterImpl {
 		output.write_number(instruction, operand, instruction_operand, s, value64, number_kind, FormatterTextKind::Number);
 	}
 
-	static void format_operand(MasmFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	// Formats a memory operand (it's a separate function to keep the debug build's stack frame of `format_operand()` small)
+	static void format_memory_operand(MasmFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
+									  std::optional<std::uint32_t> instruction_operand, std::uint32_t flags, InstrOpKind op_kind) {
+		switch (op_kind) {
+		case InstrOpKind::MemorySegSI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::SI, Register::None, 0, 0, 0, 2,
+						  flags);
+			break;
+		case InstrOpKind::MemorySegESI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::ESI, Register::None, 0, 0, 0,
+						  4, flags);
+			break;
+		case InstrOpKind::MemorySegRSI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::RSI, Register::None, 0, 0, 0,
+						  8, flags);
+			break;
+		case InstrOpKind::MemorySegDI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::DI, Register::None, 0, 0, 0, 2,
+						  flags);
+			break;
+		case InstrOpKind::MemorySegEDI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::EDI, Register::None, 0, 0, 0,
+						  4, flags);
+			break;
+		case InstrOpKind::MemorySegRDI:
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::RDI, Register::None, 0, 0, 0,
+						  8, flags);
+			break;
+		case InstrOpKind::MemoryESDI:
+			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2, flags);
+			break;
+		case InstrOpKind::MemoryESEDI:
+			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4, flags);
+			break;
+		case InstrOpKind::MemoryESRDI:
+			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8, flags);
+			break;
+
+		case InstrOpKind::Memory: {
+			const std::uint32_t displ_size = instruction.memory_displ_size();
+			const Register base_reg = instruction.memory_base();
+			Register index_reg = instruction.memory_index();
+			const std::uint32_t addr_size = InstructionInternal::get_address_size_in_bytes(base_reg, index_reg, displ_size, instruction.code_size());
+			const std::int64_t displ = addr_size == 8 ? static_cast<std::int64_t>(instruction.memory_displacement64())
+													  : static_cast<std::int64_t>(instruction.memory_displacement32());
+			if ((flags & InstrOpInfoFlags::IGNORE_INDEX_REG) != 0)
+				index_reg = Register::None;
+			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), base_reg, index_reg,
+						  InstructionInternal::internal_get_memory_index_scale(instruction), displ_size, displ, addr_size, flags);
+			break;
+		}
+
+		default:
+			ICED_UNREACHABLE();
+		}
+	}
+
+	static void format_operand(MasmFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 							   std::uint32_t operand) {
 		ICED_DEBUG_ASSERT(operand < op_info.op_count);
 
@@ -562,52 +623,17 @@ struct MasmFormatterImpl {
 			break;
 
 		case InstrOpKind::MemorySegSI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::SI, Register::None, 0, 0, 0, 2,
-						  op_info.flags);
-			break;
 		case InstrOpKind::MemorySegESI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::ESI, Register::None, 0, 0, 0,
-						  4, op_info.flags);
-			break;
 		case InstrOpKind::MemorySegRSI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::RSI, Register::None, 0, 0, 0,
-						  8, op_info.flags);
-			break;
 		case InstrOpKind::MemorySegDI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::DI, Register::None, 0, 0, 0, 2,
-						  op_info.flags);
-			break;
 		case InstrOpKind::MemorySegEDI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::EDI, Register::None, 0, 0, 0,
-						  4, op_info.flags);
-			break;
 		case InstrOpKind::MemorySegRDI:
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), Register::RDI, Register::None, 0, 0, 0,
-						  8, op_info.flags);
-			break;
 		case InstrOpKind::MemoryESDI:
-			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2, op_info.flags);
-			break;
 		case InstrOpKind::MemoryESEDI:
-			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4, op_info.flags);
-			break;
 		case InstrOpKind::MemoryESRDI:
-			format_memory(self, output, instruction, operand, instruction_operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8, op_info.flags);
+		case InstrOpKind::Memory:
+			format_memory_operand(self, instruction, output, operand, instruction_operand, op_info.flags, op_kind);
 			break;
-
-		case InstrOpKind::Memory: {
-			const std::uint32_t displ_size = instruction.memory_displ_size();
-			const Register base_reg = instruction.memory_base();
-			Register index_reg = instruction.memory_index();
-			const std::uint32_t addr_size = InstructionInternal::get_address_size_in_bytes(base_reg, index_reg, displ_size, instruction.code_size());
-			const std::int64_t displ = addr_size == 8 ? static_cast<std::int64_t>(instruction.memory_displacement64())
-													  : static_cast<std::int64_t>(instruction.memory_displacement32());
-			if ((op_info.flags & InstrOpInfoFlags::IGNORE_INDEX_REG) != 0)
-				index_reg = Register::None;
-			format_memory(self, output, instruction, operand, instruction_operand, instruction.memory_segment(), base_reg, index_reg,
-						  InstructionInternal::internal_get_memory_index_scale(instruction), displ_size, displ, addr_size, op_info.flags);
-			break;
-		}
 		}
 
 		if (operand == 0 && InstructionInternal::internal_has_op_mask_or_zeroing_masking(instruction)) {
@@ -650,7 +676,7 @@ struct MasmFormatterImpl {
 		}
 	}
 
-	static void format_decorator(const FormatterOptions& options, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_decorator(const FormatterOptions& options, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 								 std::optional<std::uint32_t> instruction_operand, const FormatterString& text, DecoratorKind decorator) {
 		output.write("{", FormatterTextKind::Punctuation);
 		output.write_decorator(instruction, operand, instruction_operand, text.get(options.uppercase_decorators() || options.uppercase_all()), decorator);
@@ -664,19 +690,12 @@ struct MasmFormatterImpl {
 		return reg_str.get(self.options_.uppercase_registers() || self.options_.uppercase_all());
 	}
 
-	static void format_register_internal(const MasmFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_register_internal(const MasmFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 										 std::optional<std::uint32_t> instruction_operand, Register reg) {
 		output.write_register(instruction, operand, instruction_operand, get_reg_str(self, reg), reg);
 	}
 
-	static std::optional<SymbolResult> get_symbol(MasmFormatter& self, const Instruction& instruction, std::uint32_t operand,
-												  std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t address_size) {
-		if (!self.symbol_resolver_)
-			return std::nullopt;
-		return self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, address_size);
-	}
-
-	ICED_NOINLINE static void format_memory(MasmFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	ICED_NOINLINE static void format_memory(MasmFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 							  std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg, Register index_reg,
 							  std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size, std::uint32_t flags) {
 		ICED_DEBUG_ASSERT(scale < 4);
@@ -713,7 +732,32 @@ struct MasmFormatterImpl {
 		else
 			abs_addr = static_cast<std::uint64_t>(displ);
 
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, abs_addr, addr_size);
+		// Only call the symbol resolver code if there's a symbol resolver: GCC zero initializes the whole
+		// `std::optional<SymbolResult>` even if it's `std::nullopt`
+		if (self.symbol_resolver_)
+			format_memory_symbol(self, output, instruction, operand, instruction_operand, seg_reg, base_reg, index_reg, scale, displ_size, displ,
+								 addr_size, flags, abs_addr, operand_options, number_options);
+		else
+			format_memory_core(self, output, instruction, operand, instruction_operand, seg_reg, base_reg, index_reg, scale, displ_size, displ,
+							   addr_size, flags, abs_addr, operand_options, number_options, nullptr);
+	}
+
+	ICED_NOINLINE static void format_memory_symbol(MasmFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
+												   std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg,
+												   Register index_reg, std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ,
+												   std::uint32_t addr_size, std::uint32_t flags, std::uint64_t abs_addr, FormatterOperandOptions operand_options,
+												   NumberFormattingOptions& number_options) {
+		const std::optional<SymbolResult> symbol = self.symbol_resolver_->symbol(instruction, operand, instruction_operand, abs_addr, addr_size);
+		format_memory_core(self, output, instruction, operand, instruction_operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size,
+						   flags, abs_addr, operand_options, number_options, symbol ? &*symbol : nullptr);
+	}
+
+	static void format_memory_core(MasmFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
+								   std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg, Register index_reg,
+								   std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size, std::uint32_t flags,
+								   std::uint64_t abs_addr, FormatterOperandOptions operand_options, NumberFormattingOptions& number_options,
+								   const SymbolResult* symbol) {
+		const auto& options = self.options_;
 
 		bool use_scale = scale != 0 || options.always_show_scale();
 		if (!use_scale) {
@@ -816,8 +860,8 @@ struct MasmFormatterImpl {
 			format_decorator(options, output, instruction, operand, instruction_operand, self.str_->mvex.eh, DecoratorKind::EvictionHint);
 	}
 
-	static void format_memory_displ(MasmFormatter& self, NumberFormattingOptions& number_options, FormatterOutput& output, const Instruction& instruction,
-									std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, const std::optional<SymbolResult>& symbol,
+	static void format_memory_displ(MasmFormatter& self, NumberFormattingOptions& number_options, TOutput& output, const Instruction& instruction,
+									std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, const SymbolResult* symbol,
 									std::uint64_t abs_addr, std::int64_t displ, std::uint32_t displ_size, std::uint32_t addr_size, bool need_plus,
 									bool force_displ) {
 		const auto& options = self.options_;
@@ -915,8 +959,8 @@ struct MasmFormatterImpl {
 		}
 	}
 
-	static void format_memory_size(const MasmFormatter& self, FormatterOutput& output, const Instruction& instruction,
-								   const std::optional<SymbolResult>& symbol, MemorySize mem_size, std::uint32_t flags,
+	static void format_memory_size(const MasmFormatter& self, TOutput& output, const Instruction& instruction,
+								   const SymbolResult* symbol, MemorySize mem_size, std::uint32_t flags,
 								   FormatterOperandOptions operand_options) {
 		const MemorySizeOptions mem_size_options = operand_options.memory_size_options();
 		if (mem_size_options == MemorySizeOptions::Never)
@@ -1004,11 +1048,11 @@ struct MasmFormatterImpl {
 		return true;
 	}
 
-	static void format_keyword(const FormatterOptions& options, FormatterOutput& output, const FormatterString& keyword) {
+	static void format_keyword(const FormatterOptions& options, TOutput& output, const FormatterString& keyword) {
 		output.write(keyword.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Keyword);
 	}
 
-	static void format_flow_control(const MasmFormatter& self, FormatterOutput& output, FormatterFlowControl kind,
+	static void format_flow_control(const MasmFormatter& self, TOutput& output, FormatterFlowControl kind,
 									FormatterOperandOptions operand_options) {
 		if (!operand_options.branch_size())
 			return;
@@ -1047,6 +1091,14 @@ struct MasmFormatterImpl {
 		}
 	}
 
+	static void add_tabs(TOutput& output, std::uint32_t column, std::uint32_t first_operand_char_index, std::uint32_t tab_size) {
+		// Fast path (default options): same as `internal::add_tabs()` but the write can be inlined
+		if (tab_size == 0 && first_operand_char_index <= column)
+			output.write(" ", FormatterTextKind::Text);
+		else
+			internal::add_tabs(output, column, first_operand_char_index, tab_size);
+	}
+
 	static InstrOpInfo get_op_info(const MasmFormatter& self, const Instruction& instruction) noexcept {
 		const auto* instr_info = self.instr_infos_[static_cast<std::size_t>(instruction.code())];
 		return instr_info->op_info(self.options_, instruction);
@@ -1055,7 +1107,8 @@ struct MasmFormatterImpl {
 
 } // namespace internal::masm
 
-using internal::masm::MasmFormatterImpl;
+using MasmFormatterImpl = internal::masm::MasmFormatterImpl<FormatterOutput>;
+using MasmFormatterStringImpl = internal::masm::MasmFormatterImpl<StringFormatterOutput>;
 
 MasmFormatter::MasmFormatter() : MasmFormatter(nullptr, nullptr) {}
 
@@ -1133,8 +1186,21 @@ void MasmFormatter::format(const Instruction& instruction, FormatterOutput& outp
 	MasmFormatterImpl::format_mnemonic(*this, instruction, output, op_info, column, FormatMnemonicOptions::NONE);
 
 	if (op_info.op_count != 0) {
-		internal::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
+		MasmFormatterImpl::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
 		MasmFormatterImpl::format_operands(*this, instruction, output, op_info);
+	}
+}
+
+void MasmFormatter::format(const Instruction& instruction, std::string& output_string) {
+	StringFormatterOutput output(output_string);
+	const auto op_info = MasmFormatterStringImpl::get_op_info(*this, instruction);
+
+	std::uint32_t column = 0;
+	MasmFormatterStringImpl::format_mnemonic(*this, instruction, output, op_info, column, FormatMnemonicOptions::NONE);
+
+	if (op_info.op_count != 0) {
+		MasmFormatterStringImpl::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
+		MasmFormatterStringImpl::format_operands(*this, instruction, output, op_info);
 	}
 }
 

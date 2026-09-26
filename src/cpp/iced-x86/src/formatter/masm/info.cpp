@@ -170,7 +170,7 @@ public:
 		if (!short_form)
 			return InstrOpInfo::with_instruction(mnemonic_args_, instruction, FLAGS_STRING_SHORT_FORM);
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -201,7 +201,7 @@ public:
 		if (!short_form)
 			return InstrOpInfo::with_instruction(mnemonic_args_, instruction, FLAGS_STRING_SHORT_FORM);
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -232,7 +232,7 @@ public:
 		if (!short_form)
 			return InstrOpInfo::with_instruction(mnemonic_args_, instruction, FLAGS_STRING_SHORT_FORM);
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -263,7 +263,7 @@ public:
 		if (!short_form)
 			return InstrOpInfo::with_instruction(mnemonic_args_, instruction, FLAGS_STRING_SHORT_FORM);
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -293,13 +293,13 @@ public:
 		const bool short_form = instruction.op0_kind() == short_form_op_kind;
 		if (!short_form) {
 			auto info = InstrOpInfo::with_default(mnemonic_args_);
-			info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+			info.flags = FLAGS_STRING_SHORT_FORM;
 			info.op_count = 1;
 			info.op_kinds[0] = InstrOpInfo::to_instr_op_kind(instruction.op0_kind());
 			return info;
 		}
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -329,14 +329,14 @@ public:
 								(instruction.segment_prefix() == Register::None || !show_segment_prefix(Register::None, instruction, options));
 		if (!short_form) {
 			auto info = InstrOpInfo::with_default(mnemonic_args_);
-			info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+			info.flags = FLAGS_STRING_SHORT_FORM;
 			info.op_count = 1;
 			info.op_kinds[0] = InstrOpInfo::to_instr_op_kind(instruction.op1_kind());
 			info.op_indexes[0] = 1;
 			return info;
 		}
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -366,14 +366,14 @@ public:
 								(instruction.segment_prefix() == Register::None || !show_segment_prefix(Register::None, instruction, options));
 		if (!short_form) {
 			auto info = InstrOpInfo::with_default(mnemonic_args_);
-			info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+			info.flags = FLAGS_STRING_SHORT_FORM;
 			info.op_count = 1;
 			info.op_kinds[0] = InstrOpInfo::to_instr_op_kind(instruction.op1_kind());
 			info.op_indexes[0] = 1;
 			return info;
 		}
 		auto info = InstrOpInfo::with_default(mnemonic_no_args_);
-		info.flags = static_cast<std::uint16_t>(FLAGS_STRING_SHORT_FORM);
+		info.flags = FLAGS_STRING_SHORT_FORM;
 		return info;
 	}
 };
@@ -633,7 +633,7 @@ public:
 		if (!short_form)
 			return InstrOpInfo::with_instruction(mnemonic_, instruction, flags_);
 		auto info = InstrOpInfo::with_default(mnemonic_);
-		info.flags = static_cast<std::uint16_t>(flags_);
+		info.flags = flags_;
 		info.op_count = 2;
 		info.op_kinds[0] = InstrOpInfo::to_instr_op_kind(instruction.op1_kind());
 		info.op_indexes[0] = 1;

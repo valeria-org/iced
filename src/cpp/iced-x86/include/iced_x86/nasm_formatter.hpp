@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "iced_x86/formatter.hpp"
@@ -27,6 +28,7 @@ struct FormatterArrayConstants;
 namespace nasm {
 class InstrInfo;
 struct MemSizeInfo;
+template <typename TOutput>
 struct NasmFormatterImpl;
 } // namespace nasm
 } // namespace internal
@@ -89,6 +91,7 @@ struct NasmFormatterImpl;
 /// assert(output == "mov rcx,[rdx+my_data]");
 /// ```
 class NasmFormatter final : public Formatter {
+	template <typename TOutput>
 	friend struct internal::nasm::NasmFormatterImpl;
 
 public:
@@ -118,6 +121,14 @@ public:
 	/// - `instruction`: Instruction
 	/// - `output`: Output, eg. a `StringFormatterOutput`
 	void format(const Instruction& instruction, FormatterOutput& output) override;
+
+	/// Formats the whole instruction: prefixes, mnemonic, operands
+	///
+	/// # Arguments
+	///
+	/// - `instruction`: Instruction
+	/// - `output`: The formatted instruction is appended to this string
+	void format(const Instruction& instruction, std::string& output) override;
 
 	/// Gets the formatter options (immutable)
 	const FormatterOptions& options() const noexcept override { return options_; }
