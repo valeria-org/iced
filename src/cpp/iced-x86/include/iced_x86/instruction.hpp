@@ -41,6 +41,7 @@ class MemoryOperand;
 
 namespace internal {
 struct InstructionInternal;
+class DecoderCore;
 extern const std::uint8_t OP_COUNT[IcedConstants::CODE_ENUM_COUNT];
 extern const MemorySize SIZES_NORMAL[IcedConstants::CODE_ENUM_COUNT];
 extern const MemorySize SIZES_BCST[IcedConstants::CODE_ENUM_COUNT];
@@ -98,6 +99,8 @@ private:
 /// - formatters: `to_string(const Instruction&)`
 class Instruction {
 	friend struct internal::InstructionInternal;
+	// The inline decoder code in decoder.hpp can't use InstructionInternal
+	friend class internal::DecoderCore;
 
 public:
 	/// All op kinds of an instruction (`op_count()` values), see `Instruction::op_kinds()`

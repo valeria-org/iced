@@ -12,11 +12,11 @@
 namespace iced_x86::internal {
 
 // Copies the 0x100 handlers to memory that is never freed
-static const OpCodeHandler* const* to_table(HandlerAllocator& allocator, const HandlerVec& handlers) noexcept {
+static const HandlerEntry* to_table(HandlerAllocator& allocator, const HandlerVec& handlers) noexcept {
 	ICED_ASSERT(handlers.size() == 0x100);
-	auto table = static_cast<const OpCodeHandler**>(allocator.alloc(sizeof(const OpCodeHandler*) * 0x100, alignof(const OpCodeHandler*)));
+	auto table = static_cast<HandlerEntry*>(allocator.alloc(sizeof(HandlerEntry) * 0x100, alignof(HandlerEntry)));
 	for (std::size_t i = 0; i < 0x100; i++)
-		table[i] = handlers[i];
+		table[i] = to_handler_entry(handlers[i]);
 	return table;
 }
 

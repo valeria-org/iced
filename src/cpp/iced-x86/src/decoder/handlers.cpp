@@ -9,20 +9,20 @@ const OpCodeHandler_Invalid NULL_HANDLER{true};
 const OpCodeHandler_Invalid INVALID_HANDLER{true};
 const OpCodeHandler_Invalid INVALID_NO_MODRM_HANDLER{false};
 
-void OpCodeHandler_Invalid::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Invalid::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	decoder.set_invalid_instruction();
 }
 
-void OpCodeHandler_Simple::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Simple::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Simple>(self_ptr);
 	instruction.set_code(this_.code);
 }
 
-void OpCodeHandler_Int3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Int3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	instruction.set_code(Code::Int3);
 }
 
-void OpCodeHandler_Group8x8::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Group8x8::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Group8x8>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.reg <= 7);
 	const OpCodeHandler* handler;
@@ -33,7 +33,7 @@ void OpCodeHandler_Group8x8::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Group8x64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Group8x64::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Group8x64>(self_ptr);
 	const OpCodeHandler* handler;
 	if (decoder.state.mod_ == 3) {
@@ -51,19 +51,19 @@ void OpCodeHandler_Group8x64::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Group::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Group::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Group>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.reg <= 7);
-	const OpCodeHandler* handler = this_.group_handlers[decoder.state.reg];
-	handler->decode(handler, decoder, instruction);
+	HandlerEntry handler = this_.group_handlers[decoder.state.reg];
+	handler.decode(handler.handler, decoder, instruction);
 }
 
-void OpCodeHandler_AnotherTable::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_AnotherTable::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_AnotherTable>(self_ptr);
 	std::size_t b;
 	if (decoder.try_read_u8(b)) {
-		const OpCodeHandler* handler = this_.handlers[b];
-		if (handler->has_modrm) {
+		HandlerEntry handler = this_.handlers[b];
+		if (handler.handler->has_modrm) {
 			std::size_t m_;
 			if (!decoder.try_read_u8(m_)) {
 				decoder.state.flags |= StateFlags::IS_INVALID | StateFlags::NO_MORE_BYTES;
@@ -76,13 +76,13 @@ void OpCodeHandler_AnotherTable::decode(const OpCodeHandler* self_ptr, DecoderCo
 			decoder.state.rm = m & 7;
 			decoder.state.mem_index = (decoder.state.mod_ << 3) | decoder.state.rm;
 		}
-		handler->decode(handler, decoder, instruction);
+		handler.decode(handler.handler, decoder, instruction);
 		return;
 	}
 	decoder.state.flags |= StateFlags::IS_INVALID | StateFlags::NO_MORE_BYTES;
 }
 
-void OpCodeHandler_MandatoryPrefix2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MandatoryPrefix2::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MandatoryPrefix2>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::VEX) ||
 					  decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::EVEX) ||
@@ -92,7 +92,7 @@ void OpCodeHandler_MandatoryPrefix2::decode(const OpCodeHandler* self_ptr, Decod
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_W>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::VEX) ||
 					  decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::EVEX) ||
@@ -102,7 +102,7 @@ void OpCodeHandler_W::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Bitness::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Bitness::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Bitness>(self_ptr);
 	const OpCodeHandler* handler = decoder.is64b_mode ? this_.handler64 : this_.handler1632;
 	if (handler->has_modrm)
@@ -110,19 +110,19 @@ void OpCodeHandler_Bitness::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Bitness_DontReadModRM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Bitness_DontReadModRM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Bitness_DontReadModRM>(self_ptr);
 	const OpCodeHandler* handler = decoder.is64b_mode ? this_.handler64 : this_.handler1632;
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_RM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_RM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_RM>(self_ptr);
 	const OpCodeHandler* handler = decoder.state.mod_ == 3 ? this_.reg : this_.mem;
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Options1632::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Options1632::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Options1632>(self_ptr);
 	const OpCodeHandler* handler = this_.default_handler;
 	std::uint32_t options = decoder.options;
@@ -139,7 +139,7 @@ void OpCodeHandler_Options1632::decode(const OpCodeHandler* self_ptr, DecoderCor
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Options::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Options::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Options>(self_ptr);
 	const OpCodeHandler* handler = this_.default_handler;
 	std::uint32_t options = decoder.options;
@@ -156,7 +156,7 @@ void OpCodeHandler_Options::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_Options_DontReadModRM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_Options_DontReadModRM::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_Options_DontReadModRM>(self_ptr);
 	const OpCodeHandler* handler = this_.default_handler;
 	std::uint32_t options = decoder.options;

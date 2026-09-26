@@ -127,105 +127,51 @@ const char* DecoderCore::init(DecoderCore& self, std::uint32_t bitness, const st
 	return nullptr;
 }
 
-void DecoderCore::decode_out_impl(Instruction& instruction) noexcept {
-	instruction = Instruction();
-
-	state.extra_register_base = 0;
-	state.extra_index_register_base = 0;
-	state.extra_base_register_base = 0;
-	state.extra_index_register_base_vsib = 0;
-	state.flags = 0;
-	state.mandatory_prefix = DecoderMandatoryPrefix::PNP;
-	// These don't need to be cleared, but they're here so the compiler can re-use the
-	// same XMM reg to clear the previous 2 u32s (including these 2 u32s).
-	state.vvvv = 0;
-	state.vvvv_invalid_check = 0;
-
-	// We only need to write addr/op size fields and init segment_prio to 0.
-	// The fields are consecutive so we can read all 4 fields (including dummy) and write all 4 fields at the same time.
+// The rarely used code of decode_out() (decode_out_inline() in decoder.hpp): invalid instructions, LOCK prefix and
+// IP_REL32 (IP_REL64 without IS_INVALID/LOCK is handled by decode_out_inline()).
+void DecoderCore::decode_out_slow(Instruction& instruction, std::uintptr_t data_ptr_, std::uint64_t orig_ip) noexcept {
 	static_assert(offsetof(DecoderState, operand_size) == offsetof(DecoderState, address_size) + 1, "");
 	static_assert(offsetof(DecoderState, segment_prio) == offsetof(DecoderState, address_size) + 2, "");
 	static_assert(offsetof(DecoderState, dummy) == offsetof(DecoderState, address_size) + 3, "");
 	static_assert(offsetof(DecoderCore, default_operand_size) == offsetof(DecoderCore, default_address_size) + 1, "");
 	static_assert(offsetof(DecoderCore, segment_prio) == offsetof(DecoderCore, default_address_size) + 2, "");
 	static_assert(offsetof(DecoderCore, dummy) == offsetof(DecoderCore, default_address_size) + 3, "");
-	std::memcpy(&state.address_size, &default_address_size, 4);
-
-	std::uintptr_t data_ptr_ = data_ptr;
-	instr_start_data_ptr = data_ptr_;
-	// The ctor has verified that the two expressions used in min() don't overflow and are >= data_ptr.
-	// The calculated value is a valid pointer in `data` or at most 1 byte past the last valid byte.
-	max_data_ptr = std::min<std::uintptr_t>(data_ptr_ + IcedConstants::MAX_INSTRUCTION_LENGTH, data_ptr_end);
-
-	std::size_t b = read_u8();
-	const OpCodeHandler* handler = handlers_map0[b];
-	if ((static_cast<std::uint32_t>(b) & rex_mask) == 0x40) {
-		ICED_DEBUG_ASSERT(is64b_mode);
-		handler = handlers_map0[read_u8()];
-		std::uint32_t flags = state.flags | StateFlags::HAS_REX;
-		if ((b & 8) != 0) {
-			flags |= StateFlags::W;
-			state.operand_size = OpSize::Size64;
-		}
-		state.flags = flags;
-		state.extra_register_base = (static_cast<std::uint32_t>(b) & 4) << 1;
-		state.extra_index_register_base = (static_cast<std::uint32_t>(b) & 2) << 2;
-		state.extra_base_register_base = (static_cast<std::uint32_t>(b) & 1) << 3;
-	}
-	decode_table2(handler, instruction);
 
 	ICED_DEBUG_ASSERT(data_ptr_ == instr_start_data_ptr);
-	std::uint32_t instr_len = static_cast<std::uint32_t>(data_ptr) - static_cast<std::uint32_t>(data_ptr_);
-	ICED_DEBUG_ASSERT(instr_len <= IcedConstants::MAX_INSTRUCTION_LENGTH); // Could be 0 if there were no bytes available
-	InstructionInternal::internal_set_len(instruction, instr_len);
-	std::uint64_t orig_ip = ip;
-	std::uint64_t ip_ = orig_ip + instr_len;
-	ip = ip_;
-	instruction.set_next_ip(ip_);
-	InstructionInternal::internal_set_code_size(instruction, default_code_size);
-
 	std::uint32_t flags = state.flags;
-	if ((flags & (StateFlags::IS_INVALID | StateFlags::LOCK | StateFlags::IP_REL64 | StateFlags::IP_REL32)) != 0) {
-		std::uint64_t addr = ip_ + instruction.memory_displacement64();
-		// Assume it's IP_REL64 (very common if we're here). We'll undo this if it's not.
-		instruction.set_memory_displacement64(addr);
-		// RIP rel ops are common, but invalid/lock bits are usually never set, so exit early if possible
-		if ((flags & (StateFlags::IP_REL64 | StateFlags::IS_INVALID | StateFlags::LOCK)) == StateFlags::IP_REL64)
-			return;
-		if ((flags & StateFlags::IP_REL64) == 0) {
-			// Undo what we did above
-			instruction.set_memory_displacement64(addr - ip_);
+	std::uint64_t ip_ = ip;
+	ICED_DEBUG_ASSERT((flags & (StateFlags::IS_INVALID | StateFlags::LOCK | StateFlags::IP_REL64 | StateFlags::IP_REL32)) != 0);
+	ICED_DEBUG_ASSERT((flags & (StateFlags::IP_REL64 | StateFlags::IS_INVALID | StateFlags::LOCK)) != StateFlags::IP_REL64);
+	if ((flags & StateFlags::IP_REL64) != 0)
+		instruction.set_memory_displacement64(ip_ + instruction.memory_displacement64());
+	if ((flags & StateFlags::IP_REL32) != 0) {
+		std::uint64_t addr32 = ip_ + instruction.memory_displacement64();
+		instruction.set_memory_displacement64(static_cast<std::uint32_t>(addr32));
+	}
+
+	if ((flags & StateFlags::IS_INVALID) != 0 ||
+		(((flags & (StateFlags::LOCK | StateFlags::ALLOW_LOCK)) & invalid_check_mask) == StateFlags::LOCK)) {
+		instruction = Instruction();
+		static_assert(static_cast<std::uint32_t>(Code::INVALID) == 0, "");
+		// instruction.set_code(Code::INVALID);
+
+		if ((flags & StateFlags::NO_MORE_BYTES) != 0) {
+			std::uintptr_t max_len = data_ptr_end - data_ptr_;
+			// If max-instr-len bytes is available, it's never no-more-bytes, and always invalid-instr
+			if (max_len >= IcedConstants::MAX_INSTRUCTION_LENGTH)
+				flags &= ~StateFlags::NO_MORE_BYTES;
+			// max_data_ptr is in `data` or at most 1 byte past the last valid byte
+			data_ptr = max_data_ptr;
 		}
-		if ((flags & StateFlags::IP_REL32) != 0) {
-			std::uint64_t addr32 = ip_ + instruction.memory_displacement64();
-			instruction.set_memory_displacement64(static_cast<std::uint32_t>(addr32));
-		}
 
-		if ((flags & StateFlags::IS_INVALID) != 0 ||
-			(((flags & (StateFlags::LOCK | StateFlags::ALLOW_LOCK)) & invalid_check_mask) == StateFlags::LOCK)) {
-			instruction = Instruction();
-			static_assert(static_cast<std::uint32_t>(Code::INVALID) == 0, "");
-			// instruction.set_code(Code::INVALID);
+		state.flags = flags | StateFlags::IS_INVALID;
 
-			if ((flags & StateFlags::NO_MORE_BYTES) != 0) {
-				ICED_DEBUG_ASSERT(data_ptr_ == instr_start_data_ptr);
-				std::uintptr_t max_len = data_ptr_end - data_ptr_;
-				// If max-instr-len bytes is available, it's never no-more-bytes, and always invalid-instr
-				if (max_len >= IcedConstants::MAX_INSTRUCTION_LENGTH)
-					flags &= ~StateFlags::NO_MORE_BYTES;
-				// max_data_ptr is in `data` or at most 1 byte past the last valid byte
-				data_ptr = max_data_ptr;
-			}
-
-			state.flags = flags | StateFlags::IS_INVALID;
-
-			std::uint32_t instr_len2 = static_cast<std::uint32_t>(data_ptr) - static_cast<std::uint32_t>(data_ptr_);
-			InstructionInternal::internal_set_len(instruction, instr_len2);
-			std::uint64_t ip2 = orig_ip + instr_len2;
-			ip = ip2;
-			instruction.set_next_ip(ip2);
-			InstructionInternal::internal_set_code_size(instruction, default_code_size);
-		}
+		std::uint32_t instr_len2 = static_cast<std::uint32_t>(data_ptr) - static_cast<std::uint32_t>(data_ptr_);
+		InstructionInternal::internal_set_len(instruction, instr_len2);
+		std::uint64_t ip2 = orig_ip + instr_len2;
+		ip = ip2;
+		instruction.set_next_ip(ip2);
+		InstructionInternal::internal_set_code_size(instruction, default_code_size);
 	}
 }
 
@@ -260,7 +206,7 @@ void DecoderCore::vex2(Instruction& instruction) noexcept {
 #endif
 
 	std::size_t b_ = read_u8();
-	const OpCodeHandler* handler = handlers_vex[0][b_];
+	HandlerEntry handler = handlers_vex[0][b_];
 
 	std::uint32_t b = state.modrm;
 
@@ -429,8 +375,8 @@ void DecoderCore::evex_mvex(Instruction& instruction) noexcept {
 
 			std::size_t table_index = static_cast<std::size_t>(p0 & 7) - 1;
 			if (table_index < sizeof(handlers_evex) / sizeof(handlers_evex[0])) {
-				const OpCodeHandler* handler = handlers_evex[table_index][static_cast<std::uint8_t>(d >> 16)];
-				ICED_DEBUG_ASSERT(handler->has_modrm);
+				HandlerEntry handler = handlers_evex[table_index][static_cast<std::uint8_t>(d >> 16)];
+				ICED_DEBUG_ASSERT(handler.handler->has_modrm);
 				std::uint32_t m = d >> 24;
 				state.modrm = m;
 				state.reg = (m >> 3) & 7;
@@ -442,7 +388,7 @@ void DecoderCore::evex_mvex(Instruction& instruction) noexcept {
 				ICED_DEBUG_ASSERT(static_cast<std::uint32_t>(state.vector_length) <= 3);
 				if ((((state.flags & StateFlags::B) | static_cast<std::uint32_t>(state.vector_length)) & invalid_check_mask) == 3)
 					set_invalid_instruction();
-				handler->decode(handler, *this, instruction);
+				handler.decode(handler.handler, *this, instruction);
 			}
 			else
 				set_invalid_instruction();
@@ -490,15 +436,15 @@ void DecoderCore::evex_mvex(Instruction& instruction) noexcept {
 
 			std::size_t table_index = static_cast<std::size_t>(p0 & 0xF) - 1;
 			if (table_index < sizeof(handlers_mvex) / sizeof(handlers_mvex[0])) {
-				const OpCodeHandler* handler = handlers_mvex[table_index][static_cast<std::uint8_t>(d >> 16)];
-				ICED_DEBUG_ASSERT(handler->has_modrm);
+				HandlerEntry handler = handlers_mvex[table_index][static_cast<std::uint8_t>(d >> 16)];
+				ICED_DEBUG_ASSERT(handler.handler->has_modrm);
 				std::uint32_t m = d >> 24;
 				state.modrm = m;
 				state.reg = (m >> 3) & 7;
 				state.mod_ = m >> 6;
 				state.rm = m & 7;
 				state.mem_index = (state.mod_ << 3) | state.rm;
-				handler->decode(handler, *this, instruction);
+				handler.decode(handler.handler, *this, instruction);
 			}
 			else
 				set_invalid_instruction();

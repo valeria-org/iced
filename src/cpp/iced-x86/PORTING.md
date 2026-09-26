@@ -132,6 +132,26 @@ iterator's instruction). Decoder test cases (used by the encoder/formatter/instr
 (`decoder_tests(include_other_tests, include_invalid)`, `encoder_tests(...)`, `get_test_cases(bitness)`, `create_decoder(...)`, ...).
 Rust `#[should_panic]` tests: `aborts([] { ... })` in `tests/test_utils/abort_utils.hpp`.
 
+Decoder performance notes (keep these when changing the decoder, measure with `perf stat -e cycles:u`):
+
+- The hot part of `decode_out()` (`DecoderCore::decode_out_inline()`: state reset, first byte/REX prefix, table dispatch,
+  length/IP/RIP-relative fixups) is inline in `decoder.hpp` and force-inlined into the caller's loop
+  (`ICED_X86_INTERNAL_HOT_INLINE`, `iced_x86/internal/macros.hpp`; not forced with `-Os`), which is what Rust gets with
+  LTO. Only the table dispatch is inline, the handlers are out of line; rarely used code (invalid instructions, `LOCK`,
+  `IP_REL32`) is in `decode_out_slow()` (`src/decoder/decoder.cpp`). `read_u8()`, `read_modrm()` and `decode_table2()`
+  are also defined in `decoder.hpp`. That code can't include internal headers so it uses copies of the `StateFlags`
+  (`DecoderCore::SF_*`, verified by `static_assert`s in `decoder_core.hpp`) and `DecoderCore` is a `friend` of `Instruction`.
+- The 0x100-entry tables and `OpCodeHandler_AnotherTable`/`OpCodeHandler_Group` store `HandlerEntry`s
+  (`{decode fn, handler}`, Rust's `(OpCodeHandlerDecodeFn, &OpCodeHandler)` tuples) so the indirect call target doesn't
+  depend on a load from the handler.
+- Handler decode fns are `noexcept` (`OpCodeHandlerDecodeFn` is a `noexcept` fn pointer): a `noexcept` function calling a
+  potentially throwing fn pointer needs an EH region, which prevents tail calls (GCC).
+- The hot `DecoderCore` fields (`state`, `data_ptr`, `max_data_ptr`, ...) are first so most accesses need only an 8-bit
+  displacement.
+- GCC's SLP vectorizer (`-O3`) merges the `modrm`/`mod_`/`reg`/`rm` stores into SIMD shuffles + a 16-byte store which is
+  slower: `src/decoder/*.cpp` are compiled with `-fno-tree-slp-vectorize` (CMake) and `read_modrm()` (inlined into the
+  user's code) has an empty `asm` that prevents it.
+
 ## Code assembler
 
 `iced_x86::code_asm` (`include/iced_x86/code_asm.hpp`). `CodeAssembler a(64);` (or `CodeAssembler::create(64)` -> `Result`).

@@ -76,14 +76,14 @@ static ICED_FORCE_INLINE TupleType get_tuple_type(MvexTupleTypeLutKind lut, std:
 	return MVEX_TUPLE_TYPE_LUT[static_cast<std::size_t>(lut) * (static_cast<std::size_t>(StateFlags::MVEX_SSS_MASK) + 1) + static_cast<std::size_t>(sss)];
 }
 
-void OpCodeHandler_EH::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_EH::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_EH>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	const OpCodeHandler* handler = this_.handlers[(decoder.state.flags & StateFlags::MVEX_EH) != 0 ? 1 : 0];
 	handler->decode(handler, decoder, instruction);
 }
 
-void OpCodeHandler_MVEX_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_M>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -101,7 +101,7 @@ void OpCodeHandler_MVEX_M::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	}
 }
 
-void OpCodeHandler_MVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_MV>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -122,7 +122,7 @@ void OpCodeHandler_MVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_MVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -145,7 +145,7 @@ void OpCodeHandler_MVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 	}
 }
 
-void OpCodeHandler_MVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_HWIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
@@ -167,7 +167,7 @@ void OpCodeHandler_MVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	instruction.set_immediate8(static_cast<std::uint8_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_MVEX_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VWIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
@@ -192,7 +192,7 @@ void OpCodeHandler_MVEX_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	instruction.set_immediate8(static_cast<std::uint8_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_MVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VHW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
@@ -216,7 +216,7 @@ void OpCodeHandler_MVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_MVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VHWIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
@@ -240,7 +240,7 @@ void OpCodeHandler_MVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	instruction.set_immediate8(static_cast<std::uint8_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_MVEX_VKW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VKW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VKW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv & decoder.invalid_check_mask) > 7)
@@ -264,7 +264,7 @@ void OpCodeHandler_MVEX_VKW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_MVEX_KHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_KHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_KHW>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
@@ -287,7 +287,7 @@ void OpCodeHandler_MVEX_KHW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 	}
 }
 
-void OpCodeHandler_MVEX_KHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_KHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_KHWIb>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
@@ -312,7 +312,7 @@ void OpCodeHandler_MVEX_KHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 	instruction.set_immediate8(static_cast<std::uint8_t>(decoder.read_u8()));
 }
 
-void OpCodeHandler_MVEX_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VSIB>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))
@@ -331,7 +331,7 @@ void OpCodeHandler_MVEX_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore&
 	}
 }
 
-void OpCodeHandler_MVEX_VSIB_V::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_VSIB_V::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VSIB_V>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))
@@ -352,7 +352,7 @@ void OpCodeHandler_MVEX_VSIB_V::decode(const OpCodeHandler* self_ptr, DecoderCor
 	}
 }
 
-void OpCodeHandler_MVEX_V_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) {
+void OpCodeHandler_MVEX_V_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_V_VSIB>(self_ptr);
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))

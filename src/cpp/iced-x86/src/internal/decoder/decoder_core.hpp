@@ -28,14 +28,16 @@
 
 namespace iced_x86::internal {
 
-// All handlers derive from this struct. Rust stores `(decode_fn, &handler)` tuples in the tables; here the decode fn is the
-// first field of the handler and the tables store `const OpCodeHandler*`.
-struct OpCodeHandler {
-	OpCodeHandlerDecodeFn decode;
-	bool has_modrm;
+static_assert(DecoderCore::SF_IP_REL64 == StateFlags::IP_REL64, "");
+static_assert(DecoderCore::SF_IP_REL32 == StateFlags::IP_REL32, "");
+static_assert(DecoderCore::SF_HAS_REX == StateFlags::HAS_REX, "");
+static_assert(DecoderCore::SF_IS_INVALID == StateFlags::IS_INVALID, "");
+static_assert(DecoderCore::SF_W == StateFlags::W, "");
+static_assert(DecoderCore::SF_LOCK == StateFlags::LOCK, "");
+static_assert(DecoderCore::SF_NO_MORE_BYTES == StateFlags::NO_MORE_BYTES, "");
+static_assert(DecoderCore::OP_SIZE64 == static_cast<std::uint8_t>(OpSize::Size64), "");
 
-	constexpr OpCodeHandler(OpCodeHandlerDecodeFn decode_fn, bool has_modrm_) noexcept : decode(decode_fn), has_modrm(has_modrm_) {}
-};
+ICED_FORCE_INLINE HandlerEntry to_handler_entry(const OpCodeHandler* handler) noexcept { return HandlerEntry{handler->decode, handler}; }
 
 // Casts `self_ptr` (the handler passed to its decode fn) to the real handler type
 template <typename T>
@@ -151,7 +153,6 @@ ICED_FORCE_INLINE bool DecoderCore::try_read_u32(std::size_t& value) noexcept { 
 	state.flags |= StateFlags::IS_INVALID | StateFlags::NO_MORE_BYTES; \
 	return 0
 
-ICED_FORCE_INLINE std::size_t DecoderCore::read_u8() noexcept { ICED_DECODER_READ(std::uint8_t, std::size_t); }
 ICED_FORCE_INLINE std::size_t DecoderCore::read_u16() noexcept { ICED_DECODER_READ(std::uint16_t, std::size_t); }
 ICED_FORCE_INLINE std::size_t DecoderCore::read_u32() noexcept { ICED_DECODER_READ(std::uint32_t, std::size_t); }
 ICED_FORCE_INLINE std::uint64_t DecoderCore::read_u64() noexcept { ICED_DECODER_READ(std::uint64_t, std::uint64_t); }
@@ -212,21 +213,6 @@ ICED_FORCE_INLINE void DecoderCore::clear_mandatory_prefix_f2(Instruction& instr
 }
 
 ICED_FORCE_INLINE void DecoderCore::set_invalid_instruction() noexcept { state.flags |= StateFlags::IS_INVALID; }
-
-ICED_FORCE_INLINE void DecoderCore::read_modrm() noexcept {
-	std::uint32_t m = static_cast<std::uint32_t>(read_u8());
-	state.modrm = m;
-	state.reg = (m >> 3) & 7;
-	state.mod_ = m >> 6;
-	state.rm = m & 7;
-	state.mem_index = (state.mod_ << 3) | state.rm;
-}
-
-ICED_FORCE_INLINE void DecoderCore::decode_table2(const OpCodeHandler* handler, Instruction& instruction) noexcept {
-	if (handler->has_modrm)
-		read_modrm();
-	handler->decode(handler, *this, instruction);
-}
 
 ICED_FORCE_INLINE std::uint32_t DecoderCore::read_op_seg_reg() noexcept {
 	std::uint32_t reg = state.reg;
