@@ -31,17 +31,13 @@ TEST_CASE("formatter/fast/test_fmt_factory/fmt_misc_16") {
 	formatter_test_fast<DefaultFastFormatterTraitOptions>(16, "Fast", "Misc", true, fast_create_default<DefaultFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_default_16") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(16, "Fast", "NonDec_Default", fast_create_default<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_inverted_16") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(16, "Fast", "NonDec_Inverted", fast_create_inverted<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_default_32") {
 	formatter_test_fast<DefaultFastFormatterTraitOptions>(32, "Fast", "Default", false, fast_create_default<DefaultFastFormatterTraitOptions>);
@@ -55,17 +51,13 @@ TEST_CASE("formatter/fast/test_fmt_factory/fmt_misc_32") {
 	formatter_test_fast<DefaultFastFormatterTraitOptions>(32, "Fast", "Misc", true, fast_create_default<DefaultFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_default_32") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(32, "Fast", "NonDec_Default", fast_create_default<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_inverted_32") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(32, "Fast", "NonDec_Inverted", fast_create_inverted<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_default_64") {
 	formatter_test_fast<DefaultFastFormatterTraitOptions>(64, "Fast", "Default", false, fast_create_default<DefaultFastFormatterTraitOptions>);
@@ -79,17 +71,13 @@ TEST_CASE("formatter/fast/test_fmt_factory/fmt_misc_64") {
 	formatter_test_fast<DefaultFastFormatterTraitOptions>(64, "Fast", "Misc", true, fast_create_default<DefaultFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_default_64") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(64, "Fast", "NonDec_Default", fast_create_default<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_fmt_factory/fmt_nondec_inverted_64") {
 	formatter_test_nondec_fast<DefaultFastFormatterTraitOptions>(64, "Fast", "NonDec_Inverted", fast_create_inverted<DefaultFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_default_16") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(16, "Fast", "Default", false, fast_create_default<NotFastFormatterTraitOptions>);
@@ -103,17 +91,13 @@ TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_misc_16") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(16, "Fast", "Misc", true, fast_create_default<NotFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_default_16") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(16, "Fast", "NonDec_Default", fast_create_default<NotFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_inverted_16") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(16, "Fast", "NonDec_Inverted", fast_create_inverted<NotFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_default_32") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(32, "Fast", "Default", false, fast_create_default<NotFastFormatterTraitOptions>);
@@ -127,17 +111,13 @@ TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_misc_32") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(32, "Fast", "Misc", true, fast_create_default<NotFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_default_32") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(32, "Fast", "NonDec_Default", fast_create_default<NotFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_inverted_32") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(32, "Fast", "NonDec_Inverted", fast_create_inverted<NotFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_default_64") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(64, "Fast", "Default", false, fast_create_default<NotFastFormatterTraitOptions>);
@@ -151,17 +131,13 @@ TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_misc_64") {
 	formatter_test_fast<NotFastFormatterTraitOptions>(64, "Fast", "Misc", true, fast_create_default<NotFastFormatterTraitOptions>);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_default_64") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(64, "Fast", "NonDec_Default", fast_create_default<NotFastFormatterTraitOptions>);
 }
-#endif
 
-#if ICED_X86_TESTS_HAS_ENCODER
 TEST_CASE("formatter/fast/test_not_fmt_factory/fmt_nondec_inverted_64") {
 	formatter_test_nondec_fast<NotFastFormatterTraitOptions>(64, "Fast", "NonDec_Inverted", fast_create_inverted<NotFastFormatterTraitOptions>);
 }
-#endif
 
 TEST_CASE("formatter/fast/format_hex2") {
 	// mov rax,0000_0000_0000_0000h

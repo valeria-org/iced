@@ -19,9 +19,7 @@
 #include "test_framework.hpp"
 #include "test_utils/decoder_test_utils.hpp"
 #include "test_utils/from_str_conv.hpp"
-#if ICED_X86_TESTS_HAS_ENCODER
 #include "test_utils/non_decoded_tests.hpp"
-#endif
 
 using namespace iced_x86;
 using namespace iced_x86::tests;
@@ -134,7 +132,6 @@ TEST_CASE("formatter/misc/verify_formatter_options_new_is_same_as_default") {
 	CHECK(modified != new_options);
 }
 
-#if ICED_X86_TESTS_HAS_ENCODER
 // Rust: formatter/tests/misc2.rs
 TEST_CASE("formatter/misc2/make_sure_all_code_values_are_formatted") {
 	std::vector<std::uint8_t> tested(IcedConstants::CODE_ENUM_COUNT, 0);
@@ -161,7 +158,6 @@ TEST_CASE("formatter/misc2/make_sure_all_code_values_are_formatted") {
 	}
 	CHECK_EQ("Fmt: " + std::to_string(missing) + " ins " + sb, std::string("Fmt: 0 ins "));
 }
-#endif
 
 // Rust: formatter/tests/mod.rs
 //
