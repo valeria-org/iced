@@ -40,6 +40,13 @@
 #include "iced_x86/number_base.hpp"
 #include "iced_x86/symbol_resolver.hpp"
 
+// TEMPORARY until the encoder lands on `cpp` (non_decoded_tests.hpp + Instruction::with_declare_*())
+#if __has_include("test_utils/non_decoded_tests.hpp")
+#define ICED_X86_TESTS_HAS_ENCODER 1
+#else
+#define ICED_X86_TESTS_HAS_ENCODER 0
+#endif
+
 namespace iced_x86::tests {
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,9 @@
 #include "test_utils.hpp"
 #include "test_utils/decoder_test_utils.hpp"
 #include "test_utils/from_str_conv.hpp"
+#if ICED_X86_TESTS_HAS_ENCODER
 #include "test_utils/non_decoded_tests.hpp"
+#endif
 #include "test_utils/str_utils.hpp"
 
 namespace iced_x86::tests {
@@ -173,6 +175,7 @@ void formatter_test(std::uint32_t bitness, std::string_view dir, std::string_vie
 	}
 }
 
+#if ICED_X86_TESTS_HAS_ENCODER
 void formatter_test_nondec(std::uint32_t bitness, std::string_view dir, std::string_view filename, const FormatterFactory& fmt_factory) {
 	const auto& instrs = get_non_decoded_infos(bitness);
 	const auto lines = get_formatted_lines(bitness, dir, filename);
@@ -184,6 +187,7 @@ void formatter_test_nondec(std::uint32_t bitness, std::string_view dir, std::str
 									 "(" + std::to_string(bitness) + "-bit, hex bytes: " + instrs[i].hex_bytes + ")");
 	}
 }
+#endif
 
 void format_test_instruction_core(const Instruction& instruction, const std::string& formatted_string, Formatter& formatter,
 								  const std::string& context) {
@@ -1108,6 +1112,7 @@ void register_tests(std::string_view dir, std::string_view file_part, const Form
 // ---------------------------------------------------------------------------------------------------------------------
 // Rust: formatter/tests/misc.rs
 
+#if ICED_X86_TESTS_HAS_ENCODER
 static void check_declare_data(const FormatterFactory& fmt_factory, const Instruction& db) {
 	for (std::uint32_t i = 0; i < db.declare_data_len(); i++) {
 		static_cast<void>(fmt_factory()->op_access(db, i));
@@ -1123,6 +1128,7 @@ static void check_declare_data(const FormatterFactory& fmt_factory, const Instru
 	}
 	CHECK(fmt_factory()->get_formatter_operand(db, 0).is_err());
 }
+#endif
 
 void methods_panic_if_invalid_operand_or_instruction_operand(const FormatterFactory& fmt_factory) {
 	{
@@ -1150,6 +1156,7 @@ void methods_panic_if_invalid_operand_or_instruction_operand(const FormatterFact
 		CHECK(fmt_factory()->format_operand(invalid, output, 0).is_err());
 	}
 
+#if ICED_X86_TESTS_HAS_ENCODER
 	{
 		const std::uint8_t data[8] = {};
 		const auto db = Instruction::with_declare_byte(data, sizeof(data)).value();
@@ -1177,6 +1184,7 @@ void methods_panic_if_invalid_operand_or_instruction_operand(const FormatterFact
 		CHECK_EQ(dq.declare_data_len(), static_cast<std::size_t>(1));
 		check_declare_data(fmt_factory, dq);
 	}
+#endif
 }
 
 void test_op_index(const FormatterFactory& fmt_factory) {

@@ -16,7 +16,9 @@
 #include "test_framework.hpp"
 #include "test_utils.hpp"
 #include "test_utils/from_str_conv.hpp"
+#if ICED_X86_TESTS_HAS_ENCODER
 #include "test_utils/non_decoded_tests.hpp"
+#endif
 
 namespace iced_x86::tests {
 
@@ -136,6 +138,7 @@ void formatter_test_fast(std::uint32_t bitness, std::string_view dir, std::strin
 	}
 }
 
+#if ICED_X86_TESTS_HAS_ENCODER
 template <typename TraitOptions>
 void formatter_test_nondec_fast(std::uint32_t bitness, std::string_view dir, std::string_view filename,
 								const FastFormatterFactory<TraitOptions>& fmt_factory) {
@@ -149,6 +152,7 @@ void formatter_test_nondec_fast(std::uint32_t bitness, std::string_view dir, std
 										  "(" + std::to_string(bitness) + "-bit, hex bytes: " + instrs[i].hex_bytes + ")");
 	}
 }
+#endif
 
 template <typename TraitOptions>
 void simple_format_test_fast(std::uint32_t bitness, const std::string& hex_bytes, std::uint64_t ip, Code code, std::uint32_t decoder_options,
