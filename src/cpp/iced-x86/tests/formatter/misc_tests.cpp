@@ -15,6 +15,7 @@
 #include "iced_x86/fast_formatter.hpp"
 #include "iced_x86/formatter.hpp"
 #include "iced_x86/iced_constants.hpp"
+#include "iced_x86/masm_formatter.hpp"
 #include "iced_x86/rounding_control.hpp"
 #include "test_framework.hpp"
 #include "test_utils/decoder_test_utils.hpp"
@@ -190,7 +191,12 @@ std::vector<SaeErFormatter> get_sae_er_formatters() {
 	}
 	// gas: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
 	// intel: {"{sae}", "{rne}", "{rd}", "{ru}", "{rz}", "{rne-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
-	// masm: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
+	{
+		auto masm = std::make_shared<MasmFormatter>();
+		masm->options_mut().set_show_useless_prefixes(true);
+		formatters.push_back(SaeErFormatter{" masm", [masm](const Instruction& instruction, std::string& output) { masm->format(instruction, output); },
+											{"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}});
+	}
 	// nasm: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
 	return formatters;
 }
