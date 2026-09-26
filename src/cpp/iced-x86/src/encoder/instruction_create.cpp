@@ -5,7 +5,6 @@
 
 #include "iced_x86/instruction.hpp"
 #include "iced_x86/memory_operand.hpp"
-#include "iced_x86/rep_prefix_kind.hpp"
 #include "internal/encoder/op_code_handler.hpp"
 #include "internal/iced_assert.hpp"
 #include "internal/instruction_internal.hpp"
@@ -15,9 +14,9 @@
 
 namespace iced_x86 {
 
-namespace {
-
 using internal::InstructionInternal;
+
+namespace {
 
 // Returns the error if `expr` (a `Result<void>`) is an error
 #define ICED_TRY(expr) \
@@ -53,7 +52,11 @@ IcedError not_enough_operands_error(Code code, std::size_t operand) {
 
 const internal::OpCodeHandler& get_handler(Code code) noexcept { return internal::get_handlers_table()[static_cast<std::size_t>(code)]; }
 
-Result<OpKind> get_immediate_op_kind(Code code, std::size_t operand) {
+} // namespace
+
+// These InstructionInternal methods are implemented by the encoder since they use the encoder's op handlers
+
+Result<OpKind> internal::InstructionInternal::get_immediate_op_kind(Code code, std::size_t operand) {
 	const internal::OpCodeHandler& handler = get_handler(code);
 	const std::size_t operands_len = handler.operands_len;
 	if (operand < operands_len) {
@@ -71,7 +74,7 @@ Result<OpKind> get_immediate_op_kind(Code code, std::size_t operand) {
 	return not_enough_operands_error(code, operand);
 }
 
-Result<OpKind> get_near_branch_op_kind(Code code, std::size_t operand) {
+Result<OpKind> internal::InstructionInternal::get_near_branch_op_kind(Code code, std::size_t operand) {
 	const internal::OpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
 		if (const auto op_kind = handler.operands[operand]->near_branch_op_kind())
@@ -81,7 +84,7 @@ Result<OpKind> get_near_branch_op_kind(Code code, std::size_t operand) {
 	return not_enough_operands_error(code, operand);
 }
 
-Result<OpKind> get_far_branch_op_kind(Code code, std::size_t operand) {
+Result<OpKind> internal::InstructionInternal::get_far_branch_op_kind(Code code, std::size_t operand) {
 	const internal::OpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
 		if (const auto op_kind = handler.operands[operand]->far_branch_op_kind())
@@ -90,332 +93,6 @@ Result<OpKind> get_far_branch_op_kind(Code code, std::size_t operand) {
 	}
 	return not_enough_operands_error(code, operand);
 }
-
-Result<void> initialize_signed_immediate(Instruction& instruction, std::size_t operand, std::int64_t immediate) {
-	auto op_kind_result = get_immediate_op_kind(instruction.code(), operand);
-	if (op_kind_result.is_err())
-		return op_kind_result.error();
-	const OpKind op_kind = op_kind_result.value();
-	ICED_TRY(instruction.try_set_op_kind(static_cast<std::uint32_t>(operand), op_kind));
-
-	switch (op_kind) {
-	case OpKind::Immediate8:
-		// All i8 and all u8 values can be used
-		if (std::numeric_limits<std::int8_t>::min() <= immediate && immediate <= std::numeric_limits<std::uint8_t>::max()) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8_2nd:
-		// All i8 and all u8 values can be used
-		if (std::numeric_limits<std::int8_t>::min() <= immediate && immediate <= std::numeric_limits<std::uint8_t>::max()) {
-			InstructionInternal::internal_set_immediate8_2nd(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8to16:
-	case OpKind::Immediate8to32:
-	case OpKind::Immediate8to64:
-		if (std::numeric_limits<std::int8_t>::min() <= immediate && immediate <= std::numeric_limits<std::int8_t>::max()) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate16:
-		// All i16 and all u16 values can be used
-		if (std::numeric_limits<std::int16_t>::min() <= immediate && immediate <= std::numeric_limits<std::uint16_t>::max()) {
-			InstructionInternal::internal_set_immediate16(instruction, static_cast<std::uint16_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate32:
-		// All i32 and all u32 values can be used
-		if (std::numeric_limits<std::int32_t>::min() <= immediate && immediate <= static_cast<std::int64_t>(std::numeric_limits<std::uint32_t>::max())) {
-			instruction.set_immediate32(static_cast<std::uint32_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate32to64:
-		if (std::numeric_limits<std::int32_t>::min() <= immediate && immediate <= std::numeric_limits<std::int32_t>::max()) {
-			instruction.set_immediate32(static_cast<std::uint32_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate64:
-		instruction.set_immediate64(static_cast<std::uint64_t>(immediate));
-		return {};
-
-	default:
-		return IcedError("Not an immediate operand");
-	}
-
-	return IcedError("Invalid signed immediate");
-}
-
-Result<void> initialize_unsigned_immediate(Instruction& instruction, std::size_t operand, std::uint64_t immediate) {
-	auto op_kind_result = get_immediate_op_kind(instruction.code(), operand);
-	if (op_kind_result.is_err())
-		return op_kind_result.error();
-	const OpKind op_kind = op_kind_result.value();
-	ICED_TRY(instruction.try_set_op_kind(static_cast<std::uint32_t>(operand), op_kind));
-
-	switch (op_kind) {
-	case OpKind::Immediate8:
-		if (immediate <= std::numeric_limits<std::uint8_t>::max()) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8_2nd:
-		if (immediate <= std::numeric_limits<std::uint8_t>::max()) {
-			InstructionInternal::internal_set_immediate8_2nd(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8to16:
-		if (immediate <= static_cast<std::uint64_t>(std::numeric_limits<std::int8_t>::max()) || (0xFF80 <= immediate && immediate <= 0xFFFF)) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8to32:
-		if (immediate <= static_cast<std::uint64_t>(std::numeric_limits<std::int8_t>::max()) ||
-			(0xFFFF'FF80 <= immediate && immediate <= 0xFFFF'FFFF)) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate8to64:
-		// Allow 00..7F and FFFF_FFFF_FFFF_FF80..FFFF_FFFF_FFFF_FFFF
-		if (immediate + 0x80 <= std::numeric_limits<std::uint8_t>::max()) {
-			InstructionInternal::internal_set_immediate8(instruction, static_cast<std::uint8_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate16:
-		if (immediate <= std::numeric_limits<std::uint16_t>::max()) {
-			InstructionInternal::internal_set_immediate16(instruction, static_cast<std::uint16_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate32:
-		if (immediate <= std::numeric_limits<std::uint32_t>::max()) {
-			instruction.set_immediate32(static_cast<std::uint32_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate32to64:
-		// Allow 0..7FFF_FFFF and FFFF_FFFF_8000_0000..FFFF_FFFF_FFFF_FFFF
-		if (immediate + 0x8000'0000 <= std::numeric_limits<std::uint32_t>::max()) {
-			instruction.set_immediate32(static_cast<std::uint32_t>(immediate));
-			return {};
-		}
-		break;
-
-	case OpKind::Immediate64:
-		instruction.set_immediate64(immediate);
-		return {};
-
-	default:
-		return IcedError("Not an immediate operand");
-	}
-
-	return IcedError("Invalid unsigned immediate");
-}
-
-void set_rep_prefix(Instruction& instruction, RepPrefixKind rep_prefix) noexcept {
-	switch (rep_prefix) {
-	case RepPrefixKind::None:
-		break;
-	case RepPrefixKind::Repe:
-		InstructionInternal::internal_set_has_repe_prefix(instruction);
-		break;
-	case RepPrefixKind::Repne:
-		InstructionInternal::internal_set_has_repne_prefix(instruction);
-		break;
-	}
-}
-
-Result<Instruction> with_string_reg_segrsi(Code code, std::uint32_t address_size, Register register_, Register segment_prefix, RepPrefixKind rep_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-	set_rep_prefix(instruction, rep_prefix);
-
-	// OpKind::Register == 0 so set_op0_kind() isn't needed
-	instruction.set_op0_register(register_);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op1_kind(OpKind::MemorySegRSI);
-		break;
-	case 32:
-		instruction.set_op1_kind(OpKind::MemorySegESI);
-		break;
-	case 16:
-		instruction.set_op1_kind(OpKind::MemorySegSI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	instruction.set_segment_prefix(segment_prefix);
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
-	return instruction;
-}
-
-Result<Instruction> with_string_reg_esrdi(Code code, std::uint32_t address_size, Register register_, RepPrefixKind rep_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-	set_rep_prefix(instruction, rep_prefix);
-
-	// OpKind::Register == 0 so set_op0_kind() isn't needed
-	instruction.set_op0_register(register_);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op1_kind(OpKind::MemoryESRDI);
-		break;
-	case 32:
-		instruction.set_op1_kind(OpKind::MemoryESEDI);
-		break;
-	case 16:
-		instruction.set_op1_kind(OpKind::MemoryESDI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
-	return instruction;
-}
-
-Result<Instruction> with_string_esrdi_reg(Code code, std::uint32_t address_size, Register register_, RepPrefixKind rep_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-	set_rep_prefix(instruction, rep_prefix);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op0_kind(OpKind::MemoryESRDI);
-		break;
-	case 32:
-		instruction.set_op0_kind(OpKind::MemoryESEDI);
-		break;
-	case 16:
-		instruction.set_op0_kind(OpKind::MemoryESDI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	// OpKind::Register == 0 so set_op1_kind() isn't needed
-	instruction.set_op1_register(register_);
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
-	return instruction;
-}
-
-Result<Instruction> with_string_segrsi_esrdi(Code code, std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-	set_rep_prefix(instruction, rep_prefix);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op0_kind(OpKind::MemorySegRSI);
-		instruction.set_op1_kind(OpKind::MemoryESRDI);
-		break;
-	case 32:
-		instruction.set_op0_kind(OpKind::MemorySegESI);
-		instruction.set_op1_kind(OpKind::MemoryESEDI);
-		break;
-	case 16:
-		instruction.set_op0_kind(OpKind::MemorySegSI);
-		instruction.set_op1_kind(OpKind::MemoryESDI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	instruction.set_segment_prefix(segment_prefix);
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
-	return instruction;
-}
-
-Result<Instruction> with_string_esrdi_segrsi(Code code, std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-	set_rep_prefix(instruction, rep_prefix);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op0_kind(OpKind::MemoryESRDI);
-		instruction.set_op1_kind(OpKind::MemorySegRSI);
-		break;
-	case 32:
-		instruction.set_op0_kind(OpKind::MemoryESEDI);
-		instruction.set_op1_kind(OpKind::MemorySegESI);
-		break;
-	case 16:
-		instruction.set_op0_kind(OpKind::MemoryESDI);
-		instruction.set_op1_kind(OpKind::MemorySegSI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	instruction.set_segment_prefix(segment_prefix);
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
-	return instruction;
-}
-
-Result<Instruction> with_maskmov(Code code, std::uint32_t address_size, Register register1, Register register2, Register segment_prefix) {
-	Instruction instruction;
-	instruction.set_code(code);
-
-	switch (address_size) {
-	case 64:
-		instruction.set_op0_kind(OpKind::MemorySegRDI);
-		break;
-	case 32:
-		instruction.set_op0_kind(OpKind::MemorySegEDI);
-		break;
-	case 16:
-		instruction.set_op0_kind(OpKind::MemorySegDI);
-		break;
-	default:
-		return IcedError("Invalid address size");
-	}
-
-	// OpKind::Register == 0 so set_op1_kind() isn't needed
-	instruction.set_op1_register(register1);
-
-	// OpKind::Register == 0 so set_op2_kind() isn't needed
-	instruction.set_op2_register(register2);
-
-	instruction.set_segment_prefix(segment_prefix);
-
-	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
-	return instruction;
-}
-
-} // namespace
 
 // GENERATOR-BEGIN: Create
 // ⚠️This was generated by GENERATOR!🦹‍♂️
@@ -442,7 +119,7 @@ Result<Instruction> Instruction::with1(Code code, std::int32_t immediate) {
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 1);
 	return instruction;
@@ -452,7 +129,7 @@ Result<Instruction> Instruction::with1(Code code, std::uint32_t immediate) {
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 1);
 	return instruction;
@@ -490,7 +167,7 @@ Result<Instruction> Instruction::with2(Code code, Register register_, std::int32
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -503,7 +180,7 @@ Result<Instruction> Instruction::with2(Code code, Register register_, std::uint3
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -516,7 +193,7 @@ Result<Instruction> Instruction::with2(Code code, Register register_, std::int64
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 1, immediate));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 1, immediate));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -529,7 +206,7 @@ Result<Instruction> Instruction::with2(Code code, Register register_, std::uint6
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 1, immediate));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 1, immediate));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -553,7 +230,7 @@ Result<Instruction> Instruction::with2(Code code, std::int32_t immediate, Regist
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate)));
 
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register_);
@@ -566,7 +243,7 @@ Result<Instruction> Instruction::with2(Code code, std::uint32_t immediate, Regis
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate)));
 
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register_);
@@ -579,9 +256,9 @@ Result<Instruction> Instruction::with2(Code code, std::int32_t immediate1, std::
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 0, static_cast<std::int64_t>(immediate1)));
 
-	ICED_TRY(initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -591,9 +268,9 @@ Result<Instruction> Instruction::with2(Code code, std::uint32_t immediate1, std:
 	Instruction instruction;
 	instruction.set_code(code);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 0, static_cast<std::uint64_t>(immediate1)));
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -620,7 +297,7 @@ Result<Instruction> Instruction::with2(Code code, const MemoryOperand& memory, s
 	instruction.set_op0_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -633,7 +310,7 @@ Result<Instruction> Instruction::with2(Code code, const MemoryOperand& memory, s
 	instruction.set_op0_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 2);
 	return instruction;
@@ -666,7 +343,7 @@ Result<Instruction> Instruction::with3(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register2);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -682,7 +359,7 @@ Result<Instruction> Instruction::with3(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register2);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -712,9 +389,9 @@ Result<Instruction> Instruction::with3(Code code, Register register_, std::int32
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 1, static_cast<std::int64_t>(immediate1)));
 
-	ICED_TRY(initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -727,9 +404,9 @@ Result<Instruction> Instruction::with3(Code code, Register register_, std::uint3
 	// OpKind::Register == 0 so set_op0_kind() isn't needed
 	instruction.set_op0_register(register_);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 1, static_cast<std::uint64_t>(immediate1)));
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -762,7 +439,7 @@ Result<Instruction> Instruction::with3(Code code, Register register_, const Memo
 	instruction.set_op1_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -778,7 +455,7 @@ Result<Instruction> Instruction::with3(Code code, Register register_, const Memo
 	instruction.set_op1_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -811,7 +488,7 @@ Result<Instruction> Instruction::with3(Code code, const MemoryOperand& memory, R
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register_);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -827,7 +504,7 @@ Result<Instruction> Instruction::with3(Code code, const MemoryOperand& memory, R
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register_);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 3);
 	return instruction;
@@ -866,7 +543,7 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op2_kind() isn't needed
 	instruction.set_op2_register(register3);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -885,7 +562,7 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op2_kind() isn't needed
 	instruction.set_op2_register(register3);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -921,9 +598,9 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register2);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 2, static_cast<std::int64_t>(immediate1)));
 
-	ICED_TRY(initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -939,9 +616,9 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op1_kind() isn't needed
 	instruction.set_op1_register(register2);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate1)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 2, static_cast<std::uint64_t>(immediate1)));
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate2)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate2)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -980,7 +657,7 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	instruction.set_op2_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 3, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -999,7 +676,7 @@ Result<Instruction> Instruction::with4(Code code, Register register1, Register r
 	instruction.set_op2_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 3, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 4);
 	return instruction;
@@ -1021,7 +698,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op3_kind() isn't needed
 	instruction.set_op3_register(register4);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1043,7 +720,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op3_kind() isn't needed
 	instruction.set_op3_register(register4);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1065,7 +742,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	instruction.set_op3_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1087,7 +764,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	instruction.set_op3_kind(OpKind::Memory);
 	init_memory_operand(instruction, memory);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1109,7 +786,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op3_kind() isn't needed
 	instruction.set_op3_register(register3);
 
-	ICED_TRY(initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, 4, static_cast<std::int64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1131,7 +808,7 @@ Result<Instruction> Instruction::with5(Code code, Register register1, Register r
 	// OpKind::Register == 0 so set_op3_kind() isn't needed
 	instruction.set_op3_register(register3);
 
-	ICED_TRY(initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
+	ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, 4, static_cast<std::uint64_t>(immediate)));
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 5);
 	return instruction;
@@ -1141,7 +818,7 @@ Result<Instruction> Instruction::with_branch(Code code, std::uint64_t target) {
 	Instruction instruction;
 	instruction.set_code(code);
 
-	auto op_kind = get_near_branch_op_kind(code, 0);
+	auto op_kind = InstructionInternal::get_near_branch_op_kind(code, 0);
 	if (op_kind.is_err())
 		return op_kind.error();
 	instruction.set_op0_kind(op_kind.value());
@@ -1155,7 +832,7 @@ Result<Instruction> Instruction::with_far_branch(Code code, std::uint16_t select
 	Instruction instruction;
 	instruction.set_code(code);
 
-	auto op_kind = get_far_branch_op_kind(code, 0);
+	auto op_kind = InstructionInternal::get_far_branch_op_kind(code, 0);
 	if (op_kind.is_err())
 		return op_kind.error();
 	instruction.set_op0_kind(op_kind.value());
@@ -1197,255 +874,255 @@ Result<Instruction> Instruction::with_xbegin(std::uint32_t bitness, std::uint64_
 }
 
 Result<Instruction> Instruction::with_outsb(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Outsb_DX_m8, address_size, Register::DX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsb_DX_m8, address_size, Register::DX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_outsb(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Outsb_DX_m8, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsb_DX_m8, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_outsw(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Outsw_DX_m16, address_size, Register::DX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsw_DX_m16, address_size, Register::DX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_outsw(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Outsw_DX_m16, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsw_DX_m16, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_outsd(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Outsd_DX_m32, address_size, Register::DX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsd_DX_m32, address_size, Register::DX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_outsd(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Outsd_DX_m32, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Outsd_DX_m32, address_size, Register::DX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_lodsb(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Lodsb_AL_m8, address_size, Register::AL, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsb_AL_m8, address_size, Register::AL, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_lodsb(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Lodsb_AL_m8, address_size, Register::AL, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsb_AL_m8, address_size, Register::AL, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_lodsw(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Lodsw_AX_m16, address_size, Register::AX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsw_AX_m16, address_size, Register::AX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_lodsw(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Lodsw_AX_m16, address_size, Register::AX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsw_AX_m16, address_size, Register::AX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_lodsd(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Lodsd_EAX_m32, address_size, Register::EAX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsd_EAX_m32, address_size, Register::EAX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_lodsd(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Lodsd_EAX_m32, address_size, Register::EAX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsd_EAX_m32, address_size, Register::EAX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_lodsq(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_reg_segrsi(Code::Lodsq_RAX_m64, address_size, Register::RAX, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsq_RAX_m64, address_size, Register::RAX, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_lodsq(std::uint32_t address_size) {
-	return with_string_reg_segrsi(Code::Lodsq_RAX_m64, address_size, Register::RAX, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_segrsi(Code::Lodsq_RAX_m64, address_size, Register::RAX, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_scasb(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, rep_prefix);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_scasb(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_scasb(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasb_AL_m8, address_size, Register::AL, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_scasw(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, rep_prefix);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_scasw(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_scasw(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasw_AX_m16, address_size, Register::AX, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_scasd(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, rep_prefix);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_scasd(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_scasd(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasd_EAX_m32, address_size, Register::EAX, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_scasq(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, rep_prefix);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_scasq(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_scasq(std::uint32_t address_size) {
-	return with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_reg_esrdi(Code::Scasq_RAX_m64, address_size, Register::RAX, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_insb(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Insb_m8_DX, address_size, Register::DX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insb_m8_DX, address_size, Register::DX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_insb(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Insb_m8_DX, address_size, Register::DX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insb_m8_DX, address_size, Register::DX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_insw(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Insw_m16_DX, address_size, Register::DX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insw_m16_DX, address_size, Register::DX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_insw(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Insw_m16_DX, address_size, Register::DX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insw_m16_DX, address_size, Register::DX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_insd(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Insd_m32_DX, address_size, Register::DX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insd_m32_DX, address_size, Register::DX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_insd(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Insd_m32_DX, address_size, Register::DX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Insd_m32_DX, address_size, Register::DX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_stosb(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Stosb_m8_AL, address_size, Register::AL, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosb_m8_AL, address_size, Register::AL, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_stosb(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Stosb_m8_AL, address_size, Register::AL, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosb_m8_AL, address_size, Register::AL, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_stosw(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Stosw_m16_AX, address_size, Register::AX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosw_m16_AX, address_size, Register::AX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_stosw(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Stosw_m16_AX, address_size, Register::AX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosw_m16_AX, address_size, Register::AX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_stosd(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Stosd_m32_EAX, address_size, Register::EAX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosd_m32_EAX, address_size, Register::EAX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_stosd(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Stosd_m32_EAX, address_size, Register::EAX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosd_m32_EAX, address_size, Register::EAX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_stosq(std::uint32_t address_size, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_reg(Code::Stosq_m64_RAX, address_size, Register::RAX, rep_prefix);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosq_m64_RAX, address_size, Register::RAX, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_stosq(std::uint32_t address_size) {
-	return with_string_esrdi_reg(Code::Stosq_m64_RAX, address_size, Register::RAX, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_reg(Code::Stosq_m64_RAX, address_size, Register::RAX, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_cmpsb(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_cmpsb(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_cmpsb(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, Register::None, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsb_m8_m8, address_size, Register::None, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_cmpsw(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_cmpsw(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_cmpsw(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, Register::None, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsw_m16_m16, address_size, Register::None, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_cmpsd(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_cmpsd(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_cmpsd(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, Register::None, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsd_m32_m32, address_size, Register::None, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_cmpsq(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_repe_cmpsq(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_repne_cmpsq(std::uint32_t address_size) {
-	return with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, Register::None, RepPrefixKind::Repne);
+	return InstructionInternal::with_string_segrsi_esrdi(Code::Cmpsq_m64_m64, address_size, Register::None, RepPrefixKind::Repne);
 }
 
 Result<Instruction> Instruction::with_movsb(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_segrsi(Code::Movsb_m8_m8, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsb_m8_m8, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_movsb(std::uint32_t address_size) {
-	return with_string_esrdi_segrsi(Code::Movsb_m8_m8, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsb_m8_m8, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_movsw(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_segrsi(Code::Movsw_m16_m16, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsw_m16_m16, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_movsw(std::uint32_t address_size) {
-	return with_string_esrdi_segrsi(Code::Movsw_m16_m16, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsw_m16_m16, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_movsd(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_segrsi(Code::Movsd_m32_m32, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsd_m32_m32, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_movsd(std::uint32_t address_size) {
-	return with_string_esrdi_segrsi(Code::Movsd_m32_m32, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsd_m32_m32, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_movsq(std::uint32_t address_size, Register segment_prefix, RepPrefixKind rep_prefix) {
-	return with_string_esrdi_segrsi(Code::Movsq_m64_m64, address_size, segment_prefix, rep_prefix);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsq_m64_m64, address_size, segment_prefix, rep_prefix);
 }
 
 Result<Instruction> Instruction::with_rep_movsq(std::uint32_t address_size) {
-	return with_string_esrdi_segrsi(Code::Movsq_m64_m64, address_size, Register::None, RepPrefixKind::Repe);
+	return InstructionInternal::with_string_esrdi_segrsi(Code::Movsq_m64_m64, address_size, Register::None, RepPrefixKind::Repe);
 }
 
 Result<Instruction> Instruction::with_maskmovq(std::uint32_t address_size, Register register1, Register register2, Register segment_prefix) {
-	return with_maskmov(Code::Maskmovq_rDI_mm_mm, address_size, register1, register2, segment_prefix);
+	return InstructionInternal::with_maskmov(Code::Maskmovq_rDI_mm_mm, address_size, register1, register2, segment_prefix);
 }
 
 Result<Instruction> Instruction::with_maskmovdqu(std::uint32_t address_size, Register register1, Register register2, Register segment_prefix) {
-	return with_maskmov(Code::Maskmovdqu_rDI_xmm_xmm, address_size, register1, register2, segment_prefix);
+	return InstructionInternal::with_maskmov(Code::Maskmovdqu_rDI_xmm_xmm, address_size, register1, register2, segment_prefix);
 }
 
 Result<Instruction> Instruction::with_vmaskmovdqu(std::uint32_t address_size, Register register1, Register register2, Register segment_prefix) {
-	return with_maskmov(Code::VEX_Vmaskmovdqu_rDI_xmm_xmm, address_size, register1, register2, segment_prefix);
+	return InstructionInternal::with_maskmov(Code::VEX_Vmaskmovdqu_rDI_xmm_xmm, address_size, register1, register2, segment_prefix);
 }
 
 Instruction Instruction::with_declare_byte_1(std::uint8_t b0) {

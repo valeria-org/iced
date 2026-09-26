@@ -198,19 +198,19 @@ namespace Generator.Encoder.Cpp {
 						break;
 
 					case MethodArgType.Int32:
-						writer.WriteLine($"ICED_TRY(initialize_signed_immediate(instruction, {op}, static_cast<std::int64_t>({ArgName(arg)})));");
+						writer.WriteLine($"ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, {op}, static_cast<std::int64_t>({ArgName(arg)})));");
 						break;
 
 					case MethodArgType.UInt32:
-						writer.WriteLine($"ICED_TRY(initialize_unsigned_immediate(instruction, {op}, static_cast<std::uint64_t>({ArgName(arg)})));");
+						writer.WriteLine($"ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, {op}, static_cast<std::uint64_t>({ArgName(arg)})));");
 						break;
 
 					case MethodArgType.Int64:
-						writer.WriteLine($"ICED_TRY(initialize_signed_immediate(instruction, {op}, {ArgName(arg)}));");
+						writer.WriteLine($"ICED_TRY(InstructionInternal::initialize_signed_immediate(instruction, {op}, {ArgName(arg)}));");
 						break;
 
 					case MethodArgType.UInt64:
-						writer.WriteLine($"ICED_TRY(initialize_unsigned_immediate(instruction, {op}, {ArgName(arg)}));");
+						writer.WriteLine($"ICED_TRY(InstructionInternal::initialize_unsigned_immediate(instruction, {op}, {ArgName(arg)}));");
 						break;
 
 					default:
@@ -230,7 +230,7 @@ namespace Generator.Encoder.Cpp {
 			using (writer.Indent()) {
 				WriteInitializeInstruction(writer, ArgName(method.Args[0]));
 				writer.WriteLine();
-				writer.WriteLine($"auto op_kind = get_near_branch_op_kind({ArgName(method.Args[0])}, 0);");
+				writer.WriteLine($"auto op_kind = InstructionInternal::get_near_branch_op_kind({ArgName(method.Args[0])}, 0);");
 				writer.WriteLine("if (op_kind.is_err())");
 				using (writer.Indent())
 					writer.WriteLine("return op_kind.error();");
@@ -249,7 +249,7 @@ namespace Generator.Encoder.Cpp {
 			using (writer.Indent()) {
 				WriteInitializeInstruction(writer, ArgName(method.Args[0]));
 				writer.WriteLine();
-				writer.WriteLine($"auto op_kind = get_far_branch_op_kind({ArgName(method.Args[0])}, 0);");
+				writer.WriteLine($"auto op_kind = InstructionInternal::get_far_branch_op_kind({ArgName(method.Args[0])}, 0);");
 				writer.WriteLine("if (op_kind.is_err())");
 				using (writer.Indent())
 					writer.WriteLine("return op_kind.error();");
@@ -322,7 +322,7 @@ namespace Generator.Encoder.Cpp {
 			if (!WriteMethod(writer, method, methodName, true, GetAddrSizeOrBitnessError(method)))
 				return;
 			using (writer.Indent())
-				writer.WriteLine($"return {helperName}({string.Join(", ", helperArgs)});");
+				writer.WriteLine($"return InstructionInternal::{helperName}({string.Join(", ", helperArgs)});");
 			WriteMethodEnd(writer);
 		}
 

@@ -26,10 +26,8 @@
 #include "internal/encoder/w_bit.hpp"
 #include "internal/encoder/xop_op_code_table.hpp"
 #include "internal/iced_assert.hpp"
-#include "internal/instruction_memory_sizes.hpp"
-#include "internal/instruction_op_counts.hpp"
 #include "internal/mandatory_prefix_byte.hpp"
-#include "internal/mvex/mvex_info.hpp"
+#include "internal/mvex/mvex.hpp"
 #include <memory>
 
 namespace iced_x86 {
@@ -409,9 +407,9 @@ std::uint8_t OpCodeInfo::mvex_valid_swizzle_funcs_mask() const noexcept {
 	return 0;
 }
 
-MemorySize OpCodeInfo::memory_size() const noexcept { return internal::instruction_memory_sizes::SIZES_NORMAL[static_cast<std::size_t>(code())]; }
+MemorySize OpCodeInfo::memory_size() const noexcept { return internal::SIZES_NORMAL[static_cast<std::size_t>(code())]; }
 
-MemorySize OpCodeInfo::broadcast_memory_size() const noexcept { return internal::instruction_memory_sizes::SIZES_BCST[static_cast<std::size_t>(code())]; }
+MemorySize OpCodeInfo::broadcast_memory_size() const noexcept { return internal::SIZES_BCST[static_cast<std::size_t>(code())]; }
 
 std::uint32_t OpCodeInfo::decoder_option() const noexcept {
 	const std::uint32_t dec_opt_value = (opc_flags1_ >> OpCodeInfoFlags1::DEC_OPTION_VALUE_SHIFT) & OpCodeInfoFlags1::DEC_OPTION_VALUE_MASK;
@@ -420,7 +418,7 @@ std::uint32_t OpCodeInfo::decoder_option() const noexcept {
 
 std::uint32_t OpCodeInfo::op_code_len() const noexcept { return (enc_flags2_ & EncFlags2::OP_CODE_IS2_BYTES) != 0 ? 2 : 1; }
 
-std::uint32_t OpCodeInfo::op_count() const noexcept { return internal::instruction_op_counts::OP_COUNT[static_cast<std::size_t>(code())]; }
+std::uint32_t OpCodeInfo::op_count() const noexcept { return internal::OP_COUNT[static_cast<std::size_t>(code())]; }
 
 Result<OpCodeOperandKind> OpCodeInfo::try_op_kind(std::uint32_t operand) const {
 	if (operand < MAX_OP_COUNT)
@@ -517,7 +515,5 @@ bool OpCodeInfo::amd_decoder64() const noexcept { return (opc_flags2_ & OpCodeIn
 namespace code_ext {
 const OpCodeInfo& op_code(Code code) noexcept { return internal::OpCodeInfoInternal::get_table()[static_cast<std::size_t>(code)]; }
 } // namespace code_ext
-
-const OpCodeInfo& Instruction::op_code() const noexcept { return code_ext::op_code(code()); }
 
 } // namespace iced_x86

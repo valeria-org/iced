@@ -186,25 +186,25 @@ ConstantOffsets Encoder::get_constant_offsets() const noexcept {
 		break;
 
 	case DisplSize::Size1:
-		co.displacement_size = 1;
-		co.displacement_offset = static_cast<std::uint8_t>(displ_addr_ - eip_);
+		co.displacement_size_ = 1;
+		co.displacement_offset_ = static_cast<std::uint8_t>(displ_addr_ - eip_);
 		break;
 
 	case DisplSize::Size2:
-		co.displacement_size = 2;
-		co.displacement_offset = static_cast<std::uint8_t>(displ_addr_ - eip_);
+		co.displacement_size_ = 2;
+		co.displacement_offset_ = static_cast<std::uint8_t>(displ_addr_ - eip_);
 		break;
 
 	case DisplSize::Size4:
 	case DisplSize::RipRelSize4_Target32:
 	case DisplSize::RipRelSize4_Target64:
-		co.displacement_size = 4;
-		co.displacement_offset = static_cast<std::uint8_t>(displ_addr_ - eip_);
+		co.displacement_size_ = 4;
+		co.displacement_offset_ = static_cast<std::uint8_t>(displ_addr_ - eip_);
 		break;
 
 	case DisplSize::Size8:
-		co.displacement_size = 8;
-		co.displacement_offset = static_cast<std::uint8_t>(displ_addr_ - eip_);
+		co.displacement_size_ = 8;
+		co.displacement_offset_ = static_cast<std::uint8_t>(displ_addr_ - eip_);
 		break;
 	}
 
@@ -218,56 +218,56 @@ ConstantOffsets Encoder::get_constant_offsets() const noexcept {
 	case ImmSize::RipRelSize1_Target16:
 	case ImmSize::RipRelSize1_Target32:
 	case ImmSize::RipRelSize1_Target64:
-		co.immediate_size = 1;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size_ = 1;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
 		break;
 
 	case ImmSize::Size1_1:
-		co.immediate_size = 1;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
-		co.immediate_size2 = 1;
-		co.immediate_offset2 = static_cast<std::uint8_t>(imm_addr_ - eip_ + 1);
+		co.immediate_size_ = 1;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size2_ = 1;
+		co.immediate_offset2_ = static_cast<std::uint8_t>(imm_addr_ - eip_ + 1);
 		break;
 
 	case ImmSize::Size2:
 	case ImmSize::RipRelSize2_Target16:
 	case ImmSize::RipRelSize2_Target32:
 	case ImmSize::RipRelSize2_Target64:
-		co.immediate_size = 2;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size_ = 2;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
 		break;
 
 	case ImmSize::Size2_1:
-		co.immediate_size = 2;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
-		co.immediate_size2 = 1;
-		co.immediate_offset2 = static_cast<std::uint8_t>(imm_addr_ - eip_ + 2);
+		co.immediate_size_ = 2;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size2_ = 1;
+		co.immediate_offset2_ = static_cast<std::uint8_t>(imm_addr_ - eip_ + 2);
 		break;
 
 	case ImmSize::Size2_2:
-		co.immediate_size = 2;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
-		co.immediate_size2 = 2;
-		co.immediate_offset2 = static_cast<std::uint8_t>(imm_addr_ - eip_ + 2);
+		co.immediate_size_ = 2;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size2_ = 2;
+		co.immediate_offset2_ = static_cast<std::uint8_t>(imm_addr_ - eip_ + 2);
 		break;
 
 	case ImmSize::Size4:
 	case ImmSize::RipRelSize4_Target32:
 	case ImmSize::RipRelSize4_Target64:
-		co.immediate_size = 4;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size_ = 4;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
 		break;
 
 	case ImmSize::Size4_2:
-		co.immediate_size = 4;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
-		co.immediate_size2 = 2;
-		co.immediate_offset2 = static_cast<std::uint8_t>(imm_addr_ - eip_ + 4);
+		co.immediate_size_ = 4;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size2_ = 2;
+		co.immediate_offset2_ = static_cast<std::uint8_t>(imm_addr_ - eip_ + 4);
 		break;
 
 	case ImmSize::Size8:
-		co.immediate_size = 8;
-		co.immediate_offset = static_cast<std::uint8_t>(imm_addr_ - eip_);
+		co.immediate_size_ = 8;
+		co.immediate_offset_ = static_cast<std::uint8_t>(imm_addr_ - eip_);
 		break;
 	}
 

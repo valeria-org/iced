@@ -4,6 +4,7 @@
 #pragma once
 
 #include "iced_x86/code.hpp"
+#include "iced_x86/code_ext.hpp"
 #include "iced_x86/encoding_kind.hpp"
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/iced_error.hpp"
@@ -15,6 +16,7 @@
 #include "iced_x86/mvex_tuple_type_lut_kind.hpp"
 #include "iced_x86/op_code_operand_kind.hpp"
 #include "iced_x86/op_code_table_kind.hpp"
+#include "iced_x86/slice.hpp"
 #include "iced_x86/tuple_type.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -30,28 +32,6 @@ struct OpCodeInfoInternal;
 /// Opcode info, returned by `code_ext::op_code()` and `Instruction::op_code()`
 class OpCodeInfo {
 public:
-	/// A read-only view of the operand kinds (see `op_kinds()`)
-	class OpKinds {
-	public:
-		constexpr OpKinds(const OpCodeOperandKind* data, std::size_t size) noexcept : data_(data), size_(size) {}
-		/// Gets a pointer to the first element
-		constexpr const OpCodeOperandKind* data() const noexcept { return data_; }
-		/// Gets the number of elements
-		constexpr std::size_t size() const noexcept { return size_; }
-		/// `true` if there are no elements
-		constexpr bool empty() const noexcept { return size_ == 0; }
-		/// Gets an element. `index` must be less than `size()`
-		constexpr OpCodeOperandKind operator[](std::size_t index) const noexcept { return data_[index]; }
-		/// Begin iterator
-		constexpr const OpCodeOperandKind* begin() const noexcept { return data_; }
-		/// End iterator
-		constexpr const OpCodeOperandKind* end() const noexcept { return data_ + size_; }
-
-	private:
-		const OpCodeOperandKind* data_;
-		std::size_t size_;
-	};
-
 	/// Gets the code
 	///
 	/// # Examples
@@ -480,7 +460,7 @@ public:
 	Result<OpCodeOperandKind> try_op_kind(std::uint32_t operand) const;
 
 	/// Gets all operand kinds
-	OpKinds op_kinds() const noexcept { return OpKinds(op_kinds_, op_count()); }
+	Slice<OpCodeOperandKind> op_kinds() const noexcept { return Slice<OpCodeOperandKind>(op_kinds_, op_count()); }
 
 	/// Checks if the instruction is available in 16-bit mode, 32-bit mode or 64-bit mode
 	///
@@ -557,14 +537,5 @@ private:
 
 /// Gets the instruction string (same as `OpCodeInfo::instruction_string()`), eg. `VMOVAPD ymm1 {k1}{z}, ymm2/m256`
 inline std::string to_string(const OpCodeInfo& op_code) { return std::string(op_code.instruction_string()); }
-
-namespace code_ext {
-/// Gets a `OpCodeInfo`
-///
-/// # Arguments
-///
-/// * `code`: Code value
-const OpCodeInfo& op_code(Code code) noexcept;
-} // namespace code_ext
 
 } // namespace iced_x86

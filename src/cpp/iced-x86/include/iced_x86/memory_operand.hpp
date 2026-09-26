@@ -11,7 +11,8 @@
 namespace iced_x86 {
 
 /// Memory operand passed to one of `Instruction`'s `with*()` constructor methods
-struct MemoryOperand {
+class MemoryOperand {
+public:
 	/// Segment override or `Register::None`
 	Register segment_prefix = Register::None;
 

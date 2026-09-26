@@ -3,7 +3,7 @@
 
 #include "internal/encoder/op_code_fmt.hpp"
 #include "internal/iced_assert.hpp"
-#include "internal/mvex/mvex_info.hpp"
+#include "internal/mvex/mvex.hpp"
 
 namespace iced_x86::internal {
 

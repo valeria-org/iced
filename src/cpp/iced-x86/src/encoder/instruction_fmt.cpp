@@ -5,8 +5,8 @@
 #include "iced_x86/memory_size_ext.hpp"
 #include "internal/encoder/mnemonic_str_tbl.hpp"
 #include "internal/iced_assert.hpp"
-#include "internal/instruction_memory_sizes.hpp"
-#include "internal/mvex/mvex_info.hpp"
+#include "iced_x86/instruction.hpp"
+#include "internal/mvex/mvex.hpp"
 
 namespace iced_x86::internal {
 
@@ -133,8 +133,8 @@ std::uint32_t InstructionFormatter::get_tmm_index() noexcept {
 MemorySize InstructionFormatter::get_memory_size(bool is_broadcast) const noexcept {
 	const std::size_t code = static_cast<std::size_t>(op_code.code());
 	if (is_broadcast)
-		return instruction_memory_sizes::SIZES_BCST[code];
-	return instruction_memory_sizes::SIZES_NORMAL[code];
+		return SIZES_BCST[code];
+	return SIZES_NORMAL[code];
 }
 
 std::string InstructionFormatter::format() {

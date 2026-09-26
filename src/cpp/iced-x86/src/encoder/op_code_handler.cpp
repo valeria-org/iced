@@ -24,8 +24,7 @@
 #include "internal/iced_assert.hpp"
 #include "internal/instruction_internal.hpp"
 #include "internal/mandatory_prefix_byte.hpp"
-#include "internal/mvex/mvex_info.hpp"
-#include "internal/mvex/mvex_tt_lut.hpp"
+#include "internal/mvex/mvex.hpp"
 #include "internal/tuple_type_tbl.hpp"
 #include <limits>
 #include <memory>
