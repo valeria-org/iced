@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: MIT
+// Copyright (C) 2018-present iced project and contributors
+
+// Port of src/rust/iced-x86/src/test/va.rs
+// PENDING: needs the Decoder. Rename to tests/core/va_tests.cpp once the decoder exists (and adapt the
+// Decoder construction if its API differs from `Decoder::with_ip(bitness, data, size, ip, options)`).
+
+#include "test_framework.hpp"
+#include "test_utils.hpp"
+#include "test_utils/from_str_conv.hpp"
+#include "test_utils/va_test_parser.hpp"
+#include "iced_x86/decoder.hpp"
+#include "iced_x86/instruction.hpp"
+
+#include <cstdint>
+#include <optional>
+
+using namespace iced_x86;
+using namespace iced_x86::tests;
+
+TEST_CASE("core/va_tests") {
+	for (const auto& tc : get_va_test_cases()) {
+		if (tc.operand < 0)
+			continue;
+		const auto operand = static_cast<std::uint32_t>(tc.operand);
+		const auto bytes = to_vec_u8(tc.hex_bytes);
+		auto decoder = Decoder::with_ip(tc.bitness, bytes.data(), bytes.size(), get_default_ip(tc.bitness), tc.decoder_options);
+		const Instruction instruction = decoder.decode();
+
+		auto get_register_value = [&tc](Register register_, std::size_t element_index, std::size_t element_size) -> std::optional<std::uint64_t> {
+			for (const auto& reg_value : tc.register_values) {
+				if (reg_value.register_ == register_ && reg_value.element_index == element_index && reg_value.element_size == element_size)
+					return reg_value.value;
+			}
+			return std::nullopt;
+		};
+
+		const auto value1 = instruction.virtual_address(operand, tc.element_index, get_register_value);
+		CHECK(value1 == std::optional<std::uint64_t>(tc.expected_value));
+
+		const auto value2 = instruction.try_virtual_address(operand, tc.element_index, get_register_value);
+		CHECK(value2 == std::optional<std::uint64_t>(tc.expected_value));
+
+		const auto none_fn = [](Register, std::size_t, std::size_t) -> std::optional<std::uint64_t> { return std::nullopt; };
+		const auto value3 = instruction.virtual_address(operand, tc.element_index, none_fn);
+		CHECK(!value3.has_value());
+
+		const auto value4 = instruction.try_virtual_address(operand, tc.element_index, none_fn);
+		CHECK(!value4.has_value());
+	}
+}
