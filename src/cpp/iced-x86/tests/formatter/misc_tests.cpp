@@ -14,6 +14,8 @@
 #include "formatter/formatter_test_utils.hpp"
 #include "iced_x86/fast_formatter.hpp"
 #include "iced_x86/formatter.hpp"
+#include "iced_x86/gas_formatter.hpp"
+#include "iced_x86/intel_formatter.hpp"
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/rounding_control.hpp"
 #include "test_framework.hpp"
@@ -188,8 +190,18 @@ std::vector<SaeErFormatter> get_sae_er_formatters() {
 		formatters.push_back(SaeErFormatter{" fast", [fast](const Instruction& instruction, std::string& output) { fast->format(instruction, output); },
 											{"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}});
 	}
-	// gas: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
-	// intel: {"{sae}", "{rne}", "{rd}", "{ru}", "{rz}", "{rne-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
+	{
+		auto gas = std::make_shared<GasFormatter>();
+		gas->options_mut().set_show_useless_prefixes(true);
+		formatters.push_back(SaeErFormatter{"  gas", [gas](const Instruction& instruction, std::string& output) { gas->format(instruction, output); },
+											{"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}});
+	}
+	{
+		auto intel = std::make_shared<IntelFormatter>();
+		intel->options_mut().set_show_useless_prefixes(true);
+		formatters.push_back(SaeErFormatter{"intel", [intel](const Instruction& instruction, std::string& output) { intel->format(instruction, output); },
+											{"{sae}", "{rne}", "{rd}", "{ru}", "{rz}", "{rne-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}});
+	}
 	// masm: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
 	// nasm: {"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}
 	return formatters;

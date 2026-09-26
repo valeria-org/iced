@@ -76,93 +76,94 @@ void FormatterOutputMethods::write2(FormatterOutput& output, const Instruction& 
 	}
 }
 
-const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const std::vector<FormatterString>& mnemonics) noexcept {
+const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const FormatterString* mnemonics,
+									   std::size_t mnemonics_size) noexcept {
 	std::size_t index;
 	switch (cc_index) {
 	// o
 	case 0:
-		ICED_DEBUG_ASSERT(mnemonics.size() == 1);
+		ICED_DEBUG_ASSERT(mnemonics_size == 1);
 		index = 0;
 		break;
 	// no
 	case 1:
-		ICED_DEBUG_ASSERT(mnemonics.size() == 1);
+		ICED_DEBUG_ASSERT(mnemonics_size == 1);
 		index = 0;
 		break;
 	// b, c, nae
 	case 2:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_B_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_B_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_b());
 		break;
 	// ae, nb, nc
 	case 3:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_AE_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_AE_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_ae());
 		break;
 	// e, z
 	case 4:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_E_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_E_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_e());
 		break;
 	// ne, nz
 	case 5:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_NE_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_NE_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_ne());
 		break;
 	// be, na
 	case 6:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_BE_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_BE_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_be());
 		break;
 	// a, nbe
 	case 7:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_A_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_A_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_a());
 		break;
 	// s
 	case 8:
-		ICED_DEBUG_ASSERT(mnemonics.size() == 1);
+		ICED_DEBUG_ASSERT(mnemonics_size == 1);
 		index = 0;
 		break;
 	// ns
 	case 9:
-		ICED_DEBUG_ASSERT(mnemonics.size() == 1);
+		ICED_DEBUG_ASSERT(mnemonics_size == 1);
 		index = 0;
 		break;
 	// p, pe
 	case 10:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_P_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_P_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_p());
 		break;
 	// np, po
 	case 11:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_NP_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_NP_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_np());
 		break;
 	// l, nge
 	case 12:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_L_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_L_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_l());
 		break;
 	// ge, nl
 	case 13:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_GE_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_GE_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_ge());
 		break;
 	// le, ng
 	case 14:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_LE_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_LE_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_le());
 		break;
 	// g, nle
 	case 15:
-		ICED_DEBUG_ASSERT(mnemonics.size() == IcedConstants::CC_G_ENUM_COUNT);
+		ICED_DEBUG_ASSERT(mnemonics_size == IcedConstants::CC_G_ENUM_COUNT);
 		index = static_cast<std::size_t>(options.cc_g());
 		break;
 	default:
 		ICED_UNREACHABLE();
 	}
-	ICED_ASSERT(index < mnemonics.size());
+	ICED_ASSERT(index < mnemonics_size);
 	return mnemonics[index];
 }
 

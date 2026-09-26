@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <vector>
@@ -63,6 +65,20 @@ inline std::optional<SymbolResult> to_owned(const std::optional<SymbolResult>& s
 
 /// Gets the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction. `cc_index` is the condition code (0-15) and `mnemonics`
 /// contains all mnemonic variants (eg. `jb`, `jc`, `jnae`), see the `CC_*` options.
-const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const std::vector<FormatterString>& mnemonics) noexcept;
+const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const FormatterString* mnemonics,
+									   std::size_t mnemonics_size) noexcept;
+
+/// Same as above
+inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
+											  const std::vector<FormatterString>& mnemonics) noexcept {
+	return get_mnemonic_cc(options, cc_index, mnemonics.data(), mnemonics.size());
+}
+
+/// Same as above (eg. `FormatterConstants::repe`)
+template <std::size_t N>
+inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
+											  const std::array<FormatterString, N>& mnemonics) noexcept {
+	return get_mnemonic_cc(options, cc_index, mnemonics.data(), N);
+}
 
 } // namespace iced_x86::internal
