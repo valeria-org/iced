@@ -9,6 +9,8 @@
 
 #include "iced_x86/decoder.hpp"
 #include "iced_x86/fast_formatter.hpp"
+#include "iced_x86/masm_formatter.hpp"
+#include "iced_x86/nasm_formatter.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -148,6 +150,14 @@ int main(int argc, char** argv) {
 	bench("SpecializedFormatter:", code, text_address, loops, [&specialized_formatter](const Instruction& instruction, std::string& output) {
 		specialized_formatter.format(instruction, output);
 	});
+
+	MasmFormatter masm_formatter;
+	bench("MasmFormatter:", code, text_address, loops,
+		  [&masm_formatter](const Instruction& instruction, std::string& output) { masm_formatter.format(instruction, output); });
+
+	NasmFormatter nasm_formatter;
+	bench("NasmFormatter:", code, text_address, loops,
+		  [&nasm_formatter](const Instruction& instruction, std::string& output) { nasm_formatter.format(instruction, output); });
 
 	return 0;
 }
