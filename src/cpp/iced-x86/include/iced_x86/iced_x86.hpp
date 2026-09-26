@@ -56,6 +56,7 @@
 #include "iced_x86/formatter_text_kind.hpp"
 #include "iced_x86/masm_formatter.hpp"
 #include "iced_x86/memory_size_options.hpp"
+#include "iced_x86/nasm_formatter.hpp"
 #include "iced_x86/number_base.hpp"
 #include "iced_x86/number_kind.hpp"
 #include "iced_x86/prefix_kind.hpp"
