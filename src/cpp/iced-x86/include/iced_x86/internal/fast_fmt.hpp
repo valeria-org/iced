@@ -16,8 +16,14 @@
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/mvex_reg_mem_conv.hpp"
 
-#if defined(__GNUC__) || defined(__clang__)
+// The fast formatter force-inlines its small helpers when optimizing. When not optimizing (-O0), every inlined copy
+// gets its own stack slots (the stack frame would be several KB) so they're normal (not inlined) functions then.
+#if (defined(__GNUC__) || defined(__clang__)) && defined(__OPTIMIZE__)
 #define ICED_X86_INTERNAL_FORCE_INLINE inline __attribute__((always_inline))
+#define ICED_X86_INTERNAL_NOINLINE __attribute__((noinline))
+#define ICED_X86_INTERNAL_COLD __attribute__((cold, noinline))
+#elif defined(__GNUC__) || defined(__clang__)
+#define ICED_X86_INTERNAL_FORCE_INLINE inline
 #define ICED_X86_INTERNAL_NOINLINE __attribute__((noinline))
 #define ICED_X86_INTERNAL_COLD __attribute__((cold, noinline))
 #elif defined(_MSC_VER)
