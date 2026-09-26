@@ -59,6 +59,8 @@ public:
 	/// * `rip`: Base IP of all encoded instructions
 	InstructionBlock(const std::vector<Instruction>& instructions, std::uint64_t rip) noexcept
 		: instructions_(instructions.data()), count_(instructions.size()), rip_(rip) {}
+	// It doesn't own the instructions so a temporary vector isn't allowed
+	InstructionBlock(std::vector<Instruction>&& instructions, std::uint64_t rip) = delete;
 
 	/// Gets the instructions
 	constexpr const Instruction* instructions() const noexcept { return instructions_; }
