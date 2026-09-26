@@ -906,7 +906,14 @@ bool DecoderCore::read_op_mem_vsib_0_4(DecoderCore& self, Instruction& instructi
 }
 
 ConstantOffsets DecoderCore::get_constant_offsets_impl(const Instruction& instruction) const noexcept {
-	ConstantOffsets constant_offsets;
+	struct {
+		std::uint8_t displacement_offset = 0;
+		std::uint8_t displacement_size = 0;
+		std::uint8_t immediate_offset = 0;
+		std::uint8_t immediate_size = 0;
+		std::uint8_t immediate_offset2 = 0;
+		std::uint8_t immediate_size2 = 0;
+	} constant_offsets;
 
 	std::uint32_t displ_size = instruction.memory_displ_size();
 	if (displ_size != 0) {
@@ -1018,7 +1025,8 @@ ConstantOffsets DecoderCore::get_constant_offsets_impl(const Instruction& instru
 	break_loop:;
 	}
 
-	return constant_offsets;
+	return ConstantOffsets(constant_offsets.displacement_offset, constant_offsets.displacement_size, constant_offsets.immediate_offset,
+						   constant_offsets.immediate_size, constant_offsets.immediate_offset2, constant_offsets.immediate_size2);
 }
 
 } // namespace internal

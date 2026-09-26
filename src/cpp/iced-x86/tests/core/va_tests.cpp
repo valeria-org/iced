@@ -2,8 +2,6 @@
 // Copyright (C) 2018-present iced project and contributors
 
 // Port of src/rust/iced-x86/src/test/va.rs
-// PENDING: needs the Decoder. Rename to tests/core/va_tests.cpp once the decoder exists (and adapt the
-// Decoder construction if its API differs from `Decoder::with_ip(bitness, data, size, ip, options)`).
 
 #include "test_framework.hpp"
 #include "test_utils.hpp"

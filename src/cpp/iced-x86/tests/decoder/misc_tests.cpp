@@ -273,10 +273,22 @@ TEST_CASE("decoder/decode_with_too_few_bytes_left") {
 	}
 }
 
+// Rust creates the instructions with `Instruction::with2()` (encoder feature). They're decoded here instead so the test
+// doesn't depend on the encoder: `mov rax,rcx` and `mov rax,rdx` (Code::Mov_r64_rm64)
 TEST_CASE("decoder/instruction_operator_eq_neq") {
-	auto instr1a = Instruction::with2(Code::Mov_r64_rm64, Register::RAX, Register::RCX).value();
+	static const std::uint8_t BYTES[] = {0x48, 0x8B, 0xC1, 0x48, 0x8B, 0xC2};
+	Decoder decoder(64, BYTES, sizeof(BYTES), DecoderOptions::NONE);
+	auto instr1a = decoder.decode();
 	auto instr1b = instr1a;
-	auto instr2 = Instruction::with2(Code::Mov_r64_rm64, Register::RAX, Register::RDX).value();
+	REQUIRE_EQ(decoder.position(), 3U);
+	REQUIRE(decoder.set_position(0).is_ok());
+	decoder.set_ip(0);
+	CHECK(decoder.decode() == instr1a);
+	auto instr2 = decoder.decode();
+	CHECK_EQ(instr1a.code(), Code::Mov_r64_rm64);
+	CHECK_EQ(instr2.code(), Code::Mov_r64_rm64);
+	CHECK_EQ(instr1a.op1_register(), Register::RCX);
+	CHECK_EQ(instr2.op1_register(), Register::RDX);
 	CHECK_EQ(instr1a == instr1b, true);
 	CHECK_EQ(instr1a == instr2, false);
 	CHECK_EQ(instr1a != instr2, true);

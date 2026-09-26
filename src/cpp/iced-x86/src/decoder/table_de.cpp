@@ -90,6 +90,7 @@ HandlerVec TableDeserializer::read_handlers(std::size_t count) noexcept {
 	}
 	ICED_ASSERT(handlers.size() == count);
 	ICED_DEBUG_ASSERT(count == i);
+	(void)i;
 	return handlers;
 }
 

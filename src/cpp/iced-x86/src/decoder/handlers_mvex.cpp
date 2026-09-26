@@ -5,7 +5,6 @@
 #include "iced_x86/mvex_reg_mem_conv.hpp"
 #include "iced_x86/mvex_tuple_type_lut_kind.hpp"
 #include "iced_x86/rounding_control.hpp"
-#include "internal/mvex/mvex_tt_lut.hpp"
 
 namespace iced_x86::internal {
 

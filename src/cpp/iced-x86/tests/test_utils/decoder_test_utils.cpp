@@ -786,14 +786,13 @@ ConstantOffsets parse_constant_offsets(std::string_view value) {
 	auto parts = split(value, ';');
 	if (parts.size() != 6)
 		throw_error("Invalid ConstantOffsets: '" + std::string(value) + "'");
-	ConstantOffsets constant_offsets;
-	constant_offsets.immediate_offset = to_u8(parts[0]);
-	constant_offsets.immediate_size = to_u8(parts[1]);
-	constant_offsets.immediate_offset2 = to_u8(parts[2]);
-	constant_offsets.immediate_size2 = to_u8(parts[3]);
-	constant_offsets.displacement_offset = to_u8(parts[4]);
-	constant_offsets.displacement_size = to_u8(parts[5]);
-	return constant_offsets;
+	auto immediate_offset = to_u8(parts[0]);
+	auto immediate_size = to_u8(parts[1]);
+	auto immediate_offset2 = to_u8(parts[2]);
+	auto immediate_size2 = to_u8(parts[3]);
+	auto displacement_offset = to_u8(parts[4]);
+	auto displacement_size = to_u8(parts[5]);
+	return ConstantOffsets(displacement_offset, displacement_size, immediate_offset, immediate_size, immediate_offset2, immediate_size2);
 }
 
 const std::vector<DecoderTestCase>& get_test_cases(std::uint32_t bitness) {

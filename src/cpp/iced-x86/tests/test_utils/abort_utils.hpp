@@ -8,6 +8,7 @@
 #if defined(__unix__) || defined(__APPLE__)
 #define ICED_X86_TESTS_CAN_CHECK_ABORT 1
 #include <cstdlib>
+#include <csignal>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -22,17 +23,20 @@ namespace iced_x86::tests {
 template <typename F>
 bool aborts(F&& fn) {
 #if ICED_X86_TESTS_CAN_CHECK_ABORT
+	constexpr int ABORT_EXIT_CODE = 0x5A;
 	pid_t pid = fork();
 	if (pid < 0)
 		return false;
 	if (pid == 0) {
+		// Exit with a special exit code instead of creating a (slow) core dump
+		std::signal(SIGABRT, [](int) { _exit(ABORT_EXIT_CODE); });
 		fn();
 		_exit(0);
 	}
 	int status = 0;
 	if (waitpid(pid, &status, 0) != pid)
 		return false;
-	return WIFSIGNALED(status);
+	return (WIFEXITED(status) && WEXITSTATUS(status) == ABORT_EXIT_CODE) || WIFSIGNALED(status);
 #else
 	(void)fn;
 	return true;

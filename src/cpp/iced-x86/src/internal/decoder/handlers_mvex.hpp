@@ -6,7 +6,7 @@
 #pragma once
 
 #include "internal/decoder/handlers.hpp"
-#include "internal/mvex/mvex_info.hpp"
+#include "internal/mvex/mvex.hpp"
 
 namespace iced_x86::internal {
 
