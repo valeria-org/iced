@@ -323,6 +323,10 @@ ConstantOffsets Encoder::get_constant_offsets() const noexcept {
 
 namespace internal {
 
+void EncoderInternal::write_byte_grow(Encoder& e, std::uint32_t value) {
+	e.buffer_.push_back(static_cast<std::uint8_t>(value));
+}
+
 void EncoderInternal::verify_op_kind_failed(Encoder& e, std::uint32_t operand, OpKind expected, OpKind actual) {
 #ifndef NDEBUG
 	set_error_message(e, op_str(operand) + "Expected: " + op_kind_str(expected) + ", actual: " + op_kind_str(actual));

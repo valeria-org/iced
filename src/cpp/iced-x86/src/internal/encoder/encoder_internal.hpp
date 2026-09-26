@@ -38,7 +38,11 @@ struct EncoderInternal {
 	// Methods
 
 	static void write_byte_internal(Encoder& e, std::uint32_t value) {
-		e.buffer_.push_back(static_cast<std::uint8_t>(value));
+		// Keep the common case (no reallocation) inline, like Rust's `Vec::push()`
+		if (ICED_LIKELY(e.buffer_.size() != e.buffer_.capacity()))
+			e.buffer_.push_back(static_cast<std::uint8_t>(value));
+		else
+			write_byte_grow(e, value);
 		e.current_rip_++;
 	}
 
@@ -110,6 +114,7 @@ struct EncoderInternal {
 	static void write_immediate(Encoder& e);
 
 private:
+	ICED_NOINLINE static void write_byte_grow(Encoder& e, std::uint32_t value);
 	ICED_NOINLINE static void verify_op_kind_failed(Encoder& e, std::uint32_t operand, OpKind expected, OpKind actual);
 	ICED_NOINLINE static void verify_register_failed(Encoder& e, std::uint32_t operand, Register expected, Register actual);
 	ICED_NOINLINE static void verify_register_range_failed(Encoder& e, std::uint32_t operand, Register register_, Register reg_lo, Register reg_hi);
