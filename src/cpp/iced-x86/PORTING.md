@@ -88,6 +88,7 @@ generators create a `CppEnumsGenerator` and call `Generate(enumType)`). `GetIncl
 | `Result<T, IcedError>` | `iced_x86::Result<T>` |
 | `Option<T>` | `std::optional<T>` (or a pointer for optional references) |
 | `&[u8]` | `const std::uint8_t* data, std::size_t size` (+ convenience overloads, eg. `std::vector<std::uint8_t>`) |
+| returned `&'static [T]` (eg. `cpuid_features()`) | `iced_x86::Slice<T>` (`include/iced_x86/slice.hpp`) |
 | `&str` / `String` | `std::string_view` / `std::string` |
 | trait objects (`Box<dyn SymbolResolver>`, `dyn FormatterOutput`) | abstract classes with virtual functions |
 | `impl Iterator` | C++ iterators (`begin()`/`end()`) where it makes sense |
@@ -95,6 +96,12 @@ generators create a `CppEnumsGenerator` and call `Generate(enumType)`). `GetIncl
 
 Where Rust uses generic `with2<T, U>(code, op0: T, op1: U)` taking `Register`/`i32`/`u32`/`i64`/`u64`/`MemoryOperand`,
 C++ uses overloads with the same name.
+
+## Public headers
+
+Public headers (`include/**`) can't include internal headers (`src/internal/**`, not installed). Use `assert()`
+(`<cassert>`) for debug asserts in inline public code and `std::abort()` instead of `ICED_ASSERT()`.
+Internal tables used by inline public functions are declared `extern` in the public header in `namespace iced_x86::internal`.
 
 ## Instruction
 
