@@ -15,7 +15,7 @@
 namespace iced_x86 {
 
 namespace internal {
-struct OpCodeHandler;
+struct EncOpCodeHandler;
 struct EncoderInternal;
 enum class DisplSize : std::uint8_t;
 enum class ImmSize : std::uint8_t;
@@ -227,7 +227,7 @@ private:
 
 	std::uint64_t current_rip_;
 	std::vector<std::uint8_t> buffer_;
-	const internal::OpCodeHandler* handler_;
+	const internal::EncOpCodeHandler* handler_;
 	std::string error_message_;
 	std::uint32_t bitness_;
 	std::uint32_t eip_;

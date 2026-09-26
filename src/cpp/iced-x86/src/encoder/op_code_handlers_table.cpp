@@ -307,12 +307,12 @@ const Op* const OPS_TABLE[175] = {
 
 namespace {
 using K = OpCodeHandlerKind;
-using H = OpCodeHandler;
+using H = EncOpCodeHandler;
 } // namespace
 
 // enc_flags3, op_code, kind, operands_len, operands, group_index, rm_group_index, op_size, addr_size, is_2byte_opcode, is_special_instr, u
 // clang-format off
-ICED_CONSTINIT const OpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT] = {
+ICED_CONSTINIT const EncOpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT] = {
 	{0x00000000, 0x0000, K::Invalid, 0, {0, 0, 0, 0, 0}, -1, -1, CodeSize::Unknown, CodeSize::Unknown, false, false, {}},// INVALID
 	{0x00000000, 0x0000, K::DeclareData, 0, {0, 0, 0, 0, 0}, -1, -1, CodeSize::Unknown, CodeSize::Unknown, false, true, H::DeclareDataData{1}},// DeclareByte
 	{0x00000000, 0x0000, K::DeclareData, 0, {0, 0, 0, 0, 0}, -1, -1, CodeSize::Unknown, CodeSize::Unknown, false, true, H::DeclareDataData{2}},// DeclareWord

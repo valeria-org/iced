@@ -68,13 +68,13 @@ inline std::optional<SymbolResult> to_owned(const std::optional<SymbolResult>& s
 const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const FormatterString* mnemonics,
 									   std::size_t mnemonics_size) noexcept;
 
-/// Gets the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction, see the overload above
+/// Same as above
 inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
 											  const std::vector<FormatterString>& mnemonics) noexcept {
 	return get_mnemonic_cc(options, cc_index, mnemonics.data(), mnemonics.size());
 }
 
-/// Gets the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction, see the overload above
+/// Same as above (eg. `FormatterConstants::repe`)
 template <std::size_t N>
 inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
 											  const std::array<FormatterString, N>& mnemonics) noexcept {
