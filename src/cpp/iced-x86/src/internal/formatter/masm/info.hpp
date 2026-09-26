@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 
@@ -63,9 +64,12 @@ struct InstrOpInfo {
 			ICED_DEBUG_ASSERT(is_declare_data());
 			instruction_operand = -1;
 		}
+		// A table is used because GCC creates the `std::optional` on the stack with two stores (value + has_value), and the
+		// following 8-byte load (it's passed in a register) can't be forwarded from the stores (a ~15 cycle stall)
 		if (instruction_operand < 0)
-			return std::nullopt;
-		return static_cast<std::uint32_t>(instruction_operand);
+			return INSTRUCTION_INDEXES[NO_INSTRUCTION_INDEX];
+		ICED_DEBUG_ASSERT(static_cast<std::uint32_t>(instruction_operand) < IcedConstants::MAX_OP_COUNT);
+		return INSTRUCTION_INDEXES[static_cast<std::uint32_t>(instruction_operand)];
 	}
 
 	std::optional<OpAccess> op_access(std::uint32_t operand) const noexcept {
@@ -178,6 +182,10 @@ struct InstrOpInfo {
 	}
 
 private:
+	static constexpr std::size_t NO_INSTRUCTION_INDEX = IcedConstants::MAX_OP_COUNT;
+	static constexpr std::optional<std::uint32_t> INSTRUCTION_INDEXES[IcedConstants::MAX_OP_COUNT + 1] = {0U, 1U, 2U, 3U, 4U, std::nullopt};
+	static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
+
 	bool is_declare_data() const noexcept {
 		return op_kinds[0] == InstrOpKind::DeclareByte || op_kinds[0] == InstrOpKind::DeclareWord || op_kinds[0] == InstrOpKind::DeclareDword ||
 			   op_kinds[0] == InstrOpKind::DeclareQword;
