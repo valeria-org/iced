@@ -24,9 +24,7 @@ namespace Generator.Encoder.Cpp {
 		public CppInstrCreateGenerator(GeneratorContext generatorContext) => this.generatorContext = generatorContext;
 
 		public void Generate() {
-			// TEMP until the core's instruction.hpp is merged
-			if (System.IO.File.Exists(CppConstants.GetIncludeFilename(generatorContext.Types, "instruction.hpp")))
-				new CppInstrCreateGen(generatorContext, declarations: true).Generate();
+			new CppInstrCreateGen(generatorContext, declarations: true).Generate();
 			new CppInstrCreateGen(generatorContext, declarations: false).Generate();
 		}
 	}

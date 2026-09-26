@@ -7,6 +7,7 @@
 #include "internal/encoder/displ_size.hpp"
 #include "internal/encoder/imm_size.hpp"
 #include "internal/encoder/op_code_handler.hpp"
+#include "internal/iced_assert.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -109,9 +110,9 @@ struct EncoderInternal {
 	static void write_immediate(Encoder& e);
 
 private:
-	static void verify_op_kind_failed(Encoder& e, std::uint32_t operand, OpKind expected, OpKind actual);
-	static void verify_register_failed(Encoder& e, std::uint32_t operand, Register expected, Register actual);
-	static void verify_register_range_failed(Encoder& e, std::uint32_t operand, Register register_, Register reg_lo, Register reg_hi);
+	ICED_NOINLINE static void verify_op_kind_failed(Encoder& e, std::uint32_t operand, OpKind expected, OpKind actual);
+	ICED_NOINLINE static void verify_register_failed(Encoder& e, std::uint32_t operand, Register expected, Register actual);
+	ICED_NOINLINE static void verify_register_range_failed(Encoder& e, std::uint32_t operand, Register register_, Register reg_lo, Register reg_hi);
 };
 
 } // namespace iced_x86::internal

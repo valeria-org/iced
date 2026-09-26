@@ -40,12 +40,58 @@ std::string to_hex(std::uint64_t value, int min_digits) {
 	return result;
 }
 
-std::string op_str(std::uint32_t operand) { return "Operand " + std::to_string(operand) + ": "; }
-
 #ifndef NDEBUG
 std::string op_kind_str(OpKind value) { return to_string(value); }
 std::string register_str(Register value) { return to_string(value); }
 #endif
+
+// Not inlined to keep the stack frames of the callers small (it's only called if there's an error)
+ICED_NOINLINE void set_distance_error(Encoder& e, const char* prefix, std::uint64_t next_ip, int next_ip_digits, std::uint64_t target, int target_digits,
+	std::int64_t diff, const char* diff_type) {
+	EncoderInternal::set_error_message(e, std::string(prefix) + " is too far away: next_ip: 0x" + to_hex(next_ip, next_ip_digits) + " target: 0x" +
+		to_hex(target, target_digits) + ", diff = " + std::to_string(diff) + ", diff must fit in an " + diff_type);
+}
+
+std::string op_str(std::uint32_t operand) { return "Operand " + std::to_string(operand) + ": "; }
+
+// The following functions aren't inlined to keep the stack frames of the callers small (they're only called if there's an error)
+
+ICED_NOINLINE void set_op_error(Encoder& e, std::uint32_t operand, const char* message) {
+	EncoderInternal::set_error_message(e, op_str(operand) + message);
+}
+
+ICED_NOINLINE void set_op_error_num(Encoder& e, std::uint32_t operand, const char* message1, std::uint64_t value, const char* message2) {
+	EncoderInternal::set_error_message(e, op_str(operand) + message1 + std::to_string(value) + message2);
+}
+
+ICED_NOINLINE void set_op_error_hex(Encoder& e, std::uint32_t operand, const char* message1, std::uint64_t value) {
+	EncoderInternal::set_error_message(e, op_str(operand) + message1 + to_hex(value, 1));
+}
+
+ICED_NOINLINE void set_op_error_op_kind(Encoder& e, std::uint32_t operand, const char* message, OpKind op_kind, bool release_value_prefix) {
+#ifndef NDEBUG
+	(void)release_value_prefix;
+	EncoderInternal::set_error_message(e, op_str(operand) + message + op_kind_str(op_kind));
+#else
+	EncoderInternal::set_error_message(
+		e, op_str(operand) + message + (release_value_prefix ? "OpKind value " : "") + std::to_string(static_cast<std::uint32_t>(op_kind)));
+#endif
+}
+
+ICED_NOINLINE void set_invalid_reg_size_error(Encoder& e, std::uint32_t reg_size, const char* message) {
+	EncoderInternal::set_error_message(e, "Invalid register size: " + std::to_string(reg_size * 8) + message);
+}
+
+ICED_NOINLINE void set_invalid_16bit_regs_error(Encoder& e, std::uint32_t operand, Register base, Register index) {
+#ifndef NDEBUG
+	EncoderInternal::set_error_message(
+		e, op_str(operand) + "Invalid 16-bit base + index registers: base=" + register_str(base) + ", index=" + register_str(index));
+#else
+	EncoderInternal::set_error_message(e, op_str(operand) + "Invalid 16-bit base + index registers: base=" +
+		std::to_string(static_cast<std::uint32_t>(base)) + ", index=" + std::to_string(static_cast<std::uint32_t>(index)));
+#endif
+}
+
 } // namespace
 
 Encoder::Encoder(PrivateTag, std::uint32_t bitness, std::size_t capacity)
@@ -168,8 +214,9 @@ Result<std::size_t> Encoder::encode(const Instruction& instruction, std::uint64_
 		handler->encode(handler, *this, instruction);
 
 	const std::size_t instr_len = static_cast<std::size_t>(current_rip_) - static_cast<std::size_t>(rip);
+	static_assert(IcedConstants::MAX_INSTRUCTION_LENGTH == 15, "");
 	if (instr_len > IcedConstants::MAX_INSTRUCTION_LENGTH && !handler->is_special_instr)
-		EncoderInternal::set_error_message(*this, "Instruction length > " + std::to_string(IcedConstants::MAX_INSTRUCTION_LENGTH) + " bytes");
+		EncoderInternal::set_error_message_str(*this, "Instruction length > 15 bytes");
 	if (!error_message_.empty()) {
 		IcedError error(std::move(error_message_));
 		error_message_.clear();
@@ -469,13 +516,13 @@ void EncoderInternal::set_addr_size(Encoder& e, std::uint32_t reg_size) {
 	ICED_DEBUG_ASSERT(reg_size == 2 || reg_size == 4 || reg_size == 8);
 	if (e.bitness_ == 64) {
 		if (reg_size == 2)
-			set_error_message(e, "Invalid register size: " + std::to_string(reg_size * 8) + ", must be 32-bit or 64-bit");
+			set_invalid_reg_size_error(e, reg_size, ", must be 32-bit or 64-bit");
 		else if (reg_size == 4)
 			e.encoder_flags_ |= EncoderFlags::P67;
 	}
 	else {
 		if (reg_size == 8)
-			set_error_message(e, "Invalid register size: " + std::to_string(reg_size * 8) + ", must be 16-bit or 32-bit");
+			set_invalid_reg_size_error(e, reg_size, ", must be 16-bit or 32-bit");
 		else if (e.bitness_ == 16) {
 			if (reg_size == 4)
 				e.encoder_flags_ |= EncoderFlags::P67;
@@ -493,24 +540,24 @@ void EncoderInternal::add_abs_mem(Encoder& e, const Instruction& instruction, st
 	const OpKind op_kind = instruction.op_kind(operand);
 	if (op_kind == OpKind::Memory) {
 		if (instruction.memory_base() != Register::None || instruction.memory_index() != Register::None) {
-			set_error_message(e, op_str(operand) + "Absolute addresses can't have base and/or index regs");
+			set_op_error(e, operand, "Absolute addresses can't have base and/or index regs");
 			return;
 		}
 		if (instruction.memory_index_scale() != 1) {
-			set_error_message(e, op_str(operand) + "Absolute addresses must have scale == *1");
+			set_op_error(e, operand, "Absolute addresses must have scale == *1");
 			return;
 		}
 		switch (instruction.memory_displ_size()) {
 		case 2:
 			if (e.bitness_ == 64) {
-				set_error_message(e, op_str(operand) + "16-bit abs addresses can't be used in 64-bit mode");
+				set_op_error(e, operand, "16-bit abs addresses can't be used in 64-bit mode");
 				return;
 			}
 			if (e.bitness_ == 32)
 				e.encoder_flags_ |= EncoderFlags::P67;
 			e.displ_size_ = DisplSize::Size2;
 			if (instruction.memory_displacement64() > std::numeric_limits<std::uint16_t>::max()) {
-				set_error_message(e, op_str(operand) + "Displacement must fit in a u16");
+				set_op_error(e, operand, "Displacement must fit in a u16");
 				return;
 			}
 			e.displ_ = instruction.memory_displacement32();
@@ -520,7 +567,7 @@ void EncoderInternal::add_abs_mem(Encoder& e, const Instruction& instruction, st
 			e.encoder_flags_ |= e.adrsize32_flags_;
 			e.displ_size_ = DisplSize::Size4;
 			if (instruction.memory_displacement64() > std::numeric_limits<std::uint32_t>::max()) {
-				set_error_message(e, op_str(operand) + "Displacement must fit in a u32");
+				set_op_error(e, operand, "Displacement must fit in a u32");
 				return;
 			}
 			e.displ_ = instruction.memory_displacement32();
@@ -528,7 +575,7 @@ void EncoderInternal::add_abs_mem(Encoder& e, const Instruction& instruction, st
 
 		case 8: {
 			if (e.bitness_ != 64) {
-				set_error_message(e, op_str(operand) + "64-bit abs address is only available in 64-bit mode");
+				set_op_error(e, operand, "64-bit abs address is only available in 64-bit mode");
 				return;
 			}
 			e.displ_size_ = DisplSize::Size8;
@@ -539,17 +586,12 @@ void EncoderInternal::add_abs_mem(Encoder& e, const Instruction& instruction, st
 		}
 
 		default:
-			set_error_message(e,
-				op_str(operand) + "Instruction::memory_displ_size() must be initialized to 2 (16-bit), 4 (32-bit) or 8 (64-bit)");
+			set_op_error(e, operand, "Instruction::memory_displ_size() must be initialized to 2 (16-bit), 4 (32-bit) or 8 (64-bit)");
 			break;
 		}
 	}
 	else {
-#ifndef NDEBUG
-		set_error_message(e, op_str(operand) + "Expected OpKind::Memory, actual: " + op_kind_str(op_kind));
-#else
-		set_error_message(e, op_str(operand) + "Expected OpKind::Memory, actual: OpKind value " + std::to_string(static_cast<std::uint32_t>(op_kind)));
-#endif
+		set_op_error_op_kind(e, operand, "Expected OpKind::Memory, actual: ", op_kind, true);
 	}
 }
 
@@ -604,7 +646,7 @@ void EncoderInternal::add_reg_or_mem_full(Encoder& e, const Instruction& instruc
 	e.encoder_flags_ |= EncoderFlags::MOD_RM;
 	if (op_kind == OpKind::Register) {
 		if (!allow_reg_op) {
-			set_error_message(e, op_str(operand) + "register operand is not allowed");
+			set_op_error(e, operand, "register operand is not allowed");
 			return;
 		}
 		const Register reg = instruction.op_register(operand);
@@ -630,7 +672,7 @@ void EncoderInternal::add_reg_or_mem_full(Encoder& e, const Instruction& instruc
 	}
 	else if (op_kind == OpKind::Memory) {
 		if (!allow_mem_op) {
-			set_error_message(e, op_str(operand) + "memory operand is not allowed");
+			set_op_error(e, operand, "memory operand is not allowed");
 			return;
 		}
 		if (memory_size_ext::is_broadcast(instruction.memory_size()))
@@ -655,13 +697,13 @@ void EncoderInternal::add_reg_or_mem_full(Encoder& e, const Instruction& instruc
 		if ((e.encoder_flags_ & EncoderFlags::REG_IS_MEMORY) != 0) {
 			const std::uint32_t reg_size = get_register_op_size(instruction);
 			if (reg_size != addr_size) {
-				set_error_message(e, op_str(operand) + "Register operand size must equal memory addressing mode (16/32/64)");
+				set_op_error(e, operand, "Register operand size must equal memory addressing mode (16/32/64)");
 				return;
 			}
 		}
 		if (addr_size == 16) {
 			if (vsib_index_reg_lo != Register::None) {
-				set_error_message(e, op_str(operand) + "VSIB operands can't use 16-bit addressing. It must be 32-bit or 64-bit addressing");
+				set_op_error(e, operand, "VSIB operands can't use 16-bit addressing. It must be 32-bit or 64-bit addressing");
 				return;
 			}
 			add_mem_op16(e, instruction, operand);
@@ -670,12 +712,7 @@ void EncoderInternal::add_reg_or_mem_full(Encoder& e, const Instruction& instruc
 			add_mem_op(e, instruction, operand, addr_size, vsib_index_reg_lo, vsib_index_reg_hi);
 	}
 	else {
-#ifndef NDEBUG
-		set_error_message(e, op_str(operand) + "Expected a register or memory operand, but op_kind is " + op_kind_str(op_kind));
-#else
-		set_error_message(
-			e, op_str(operand) + "Expected a register or memory operand, but op_kind is " + std::to_string(static_cast<std::uint32_t>(op_kind)));
-#endif
+		set_op_error_op_kind(e, operand, "Expected a register or memory operand, but op_kind is ", op_kind, false);
 	}
 }
 
@@ -705,7 +742,7 @@ std::optional<std::int8_t> EncoderInternal::try_convert_to_disp8n(Encoder& e, co
 
 void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, std::uint32_t operand) {
 	if (e.bitness_ == 64) {
-		set_error_message(e, op_str(operand) + "16-bit addressing can't be used by 64-bit code");
+		set_op_error(e, operand, "16-bit addressing can't be used by 64-bit code");
 		return;
 	}
 	const Register base = instruction.memory_base();
@@ -732,25 +769,20 @@ void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, s
 		e.mod_rm_ |= 6;
 		e.displ_size_ = DisplSize::Size2;
 		if (instruction.memory_displacement64() > std::numeric_limits<std::uint16_t>::max()) {
-			set_error_message(e, op_str(operand) + "Displacement must fit in a u16");
+			set_op_error(e, operand, "Displacement must fit in a u16");
 			return;
 		}
 		e.displ_ = instruction.memory_displacement32();
 	}
 	else {
-#ifndef NDEBUG
-		set_error_message(e, op_str(operand) + "Invalid 16-bit base + index registers: base=" + register_str(base) + ", index=" + register_str(index));
-#else
-		set_error_message(e, op_str(operand) + "Invalid 16-bit base + index registers: base=" + std::to_string(static_cast<std::uint32_t>(base)) +
-			", index=" + std::to_string(static_cast<std::uint32_t>(index)));
-#endif
+		set_invalid_16bit_regs_error(e, operand, base, index);
 		return;
 	}
 
 	if (base != Register::None || index != Register::None) {
 		const std::int64_t displ64 = static_cast<std::int64_t>(instruction.memory_displacement64());
 		if (displ64 < std::numeric_limits<std::int16_t>::min() || displ64 > std::numeric_limits<std::uint16_t>::max()) {
-			set_error_message(e, op_str(operand) + "Displacement must fit in an i16 or a u16");
+			set_op_error(e, operand, "Displacement must fit in an i16 or a u16");
 			return;
 		}
 		e.displ_ = instruction.memory_displacement32();
@@ -758,7 +790,7 @@ void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, s
 		if (displ_size == 0 && base == Register::BP && index == Register::None) {
 			displ_size = 1;
 			if (e.displ_ != 0) {
-				set_error_message(e, op_str(operand) + "Displacement must be 0 if displ_size == 0");
+				set_op_error(e, operand, "Displacement must be 0 if displ_size == 0");
 				return;
 			}
 		}
@@ -771,7 +803,7 @@ void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, s
 		}
 		if (displ_size == 0) {
 			if (e.displ_ != 0) {
-				set_error_message(e, op_str(operand) + "Displacement must be 0 if displ_size == 0");
+				set_op_error(e, operand, "Displacement must be 0 if displ_size == 0");
 				return;
 			}
 		}
@@ -779,7 +811,7 @@ void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, s
 			// This if check should never be true when we're here
 			if (static_cast<std::int32_t>(e.displ_) < std::numeric_limits<std::int8_t>::min() ||
 				static_cast<std::int32_t>(e.displ_) > std::numeric_limits<std::int8_t>::max()) {
-				set_error_message(e, op_str(operand) + "Displacement must fit in an i8");
+				set_op_error(e, operand, "Displacement must fit in an i8");
 				return;
 			}
 			e.mod_rm_ |= 0x40;
@@ -790,7 +822,7 @@ void EncoderInternal::add_mem_op16(Encoder& e, const Instruction& instruction, s
 			e.displ_size_ = DisplSize::Size2;
 		}
 		else
-			set_error_message(e, op_str(operand) + "Invalid displacement size: " + std::to_string(displ_size) + ", must be 0, 1, or 2");
+			set_op_error_num(e, operand, "Invalid displacement size: ", displ_size, ", must be 0, 1, or 2");
 	}
 }
 
@@ -798,7 +830,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 	Register vsib_index_reg_hi) {
 	ICED_DEBUG_ASSERT(addr_size == 32 || addr_size == 64);
 	if (e.bitness_ != 64 && addr_size == 64) {
-		set_error_message(e, op_str(operand) + "64-bit addressing can only be used in 64-bit mode");
+		set_op_error(e, operand, "64-bit addressing can only be used in 64-bit mode");
 		return;
 	}
 
@@ -833,24 +865,24 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 		return;
 
 	if (displ_size != 0 && displ_size != 1 && displ_size != 4 && displ_size != 8) {
-		set_error_message(e, op_str(operand) + "Invalid displ size: " + std::to_string(displ_size) + ", must be 0, 1, 4, 8");
+		set_op_error_num(e, operand, "Invalid displ size: ", displ_size, ", must be 0, 1, 4, 8");
 		return;
 	}
 	if (base == Register::RIP || base == Register::EIP) {
 		if (index != Register::None) {
-			set_error_message(e, op_str(operand) + "RIP relative addressing can't use an index register");
+			set_op_error(e, operand, "RIP relative addressing can't use an index register");
 			return;
 		}
 		if (InstructionInternal::internal_get_memory_index_scale(instruction) != 0) {
-			set_error_message(e, op_str(operand) + "RIP relative addressing must use scale *1");
+			set_op_error(e, operand, "RIP relative addressing must use scale *1");
 			return;
 		}
 		if (e.bitness_ != 64) {
-			set_error_message(e, op_str(operand) + "RIP/EIP relative addressing is only available in 64-bit mode");
+			set_op_error(e, operand, "RIP/EIP relative addressing is only available in 64-bit mode");
 			return;
 		}
 		if ((e.encoder_flags_ & EncoderFlags::MUST_USE_SIB) != 0) {
-			set_error_message(e, op_str(operand) + "RIP/EIP relative addressing isn't supported");
+			set_op_error(e, operand, "RIP/EIP relative addressing isn't supported");
 			return;
 		}
 		e.mod_rm_ |= 5;
@@ -863,7 +895,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 		else {
 			e.displ_size_ = DisplSize::RipRelSize4_Target32;
 			if (target > std::numeric_limits<std::uint32_t>::max()) {
-				set_error_message(e, op_str(operand) + "Target address doesn't fit in 32 bits: 0x" + to_hex(target, 1));
+				set_op_error_hex(e, operand, "Target address doesn't fit in 32 bits: 0x", target);
 				return;
 			}
 			e.displ_ = static_cast<std::uint32_t>(target);
@@ -875,20 +907,20 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 	const std::int64_t displ64 = static_cast<std::int64_t>(instruction.memory_displacement64());
 	if (addr_size == 64) {
 		if (displ64 < std::numeric_limits<std::int32_t>::min() || displ64 > std::numeric_limits<std::int32_t>::max()) {
-			set_error_message(e, op_str(operand) + "Displacement must fit in an i32");
+			set_op_error(e, operand, "Displacement must fit in an i32");
 			return;
 		}
 	}
 	else {
 		ICED_DEBUG_ASSERT(addr_size == 32);
 		if (displ64 < std::numeric_limits<std::int32_t>::min() || displ64 > static_cast<std::int64_t>(std::numeric_limits<std::uint32_t>::max())) {
-			set_error_message(e, op_str(operand) + "Displacement must fit in an i32 or a u32");
+			set_op_error(e, operand, "Displacement must fit in an i32 or a u32");
 			return;
 		}
 	}
 	if (base == Register::None && index == Register::None) {
 		if (vsib_index_reg_lo != Register::None) {
-			set_error_message(e, op_str(operand) + "VSIB addressing can't use an offset-only address");
+			set_op_error(e, operand, "VSIB addressing can't use an offset-only address");
 			return;
 		}
 		if (e.bitness_ == 64 || scale != 0 || (e.encoder_flags_ & EncoderFlags::MUST_USE_SIB) != 0) {
@@ -910,7 +942,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 	if (displ_size == 0 && (base_num & 7) == 5) {
 		displ_size = 1;
 		if (e.displ_ != 0) {
-			set_error_message(e, op_str(operand) + "Displacement must be 0 if displ_size == 0");
+			set_op_error(e, operand, "Displacement must be 0 if displ_size == 0");
 			return;
 		}
 	}
@@ -931,7 +963,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 		// This if check should never be true when we're here
 		if (static_cast<std::int32_t>(e.displ_) < std::numeric_limits<std::int8_t>::min() ||
 			static_cast<std::int32_t>(e.displ_) > std::numeric_limits<std::int8_t>::max()) {
-			set_error_message(e, op_str(operand) + "Displacement must fit in an i8");
+			set_op_error(e, operand, "Displacement must fit in an i8");
 			return;
 		}
 		e.mod_rm_ |= 0x40;
@@ -943,7 +975,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 	}
 	else if (displ_size == 0) {
 		if (e.displ_ != 0) {
-			set_error_message(e, op_str(operand) + "Displacement must be 0 if displ_size == 0");
+			set_op_error(e, operand, "Displacement must be 0 if displ_size == 0");
 			return;
 		}
 	}
@@ -960,7 +992,7 @@ void EncoderInternal::add_mem_op(Encoder& e, const Instruction& instruction, std
 		e.sib_ = static_cast<std::uint8_t>(scale << 6);
 		e.mod_rm_ |= 4;
 		if (index == Register::RSP || index == Register::ESP) {
-			set_error_message(e, op_str(operand) + "ESP/RSP can't be used as an index register");
+			set_op_error(e, operand, "ESP/RSP can't be used as an index register");
 			return;
 		}
 		if (base_num < 0)
@@ -1073,8 +1105,7 @@ void EncoderInternal::write_mod_rm(Encoder& e) {
 		const std::uint64_t target = (static_cast<std::uint64_t>(e.displ_hi_) << 32) | e.displ_;
 		const std::int64_t diff8 = static_cast<std::int64_t>(target - rip);
 		if (diff8 < std::numeric_limits<std::int32_t>::min() || diff8 > std::numeric_limits<std::int32_t>::max()) {
-			set_error_message(e, "RIP relative distance is too far away: next_ip: 0x" + to_hex(rip, 16) + " target: 0x" + to_hex(target, 8) +
-				", diff = " + std::to_string(diff8) + ", diff must fit in an i32");
+			set_distance_error(e, "RIP relative distance", rip, 16, target, 8, diff8, "i32");
 		}
 		diff4 = static_cast<std::uint32_t>(diff8);
 		write_byte_internal(e, diff4);
@@ -1163,8 +1194,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint16_t ip = static_cast<std::uint16_t>(static_cast<std::uint32_t>(e.current_rip_) + 1);
 		const std::int16_t diff2 = static_cast<std::int16_t>(static_cast<std::uint16_t>(e.immediate_) - ip);
 		if (diff2 < std::numeric_limits<std::int8_t>::min() || diff2 > std::numeric_limits<std::int8_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(ip, 4) + " target: 0x" +
-				to_hex(static_cast<std::uint16_t>(e.immediate_), 4) + ", diff = " + std::to_string(diff2) + ", diff must fit in an i8");
+			set_distance_error(e, "Branch distance", ip, 4, static_cast<std::uint16_t>(e.immediate_), 4, diff2, "i8");
 		}
 		write_byte_internal(e, static_cast<std::uint32_t>(static_cast<std::int32_t>(diff2)));
 		break;
@@ -1174,8 +1204,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint32_t eip = static_cast<std::uint32_t>(e.current_rip_) + 1;
 		const std::int32_t diff4 = static_cast<std::int32_t>(e.immediate_ - eip);
 		if (diff4 < std::numeric_limits<std::int8_t>::min() || diff4 > std::numeric_limits<std::int8_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(eip, 8) + " target: 0x" + to_hex(e.immediate_, 8) +
-				", diff = " + std::to_string(diff4) + ", diff must fit in an i8");
+			set_distance_error(e, "Branch distance", eip, 8, e.immediate_, 8, diff4, "i8");
 		}
 		write_byte_internal(e, static_cast<std::uint32_t>(diff4));
 		break;
@@ -1186,8 +1215,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint64_t target = (static_cast<std::uint64_t>(e.immediate_hi_) << 32) | e.immediate_;
 		const std::int64_t diff8 = static_cast<std::int64_t>(target - rip);
 		if (diff8 < std::numeric_limits<std::int8_t>::min() || diff8 > std::numeric_limits<std::int8_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(rip, 16) + " target: 0x" + to_hex(target, 16) +
-				", diff = " + std::to_string(diff8) + ", diff must fit in an i8");
+			set_distance_error(e, "Branch distance", rip, 16, target, 16, diff8, "i8");
 		}
 		write_byte_internal(e, static_cast<std::uint32_t>(diff8));
 		break;
@@ -1205,8 +1233,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint32_t eip = static_cast<std::uint32_t>(e.current_rip_) + 2;
 		const std::int32_t diff4 = static_cast<std::int32_t>(e.immediate_ - eip);
 		if (diff4 < std::numeric_limits<std::int16_t>::min() || diff4 > std::numeric_limits<std::int16_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(eip, 8) + " target: 0x" + to_hex(e.immediate_, 8) +
-				", diff = " + std::to_string(diff4) + ", diff must fit in an i16");
+			set_distance_error(e, "Branch distance", eip, 8, e.immediate_, 8, diff4, "i16");
 		}
 		value = static_cast<std::uint32_t>(diff4);
 		write_byte_internal(e, value);
@@ -1219,8 +1246,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint64_t target = (static_cast<std::uint64_t>(e.immediate_hi_) << 32) | e.immediate_;
 		const std::int64_t diff8 = static_cast<std::int64_t>(target - rip);
 		if (diff8 < std::numeric_limits<std::int16_t>::min() || diff8 > std::numeric_limits<std::int16_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(rip, 16) + " target: 0x" + to_hex(target, 16) +
-				", diff = " + std::to_string(diff8) + ", diff must fit in an i16");
+			set_distance_error(e, "Branch distance", rip, 16, target, 16, diff8, "i16");
 		}
 		value = static_cast<std::uint32_t>(diff8);
 		write_byte_internal(e, value);
@@ -1243,8 +1269,7 @@ void EncoderInternal::write_immediate(Encoder& e) {
 		const std::uint64_t target = (static_cast<std::uint64_t>(e.immediate_hi_) << 32) | e.immediate_;
 		const std::int64_t diff8 = static_cast<std::int64_t>(target - rip);
 		if (diff8 < std::numeric_limits<std::int32_t>::min() || diff8 > std::numeric_limits<std::int32_t>::max()) {
-			set_error_message(e, "Branch distance is too far away: next_ip: 0x" + to_hex(rip, 16) + " target: 0x" + to_hex(target, 16) +
-				", diff = " + std::to_string(diff8) + ", diff must fit in an i32");
+			set_distance_error(e, "Branch distance", rip, 16, target, 16, diff8, "i32");
 		}
 		value = static_cast<std::uint32_t>(diff8);
 		write_byte_internal(e, value);
