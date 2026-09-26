@@ -48,11 +48,30 @@ std::string register_str(Register value) { return to_string(value); }
 // Not inlined to keep the stack frames of the callers small (it's only called if there's an error)
 ICED_NOINLINE void set_distance_error(Encoder& e, const char* prefix, std::uint64_t next_ip, int next_ip_digits, std::uint64_t target, int target_digits,
 	std::int64_t diff, const char* diff_type) {
-	EncoderInternal::set_error_message(e, std::string(prefix) + " is too far away: next_ip: 0x" + to_hex(next_ip, next_ip_digits) + " target: 0x" +
-		to_hex(target, target_digits) + ", diff = " + std::to_string(diff) + ", diff must fit in an " + diff_type);
+	std::string msg(prefix);
+	msg += " is too far away: next_ip: 0x";
+	msg += to_hex(next_ip, next_ip_digits);
+	msg += " target: 0x";
+	msg += to_hex(target, target_digits);
+	msg += ", diff = ";
+	msg += std::to_string(diff);
+	msg += ", diff must fit in an ";
+	msg += diff_type;
+	EncoderInternal::set_error_message(e, std::move(msg));
 }
 
 std::string op_str(std::uint32_t operand) { return "Operand " + std::to_string(operand) + ": "; }
+
+// Error messages are built with one append per statement so only one temporary is alive at a time,
+// which keeps the stack frames small (every temporary of a long `a + b + c + ...` expression gets its own stack slot).
+void append_reg(std::string& msg, Register value) {
+#ifndef NDEBUG
+	msg += register_str(value);
+#else
+	msg += "Register value ";
+	msg += std::to_string(static_cast<std::uint32_t>(value));
+#endif
+}
 
 // The following functions aren't inlined to keep the stack frames of the callers small (they're only called if there's an error)
 
@@ -83,13 +102,18 @@ ICED_NOINLINE void set_invalid_reg_size_error(Encoder& e, std::uint32_t reg_size
 }
 
 ICED_NOINLINE void set_invalid_16bit_regs_error(Encoder& e, std::uint32_t operand, Register base, Register index) {
+	std::string msg = op_str(operand);
+	msg += "Invalid 16-bit base + index registers: base=";
 #ifndef NDEBUG
-	EncoderInternal::set_error_message(
-		e, op_str(operand) + "Invalid 16-bit base + index registers: base=" + register_str(base) + ", index=" + register_str(index));
+	msg += register_str(base);
+	msg += ", index=";
+	msg += register_str(index);
 #else
-	EncoderInternal::set_error_message(e, op_str(operand) + "Invalid 16-bit base + index registers: base=" +
-		std::to_string(static_cast<std::uint32_t>(base)) + ", index=" + std::to_string(static_cast<std::uint32_t>(index)));
+	msg += std::to_string(static_cast<std::uint32_t>(base));
+	msg += ", index=";
+	msg += std::to_string(static_cast<std::uint32_t>(index));
 #endif
+	EncoderInternal::set_error_message(e, std::move(msg));
 }
 
 } // namespace
@@ -328,31 +352,48 @@ void EncoderInternal::write_byte_grow(Encoder& e, std::uint32_t value) {
 }
 
 void EncoderInternal::verify_op_kind_failed(Encoder& e, std::uint32_t operand, OpKind expected, OpKind actual) {
+	std::string msg = op_str(operand);
 #ifndef NDEBUG
-	set_error_message(e, op_str(operand) + "Expected: " + op_kind_str(expected) + ", actual: " + op_kind_str(actual));
+	msg += "Expected: ";
+	msg += op_kind_str(expected);
+	msg += ", actual: ";
+	msg += op_kind_str(actual);
 #else
-	set_error_message(e, op_str(operand) + "Expected: OpKind value " + std::to_string(static_cast<std::uint32_t>(expected)) +
-		", actual: OpKind value " + std::to_string(static_cast<std::uint32_t>(actual)));
+	msg += "Expected: OpKind value ";
+	msg += std::to_string(static_cast<std::uint32_t>(expected));
+	msg += ", actual: OpKind value ";
+	msg += std::to_string(static_cast<std::uint32_t>(actual));
 #endif
+	set_error_message(e, std::move(msg));
 }
 
 void EncoderInternal::verify_register_failed(Encoder& e, std::uint32_t operand, Register expected, Register actual) {
-#ifndef NDEBUG
-	set_error_message(e, op_str(operand) + "Expected: " + register_str(expected) + ", actual: " + register_str(actual));
-#else
-	set_error_message(e, op_str(operand) + "Expected: Register value " + std::to_string(static_cast<std::uint32_t>(expected)) +
-		", actual: Register value " + std::to_string(static_cast<std::uint32_t>(actual)));
-#endif
+	std::string msg = op_str(operand);
+	msg += "Expected: ";
+	append_reg(msg, expected);
+	msg += ", actual: ";
+	append_reg(msg, actual);
+	set_error_message(e, std::move(msg));
 }
 
 void EncoderInternal::verify_register_range_failed(Encoder& e, std::uint32_t operand, Register register_, Register reg_lo, Register reg_hi) {
+	std::string msg = op_str(operand);
+	msg += "Register ";
 #ifndef NDEBUG
-	set_error_message(e, op_str(operand) + "Register " + register_str(register_) + " is not between " + register_str(reg_lo) + " and " +
-		register_str(reg_hi) + " (inclusive)");
+	msg += register_str(register_);
+	msg += " is not between ";
+	msg += register_str(reg_lo);
+	msg += " and ";
+	msg += register_str(reg_hi);
 #else
-	set_error_message(e, op_str(operand) + "Register " + std::to_string(static_cast<std::uint32_t>(register_)) + " is not between " +
-		std::to_string(static_cast<std::uint32_t>(reg_lo)) + " and " + std::to_string(static_cast<std::uint32_t>(reg_hi)) + " (inclusive)");
+	msg += std::to_string(static_cast<std::uint32_t>(register_));
+	msg += " is not between ";
+	msg += std::to_string(static_cast<std::uint32_t>(reg_lo));
+	msg += " and ";
+	msg += std::to_string(static_cast<std::uint32_t>(reg_hi));
 #endif
+	msg += " (inclusive)";
+	set_error_message(e, std::move(msg));
 }
 
 void EncoderInternal::add_branch(Encoder& e, OpKind op_kind, std::uint32_t imm_size, const Instruction& instruction, std::uint32_t operand) {
