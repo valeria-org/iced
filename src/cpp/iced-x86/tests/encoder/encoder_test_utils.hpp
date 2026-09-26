@@ -12,20 +12,10 @@
 #include <string>
 #include <vector>
 
-#if __has_include("iced_x86/decoder.hpp")
-#define ICED_X86_TESTS_HAS_DECODER 1
 #include "iced_x86/decoder.hpp"
 #include "iced_x86/decoder_options.hpp"
-#include "test_utils/decoder_test_utils.hpp"
-#else
-#define ICED_X86_TESTS_HAS_DECODER 0
-#endif
-
-#if __has_include("test_utils/abort_utils.hpp")
 #include "test_utils/abort_utils.hpp"
-#else
-#define ICED_X86_TESTS_CAN_CHECK_ABORT 0
-#endif
+#include "test_utils/decoder_test_utils.hpp"
 
 namespace iced_x86::tests {
 
