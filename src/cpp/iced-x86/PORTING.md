@@ -130,6 +130,86 @@ Registers are `constexpr` constants (`rax`, `xmm0.k1().z()`), memory operands: `
 The generated instruction methods are declared in several base classes (`code_assembler_fns.hpp`, GCC is quadratic in the
 number of class members) and implemented in `src/code_asm/fn_asm_impl_N.cpp`.
 
+## Formatters
+
+Rust `formatter/**` is split like this:
+
+| What | Where |
+|------|-------|
+| `Formatter` (abstract class, Rust trait), `FormatterOutput` + `StringFormatterOutput` (Rust `impl FormatterOutput for String`) | `include/iced_x86/formatter.hpp`, `formatter_output.hpp` |
+| `FormatterOptions`, `FormatterOperandOptions`, `NumberFormattingOptions`, `FormatterOptionsProvider` | `include/iced_x86/formatter_options.hpp` |
+| `SymbolResolver`, `SymbolResult`, `SymResTextInfo`, `SymResTextPart`, `SymResString` | `include/iced_x86/symbol_resolver.hpp` |
+| Fast formatter: `SpecializedFormatter<TraitOptions>`, `FastFormatter`, `FastFormatterOptions`, trait options | `include/iced_x86/fast_formatter.hpp`, `fast_formatter_options.hpp` (+ `include/iced_x86/internal/fast_fmt.hpp`) |
+| Shared runtime (Rust `mod.rs` private items, `fmt_consts.rs`, `fmt_utils*.rs`, `num_fmt.rs`, `pseudo_ops.rs`, `regs_tbl_ls.rs`, `strings_tbl.rs`) | `src/internal/formatter/*.hpp` + `src/formatter/*.cpp` (namespace `iced_x86::internal`) |
+| Generated data (Rust `fmt_data.rs`, `strings_data.rs`, `regs_tbl.rs`, `mem_size_tbl.rs` regions) | see *Generated formatter data* below |
+
+API notes:
+
+- Rust methods returning `&str` (`format_register()`, `format_i8()`, ...) return `std::string_view`; it's valid until the next call.
+- Every `FormatterOutput&` method of `Formatter` also has a `std::string&` overload (appends to the string). Derived classes must add
+  `ICED_X86_FORMATTER_USING_BASE_METHODS;` (defined in `formatter.hpp`) to their public section or the overloads get hidden.
+- `Box<dyn SymbolResolver>` / `Box<dyn FormatterOptionsProvider>` -> `std::unique_ptr<...>` (the formatter owns them, `nullptr` = `None`).
+  `SymbolResolver::symbol()` returns `std::optional<SymbolResult>`; borrowed strings in it are only valid until the resolver is called
+  again, so if the formatter calls the resolver again before it has used a result, it must copy it first (`internal::to_owned()`,
+  same as Rust's `to_owned()`).
+- `Option<u32>` operand args -> `std::optional<std::uint32_t>`. `Result<Option<T>, IcedError>` -> `Result<std::optional<T>>`.
+
+### Writing a syntax formatter (gas/intel/masm/nasm)
+
+1. Public header `include/iced_x86/<syntax>_formatter.hpp`: `class GasFormatter final : public Formatter` with `GasFormatter()` (Rust
+   `new()`) and `GasFormatter(std::unique_ptr<SymbolResolver>, std::unique_ptr<FormatterOptionsProvider>)` (Rust `with_options()`),
+   `ICED_X86_FORMATTER_USING_BASE_METHODS;` and `override`s of all pure virtual methods. Implementation: `src/formatter/<syntax>/*.cpp`,
+   internal headers: `src/internal/formatter/<syntax>/*.hpp` (namespace `iced_x86::internal::<syntax>`).
+2. Instruction tables (Rust `<syntax>/fmt_tbl.rs` + `info.rs`): read `internal::<syntax>::FORMATTER_TBL_DATA` (`FORMATTER_TBL_DATA_SIZE` bytes,
+   `internal/formatter/<syntax>/fmt_data.hpp`) with `DataReader` (`internal/data_reader.hpp`) and the strings table
+   (`internal::get_strings_table_ref()`, `internal/formatter/strings_tbl.hpp`). The generated enums (`CtorKind`, `InstrOpInfoFlags`, ...)
+   are in `internal/formatter/<syntax>/*.hpp`. Build big tables lazily in a function-local static *holder struct whose constructor fills
+   the table in place* (see `get_regs_tbl()` in `src/formatter/regs_tbl_ls.cpp`) so no big temporary is created on the stack.
+3. Memory size tables (Rust `<syntax>/mem_size_tbl.rs`): `internal/formatter/<syntax>/mem_size_tbl_data.hpp` (generated) has the data
+   (`MEM_SIZE_TBL_DATA`, `BCST_TO_DATA`, `SIZES`, shift/mask constants) and the generated `match`es:
+   `get_memory_keywords(ac, value)` (intel/masm, returns `FormatterStringSlice`), `get_memory_keyword(c, value)` (nasm),
+   `get_bcst_to_string(c, value)` (gas/intel/nasm). The C++ port of the rest of `mem_size_tbl.rs` is the syntax formatter's job.
+4. Shared runtime (all in namespace `iced_x86::internal`):
+
+   | Rust | C++ |
+   |------|-----|
+   | `FormatterString` (`lower`/`upper`, `get(upper)`, `len()`, `is_default()`) | `FormatterString` (`internal/formatter/formatter_string.hpp`) |
+   | `&'static [&'static FormatterString]` | `FormatterStringSlice` (same header) |
+   | `FORMATTER_CONSTANTS`, `ARRAY_CONSTS`, `SCALE_NUMBERS` | `get_formatter_constants()`, `get_array_constants()`, `SCALE_NUMBERS` (`fmt_consts.hpp`). `short` is `short_`. |
+   | `regs_tbl_ls::REGS_TBL` | `get_regs_tbl()` (`regs_tbl_ls.hpp`) |
+   | `pseudo_ops::get_pseudo_ops(kind)` | `get_pseudo_ops(kind)` (`pseudo_ops.hpp`) |
+   | `num_fmt::NumberFormatter` | `NumberFormatter` (`num_fmt.hpp`), same methods, they return `std::string_view` |
+   | `fmt_utils::*` | `fmt_utils.hpp`: `add_tabs()`, `is_call()`, `get_flow_control()` (generated), `show_rep_or_repe_prefix()`, ... |
+   | `fmt_utils_all::*` | `iced_x86/internal/fmt_utils_all.hpp` (public header because the fast formatter template needs it) |
+   | `REGISTER_ST`, `r_to_r16()`, `r64_to_r32()`, `FormatterOutputMethods::write1/write2()`, `get_mnemonic_cc()`, `to_owned()` | `fmt_common.hpp` |
+   | `FormatterOperandOptions::new(flags)`, `FormatterOperandOptionsFlags` | `FormatterOperandOptions(flags)` constructor, `internal::FormatterOperandOptionsFlags` (`iced_x86/formatter_options.hpp`) |
+   | `Code::ignores_index()`/`ignores_segment()` (crate-private) | `code_ignores_index()`/`code_ignores_segment()` (`internal/code_internal.hpp`) |
+
+5. Tests: `tests/formatter/<syntax>/*.cpp`, test names `formatter/<syntax>/...`. The shared Rust test helpers (`formatter/tests/*.rs`)
+   are in `tests/formatter/formatter_test_utils.hpp` (namespace `iced_x86::tests`), same names: `formatter_test()`,
+   `formatter_test_nondec()`, `test_format_file_common()`, `test_format_file_all()`, `test_format_file()`, `symbol_resolver_test()`,
+   `number_tests()`, `register_tests()`, `methods_panic_if_invalid_operand_or_instruction_operand()`, `test_op_index()`,
+   `format_mnemonic_options_test(dir, factory)` (each formatter's `format_mnemonic_options` test), `simple_format_test()`,
+   `OptionValue`/`parse_option()` (Rust `opt_value.rs`/`options_parser.rs`). Factories are
+   `std::function<std::unique_ptr<Formatter>()>` (+ a `std::unique_ptr<SymbolResolver>` arg for the symbol resolver tests).
+   Also add the formatter to `get_sae_er_formatters()` in `tests/formatter/misc_tests.cpp` (Rust `verify_sae_er()`).
+   `formatter/tests/misc2.rs` `display_trait` (`to_string(const Instruction&)`, uses the masm formatter) belongs to the masm formatter.
+6. Fast formatter: `SpecializedFormatter<TraitOptions>` is a template (Rust generic), `TraitOptions` derives from
+   `SpecializedFormatterTraitOptions` and hides the static constants/functions it wants to change. The library contains the
+   `FastFormatter` (`DefaultFastFormatterTraitOptions`) and `DefaultSpecializedFormatterTraitOptions` instantiations (`extern template`).
+   It formats to an internal buffer (allocated once by the constructor) and appends it to the output string.
+
+### Generated formatter data
+
+`Formatters/Cpp/CppFormatterTableGenerator.cs` + `CppTableGen.cs` generate the data of all 5 formatters:
+
+- `src/formatter/strings_data.cpp` + `src/internal/formatter/strings_data.hpp` (`internal::strings_data`): strings table (all formatters)
+- `src/formatter/<syntax>/fmt_data.cpp` + `src/internal/formatter/<syntax>/fmt_data.hpp` (`internal::<syntax>`): instruction tables
+- `src/internal/formatter/<syntax>/mem_size_tbl_data.hpp` (`internal::<syntax>`): memory size keywords/broadcast data + lookup functions
+- `src/formatter/regs_tbl.cpp` + `src/internal/formatter/regs_tbl.hpp` (`internal::regs_tbl`): register names
+- `src/formatter/fmt_flow_control.cpp`: `internal::get_flow_control()`
+- generated regions in `src/internal/formatter/fmt_consts.hpp` and `src/formatter/fmt_consts.cpp` (the keyword constants)
+
 ## Tests
 
 - Framework: `tests/test_framework.hpp` (`TEST_CASE("decoder/xxx")`, `CHECK`, `CHECK_EQ`, `REQUIRE`, ...). Tests
