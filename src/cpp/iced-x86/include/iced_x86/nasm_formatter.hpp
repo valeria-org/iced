@@ -23,6 +23,7 @@ namespace iced_x86 {
 namespace internal {
 class FormatterString;
 class NumberFormatter;
+struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace nasm {
@@ -355,6 +356,8 @@ private:
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;
 	std::unique_ptr<internal::NumberFormatter> number_formatter_;
+	// Used by `format(const Instruction&, std::string&)` (allocated the first time it's called)
+	std::unique_ptr<internal::FormatterStringBuffer> string_buffer_;
 	std::unique_ptr<SymbolResolver> symbol_resolver_;
 	std::unique_ptr<FormatterOptionsProvider> options_provider_;
 };

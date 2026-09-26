@@ -1099,10 +1099,191 @@ struct AllInfosHolder {
 		return infos_storage.back().get();
 	}
 
-	AllInfosHolder() {
-		infos_storage.reserve(IcedConstants::CODE_ENUM_COUNT);
-		DataReader reader(FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE);
-		const auto strings = get_strings_table_ref();
+	// Creates the instruction info or returns nullptr if it's created by create_info_b(). The switch is split in two
+	// functions to keep the (debug build) stack frames small.
+	ICED_NOINLINE InstrInfo* create_info_a(DataReader& reader, const std::vector<std::string_view>& strings, std::string& s, std::string& s2,
+							 std::string& s3, std::string& s4, std::vector<std::string>& mnemonics, std::vector<std::string>& mnemonics_other,
+							 CtorKind ctor_kind, std::size_t i) {
+		const auto read_string = [&strings, &reader](std::string& result) {
+			const std::size_t index = reader.read_compressed_u32();
+			ICED_ASSERT(index < strings.size());
+			result = strings[index];
+		};
+		const auto read_code_size = [&reader]() -> CodeSize {
+			const std::size_t v = reader.read_u8();
+			ICED_ASSERT(v <= static_cast<std::size_t>(CodeSize::Code64));
+			return static_cast<CodeSize>(v);
+		};
+		char c;
+		std::uint32_t v;
+		std::uint32_t v2;
+		InstrInfo* info = nullptr;
+		switch (ctor_kind) {
+		case CtorKind::Normal_1:
+			info = add<SimpleInstrInfo>(std::move(s));
+			break;
+
+		case CtorKind::Normal_2:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo>(std::move(s), v);
+			break;
+
+		case CtorKind::AamAad:
+			info = add<SimpleInstrInfo_AamAad>(std::move(s));
+			break;
+
+		case CtorKind::AX: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_AX>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::AY: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_AY>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::bnd:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_bnd>(std::move(s), v);
+			break;
+
+		case CtorKind::DeclareData:
+			info = add<SimpleInstrInfo_DeclareData>(static_cast<Code>(i), std::move(s));
+			break;
+
+		case CtorKind::DX: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_DX>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::fword: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			const CodeSize code_size = read_code_size();
+			v2 = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_fword>(code_size, v2, std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::Int3:
+			info = add<SimpleInstrInfo_Int3>(std::move(s));
+			break;
+
+		case CtorKind::imul:
+			info = add<SimpleInstrInfo_imul>(std::move(s));
+			break;
+
+		case CtorKind::invlpga:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_invlpga>(v, std::move(s));
+			break;
+
+		case CtorKind::CCa_1:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s)));
+			break;
+
+		case CtorKind::CCa_2: {
+			read_string(s2);
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
+			break;
+		}
+
+		case CtorKind::CCa_3: {
+			read_string(s2);
+			read_string(s3);
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
+			break;
+		}
+
+		case CtorKind::CCb_1:
+			v2 = reader.read_compressed_u32();
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s)), v);
+			break;
+
+		case CtorKind::CCb_2: {
+			read_string(s2);
+			v2 = reader.read_compressed_u32();
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s), std::move(s2)), v);
+			break;
+		}
+
+		case CtorKind::CCb_3: {
+			read_string(s2);
+			read_string(s3);
+			v2 = reader.read_compressed_u32();
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)), v);
+			break;
+		}
+
+		case CtorKind::jcc_1:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s)));
+			break;
+
+		case CtorKind::jcc_2: {
+			read_string(s2);
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
+			break;
+		}
+
+		case CtorKind::jcc_3: {
+			read_string(s2);
+			read_string(s3);
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
+			break;
+		}
+
+		case CtorKind::Loopcc1: {
+			read_string(s2);
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
+			break;
+		}
+
+		case CtorKind::Loopcc2: {
+			read_string(s2);
+			c = static_cast<char>(reader.read_u8());
+			v2 = reader.read_compressed_u32();
+			add_suffix(s3, s, c);
+			add_suffix(s4, s2, c);
+			const CodeSize code_size = read_code_size();
+			info = add<SimpleInstrInfo_OpSize_cc>(code_size, v2, make_vec(mnemonics, std::move(s), std::move(s2)),
+															   make_vec(mnemonics_other, std::move(s3), std::move(s4)));
+			break;
+		}
+
+		case CtorKind::maskmovq:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_maskmovq>(std::move(s), v);
+			break;
+
+		default:
+			break;
+		}
+		return info;
+	}
+
+	// Creates the instruction info (second half of the ctor kinds)
+	ICED_NOINLINE InstrInfo* create_info_b(DataReader& reader, const std::vector<std::string_view>& strings, std::string& s, std::string& s2,
+							 std::string& s3, std::string& s4, std::vector<std::string>& mnemonics, std::vector<std::string>& mnemonics_other,
+							 CtorKind ctor_kind, std::size_t i) {
+		static_cast<void>(mnemonics);
+		static_cast<void>(mnemonics_other);
+		static_cast<void>(i);
 		const auto read_string = [&strings, &reader](std::string& result) {
 			const std::size_t index = reader.read_compressed_u32();
 			ICED_ASSERT(index < strings.size());
@@ -1116,6 +1297,170 @@ struct AllInfosHolder {
 		const auto read_register = [&reader]() -> Register { return static_cast<Register>(reader.read_u8()); };
 		const auto read_pseudo_ops = [&reader]() -> PseudoOps {
 			return PseudoOps(get_pseudo_ops(static_cast<PseudoOpsKind>(reader.read_u8())));
+		};
+		char c;
+		std::uint32_t v;
+		std::uint32_t v2;
+		InstrInfo* info = nullptr;
+		switch (ctor_kind) {
+		case CtorKind::memsize:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_memsize>(v, std::move(s));
+			break;
+
+		case CtorKind::monitor: {
+			const Register r1 = read_register();
+			const Register r2 = read_register();
+			const Register r3 = read_register();
+			info = add<SimpleInstrInfo_monitor>(std::move(s), r1, r2, r3);
+			break;
+		}
+
+		case CtorKind::mwait:
+			info = add<SimpleInstrInfo_mwait>(std::move(s));
+			break;
+
+		case CtorKind::mwaitx:
+			info = add<SimpleInstrInfo_mwaitx>(std::move(s));
+			break;
+
+		case CtorKind::nop: {
+			v = reader.read_compressed_u32();
+			const Register r = read_register();
+			info = add<SimpleInstrInfo_nop>(v, std::move(s), r);
+			break;
+		}
+
+		case CtorKind::OpSize_1: {
+			const CodeSize code_size = read_code_size();
+			add_suffix(s2, s, 'w');
+			add_suffix(s3, s, 'd');
+			add_suffix(s4, s, 'q');
+			info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
+			break;
+		}
+
+		case CtorKind::OpSize_2: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			const CodeSize code_size = read_code_size();
+			s3 = s2;
+			s4 = s2;
+			info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
+			break;
+		}
+
+		case CtorKind::OpSize2: {
+			read_string(s2);
+			read_string(s3);
+			read_string(s4);
+			v = static_cast<std::uint32_t>(reader.read_u8());
+			ICED_DEBUG_ASSERT(v <= 1);
+			info = add<SimpleInstrInfo_OpSize2>(std::move(s), std::move(s2), std::move(s3), std::move(s4), v != 0);
+			break;
+		}
+
+		case CtorKind::pblendvb:
+			info = add<SimpleInstrInfo_pblendvb>(std::move(s));
+			break;
+
+		case CtorKind::pclmulqdq:
+			info = add<SimpleInstrInfo_pclmulqdq>(std::move(s), read_pseudo_ops());
+			break;
+
+		case CtorKind::pops_2:
+			info = add<SimpleInstrInfo_pops>(std::move(s), read_pseudo_ops());
+			break;
+
+		case CtorKind::pops_3: {
+			const PseudoOps pseudo_ops = read_pseudo_ops();
+			v2 = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_pops>(std::move(s), pseudo_ops, v2);
+			break;
+		}
+
+		case CtorKind::reg:
+			info = add<SimpleInstrInfo_reg>(std::move(s), read_register());
+			break;
+
+		case CtorKind::Reg16:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_Reg16>(std::move(s), v);
+			break;
+
+		case CtorKind::Reg32:
+			v = reader.read_compressed_u32();
+			info = add<SimpleInstrInfo_Reg32>(std::move(s), v);
+			break;
+
+		case CtorKind::reverse:
+			info = add<SimpleInstrInfo_reverse>(std::move(s));
+			break;
+
+		case CtorKind::ST_STi:
+			info = add<SimpleInstrInfo_ST_STi>(std::move(s));
+			break;
+
+		case CtorKind::STi_ST:
+			v = static_cast<std::uint32_t>(reader.read_u8());
+			ICED_DEBUG_ASSERT(v <= 1);
+			info = add<SimpleInstrInfo_STi_ST>(std::move(s), v != 0);
+			break;
+
+		case CtorKind::STIG1:
+			v = static_cast<std::uint32_t>(reader.read_u8());
+			ICED_DEBUG_ASSERT(v <= 1);
+			info = add<SimpleInstrInfo_STIG1>(std::move(s), v != 0);
+			break;
+
+		case CtorKind::XLAT: {
+			add_suffix(s2, s, 'b');
+			info = add<SimpleInstrInfo_XLAT>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::XY: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_XY>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::YA: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_YA>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::YD: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_YD>(std::move(s), std::move(s2));
+			break;
+		}
+
+		case CtorKind::YX: {
+			c = static_cast<char>(reader.read_u8());
+			add_suffix(s2, s, c);
+			info = add<SimpleInstrInfo_YX>(std::move(s), std::move(s2));
+			break;
+		}
+
+		default:
+			ICED_UNREACHABLE();
+		}
+		return info;
+	}
+
+	AllInfosHolder() {
+		infos_storage.reserve(IcedConstants::CODE_ENUM_COUNT);
+		DataReader reader(FORMATTER_TBL_DATA, FORMATTER_TBL_DATA_SIZE);
+		const auto strings = get_strings_table_ref();
+		const auto read_string = [&strings, &reader](std::string& result) {
+			const std::size_t index = reader.read_compressed_u32();
+			ICED_ASSERT(index < strings.size());
+			result = strings[index];
 		};
 		std::size_t prev_index = 0;
 		bool has_prev_index = false;
@@ -1151,311 +1496,9 @@ struct AllInfosHolder {
 			else
 				read_string(s);
 
-			char c;
-			std::uint32_t v;
-			std::uint32_t v2;
-			InstrInfo* info = nullptr;
-			switch (ctor_kind) {
-			case CtorKind::Normal_1:
-				info = add<SimpleInstrInfo>(std::move(s));
-				break;
-
-			case CtorKind::Normal_2:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo>(std::move(s), v);
-				break;
-
-			case CtorKind::AamAad:
-				info = add<SimpleInstrInfo_AamAad>(std::move(s));
-				break;
-
-			case CtorKind::AX: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_AX>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::AY: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_AY>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::bnd:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_bnd>(std::move(s), v);
-				break;
-
-			case CtorKind::DeclareData:
-				info = add<SimpleInstrInfo_DeclareData>(static_cast<Code>(i), std::move(s));
-				break;
-
-			case CtorKind::DX: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_DX>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::fword: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				const CodeSize code_size = read_code_size();
-				v2 = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_fword>(code_size, v2, std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::Int3:
-				info = add<SimpleInstrInfo_Int3>(std::move(s));
-				break;
-
-			case CtorKind::imul:
-				info = add<SimpleInstrInfo_imul>(std::move(s));
-				break;
-
-			case CtorKind::invlpga:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_invlpga>(v, std::move(s));
-				break;
-
-			case CtorKind::CCa_1:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s)));
-				break;
-
-			case CtorKind::CCa_2: {
-				read_string(s2);
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
-				break;
-			}
-
-			case CtorKind::CCa_3: {
-				read_string(s2);
-				read_string(s3);
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
-				break;
-			}
-
-			case CtorKind::CCb_1:
-				v2 = reader.read_compressed_u32();
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s)), v);
-				break;
-
-			case CtorKind::CCb_2: {
-				read_string(s2);
-				v2 = reader.read_compressed_u32();
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s), std::move(s2)), v);
-				break;
-			}
-
-			case CtorKind::CCb_3: {
-				read_string(s2);
-				read_string(s3);
-				v2 = reader.read_compressed_u32();
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v2, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)), v);
-				break;
-			}
-
-			case CtorKind::jcc_1:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s)));
-				break;
-
-			case CtorKind::jcc_2: {
-				read_string(s2);
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
-				break;
-			}
-
-			case CtorKind::jcc_3: {
-				read_string(s2);
-				read_string(s3);
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_jcc>(v, make_vec(mnemonics, std::move(s), std::move(s2), std::move(s3)));
-				break;
-			}
-
-			case CtorKind::Loopcc1: {
-				read_string(s2);
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_cc>(v, make_vec(mnemonics, std::move(s), std::move(s2)));
-				break;
-			}
-
-			case CtorKind::Loopcc2: {
-				read_string(s2);
-				c = static_cast<char>(reader.read_u8());
-				v2 = reader.read_compressed_u32();
-				add_suffix(s3, s, c);
-				add_suffix(s4, s2, c);
-				const CodeSize code_size = read_code_size();
-				info = add<SimpleInstrInfo_OpSize_cc>(code_size, v2, make_vec(mnemonics, std::move(s), std::move(s2)),
-																   make_vec(mnemonics_other, std::move(s3), std::move(s4)));
-				break;
-			}
-
-			case CtorKind::maskmovq:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_maskmovq>(std::move(s), v);
-				break;
-
-			case CtorKind::memsize:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_memsize>(v, std::move(s));
-				break;
-
-			case CtorKind::monitor: {
-				const Register r1 = read_register();
-				const Register r2 = read_register();
-				const Register r3 = read_register();
-				info = add<SimpleInstrInfo_monitor>(std::move(s), r1, r2, r3);
-				break;
-			}
-
-			case CtorKind::mwait:
-				info = add<SimpleInstrInfo_mwait>(std::move(s));
-				break;
-
-			case CtorKind::mwaitx:
-				info = add<SimpleInstrInfo_mwaitx>(std::move(s));
-				break;
-
-			case CtorKind::nop: {
-				v = reader.read_compressed_u32();
-				const Register r = read_register();
-				info = add<SimpleInstrInfo_nop>(v, std::move(s), r);
-				break;
-			}
-
-			case CtorKind::OpSize_1: {
-				const CodeSize code_size = read_code_size();
-				add_suffix(s2, s, 'w');
-				add_suffix(s3, s, 'd');
-				add_suffix(s4, s, 'q');
-				info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
-				break;
-			}
-
-			case CtorKind::OpSize_2: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				const CodeSize code_size = read_code_size();
-				s3 = s2;
-				s4 = s2;
-				info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
-				break;
-			}
-
-			case CtorKind::OpSize2: {
-				read_string(s2);
-				read_string(s3);
-				read_string(s4);
-				v = static_cast<std::uint32_t>(reader.read_u8());
-				ICED_DEBUG_ASSERT(v <= 1);
-				info = add<SimpleInstrInfo_OpSize2>(std::move(s), std::move(s2), std::move(s3), std::move(s4), v != 0);
-				break;
-			}
-
-			case CtorKind::pblendvb:
-				info = add<SimpleInstrInfo_pblendvb>(std::move(s));
-				break;
-
-			case CtorKind::pclmulqdq:
-				info = add<SimpleInstrInfo_pclmulqdq>(std::move(s), read_pseudo_ops());
-				break;
-
-			case CtorKind::pops_2:
-				info = add<SimpleInstrInfo_pops>(std::move(s), read_pseudo_ops());
-				break;
-
-			case CtorKind::pops_3: {
-				const PseudoOps pseudo_ops = read_pseudo_ops();
-				v2 = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_pops>(std::move(s), pseudo_ops, v2);
-				break;
-			}
-
-			case CtorKind::reg:
-				info = add<SimpleInstrInfo_reg>(std::move(s), read_register());
-				break;
-
-			case CtorKind::Reg16:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_Reg16>(std::move(s), v);
-				break;
-
-			case CtorKind::Reg32:
-				v = reader.read_compressed_u32();
-				info = add<SimpleInstrInfo_Reg32>(std::move(s), v);
-				break;
-
-			case CtorKind::reverse:
-				info = add<SimpleInstrInfo_reverse>(std::move(s));
-				break;
-
-			case CtorKind::ST_STi:
-				info = add<SimpleInstrInfo_ST_STi>(std::move(s));
-				break;
-
-			case CtorKind::STi_ST:
-				v = static_cast<std::uint32_t>(reader.read_u8());
-				ICED_DEBUG_ASSERT(v <= 1);
-				info = add<SimpleInstrInfo_STi_ST>(std::move(s), v != 0);
-				break;
-
-			case CtorKind::STIG1:
-				v = static_cast<std::uint32_t>(reader.read_u8());
-				ICED_DEBUG_ASSERT(v <= 1);
-				info = add<SimpleInstrInfo_STIG1>(std::move(s), v != 0);
-				break;
-
-			case CtorKind::XLAT: {
-				add_suffix(s2, s, 'b');
-				info = add<SimpleInstrInfo_XLAT>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::XY: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_XY>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::YA: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_YA>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::YD: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_YD>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::YX: {
-				c = static_cast<char>(reader.read_u8());
-				add_suffix(s2, s, c);
-				info = add<SimpleInstrInfo_YX>(std::move(s), std::move(s2));
-				break;
-			}
-
-			case CtorKind::Previous:
-			default:
-				ICED_UNREACHABLE();
-			}
+			InstrInfo* info = create_info_a(reader, strings, s, s2, s3, s4, mnemonics, mnemonics_other, ctor_kind, i);
+			if (info == nullptr)
+				info = create_info_b(reader, strings, s, s2, s3, s4, mnemonics, mnemonics_other, ctor_kind, i);
 
 			infos[i] = info;
 			if (restore_index)
