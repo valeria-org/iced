@@ -6,6 +6,9 @@
 #include "iced_x86/code_ext.hpp"
 #include "iced_x86/code_size.hpp"
 #include "iced_x86/decoder.hpp"
+#include "iced_x86/decoder_options.hpp"
+#include "iced_x86/flow_control.hpp"
+#include "iced_x86/cpuid_feature.hpp"
 #include "iced_x86/encoding_kind.hpp"
 #include "iced_x86/iced_constants.hpp"
 #include "iced_x86/instruction.hpp"
@@ -15,6 +18,8 @@
 #include "iced_x86/rflags_bits.hpp"
 #include "info/info_test_cases.hpp"
 #include "test_utils.hpp"
+#include "test_utils/abort_utils.hpp"
+#include "test_utils/decoder_test_utils.hpp"
 #include "test_utils/from_str_conv.hpp"
 #include <algorithm>
 #include <array>
@@ -252,7 +257,7 @@ Instruction create_instruction(const InstrInfoTestCase& tc, const std::vector<st
 			instr.set_code_size(CodeSize::Code64);
 			REQUIRE_EQ(tc.hex_bytes, "");
 		} else {
-			Decoder decoder = Decoder::with_ip(tc.bitness, code_bytes, tc.ip, tc.decoder_options);
+			Decoder decoder = create_decoder(tc.bitness, code_bytes, tc.ip, tc.decoder_options).decoder;
 			instr = decoder.decode();
 			if (code_bytes.size() > 1 && code_bytes[0] == 0x9B && instr.len() == 1) {
 				instr = decoder.decode();
@@ -306,7 +311,7 @@ Instruction create_instruction(const InstrInfoTestCase& tc, const std::vector<st
 				FAIL("unreachable");
 		}
 	} else {
-		Decoder decoder = Decoder::with_ip(tc.bitness, code_bytes, tc.ip, tc.decoder_options);
+		Decoder decoder = create_decoder(tc.bitness, code_bytes, tc.ip, tc.decoder_options).decoder;
 		instr = decoder.decode();
 	}
 	return instr;
@@ -352,8 +357,10 @@ void test_info_core(const InstrInfoTestCase& tc, InstructionInfoFactory& factory
 		CHECK_EQ(access.value(), OpAccess::None);
 	}
 #ifdef NDEBUG
-	// Debug builds abort (Rust: debug_assert!() panics)
 	CHECK_EQ(info.op_access(static_cast<std::uint32_t>(IcedConstants::MAX_OP_COUNT)), OpAccess::None);
+#else
+	// Debug builds abort (Rust: debug_assert!() panics). It's checked once in the `info/op_access_invalid_operand` test
+	// since it needs to create a new process.
 #endif
 	CHECK(info.try_op_access(static_cast<std::uint32_t>(IcedConstants::MAX_OP_COUNT)).is_err());
 
@@ -427,6 +434,116 @@ TEST_CASE("info/info_16") { test_info(16); }
 TEST_CASE("info/info_32") { test_info(32); }
 
 TEST_CASE("info/info_64") { test_info(64); }
+
+TEST_CASE("info/op_access_invalid_operand") {
+	const std::uint8_t bytes[] = {0x00, 0xCE}; // add dh,cl
+	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	const Instruction instr = decoder.decode();
+	InstructionInfoFactory factory;
+	const InstructionInfo& info = factory.info(instr);
+	CHECK(info.try_op_access(static_cast<std::uint32_t>(IcedConstants::MAX_OP_COUNT)).is_err());
+#ifdef NDEBUG
+	CHECK_EQ(info.op_access(static_cast<std::uint32_t>(IcedConstants::MAX_OP_COUNT)), OpAccess::None);
+#else
+	CHECK(aborts([&info] { (void)info.op_access(static_cast<std::uint32_t>(IcedConstants::MAX_OP_COUNT)); }));
+#endif
+}
+
+TEST_CASE("info/doc_examples") {
+	// add [rdi+r12*8-5AA5EDCCh],esi
+	const std::uint8_t bytes[] = {0x42, 0x01, 0xB4, 0xE7, 0x34, 0x12, 0x5A, 0xA5};
+	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	InstructionInfoFactory info_factory;
+
+	const Instruction instr = decoder.decode();
+	const InstructionInfo& info = info_factory.info(instr);
+
+	REQUIRE_EQ(info.used_memory().size(), 1U);
+	const UsedMemory mem = info.used_memory()[0];
+	CHECK_EQ(mem.segment(), Register::DS);
+	CHECK_EQ(mem.base(), Register::RDI);
+	CHECK_EQ(mem.index(), Register::R12);
+	CHECK_EQ(mem.scale(), 8U);
+	CHECK_EQ(mem.displacement(), 0xFFFF'FFFF'A55A'1234ULL);
+	CHECK_EQ(mem.memory_size(), MemorySize::UInt32);
+	CHECK_EQ(mem.access(), OpAccess::ReadWrite);
+	CHECK_EQ(to_string(mem), std::string("[DS:RDI+R12*8+0xFFFFFFFFA55A1234;UInt32;ReadWrite]"));
+
+	const auto& regs = info.used_registers();
+	REQUIRE_EQ(regs.size(), 3U);
+	CHECK_EQ(regs[0].register_(), Register::RDI);
+	CHECK_EQ(regs[0].access(), OpAccess::Read);
+	CHECK_EQ(regs[1].register_(), Register::R12);
+	CHECK_EQ(regs[1].access(), OpAccess::Read);
+	CHECK_EQ(regs[2].register_(), Register::ESI);
+	CHECK_EQ(regs[2].access(), OpAccess::Read);
+	CHECK_EQ(to_string(regs[2]), std::string("ESI:Read"));
+
+	// pushfq
+	const std::uint8_t bytes2[] = {0x9C};
+	Decoder decoder2(64, bytes2, sizeof(bytes2), DecoderOptions::NONE);
+	const Instruction instr2 = decoder2.decode();
+	CHECK(instr2.is_stack_instruction());
+	CHECK_EQ(instr2.stack_pointer_increment(), -8);
+
+	// ficomp dword ptr [rax]
+	const std::uint8_t bytes3[] = {0xDA, 0x18};
+	Decoder decoder3(64, bytes3, sizeof(bytes3), DecoderOptions::NONE);
+	const FpuStackIncrementInfo fpu_info = decoder3.decode().fpu_stack_increment_info();
+	CHECK_EQ(fpu_info.increment(), 1);
+	CHECK(!fpu_info.conditional());
+	CHECK(fpu_info.writes_top());
+
+	// vmovaps xmm1,xmm5 / vmovaps xmm10{k3}{z},xmm19
+	const std::uint8_t bytes4[] = {0xC5, 0xF8, 0x28, 0xCD, 0x62, 0x31, 0x7C, 0x8B, 0x28, 0xD3};
+	Decoder decoder4(64, bytes4, sizeof(bytes4), DecoderOptions::NONE);
+	const Instruction instr4 = decoder4.decode();
+	CHECK_EQ(instr4.encoding(), EncodingKind::VEX);
+	REQUIRE_EQ(instr4.cpuid_features().size(), 1U);
+	CHECK_EQ(instr4.cpuid_features()[0], CpuidFeature::AVX);
+	const Instruction instr5 = decoder4.decode();
+	REQUIRE_EQ(instr5.cpuid_features().size(), 2U);
+	CHECK_EQ(instr5.cpuid_features()[0], CpuidFeature::AVX512VL);
+	CHECK_EQ(instr5.cpuid_features()[1], CpuidFeature::AVX512F);
+
+	// or ecx,esi / ud0 rcx,rsi / call rcx
+	const std::uint8_t bytes6[] = {0x0B, 0xCE, 0x48, 0x0F, 0xFF, 0xCE, 0xFF, 0xD1};
+	Decoder decoder6(64, bytes6, sizeof(bytes6), DecoderOptions::NONE);
+	CHECK_EQ(decoder6.decode().flow_control(), FlowControl::Next);
+	CHECK_EQ(decoder6.decode().flow_control(), FlowControl::Exception);
+	CHECK_EQ(decoder6.decode().flow_control(), FlowControl::IndirectCall);
+
+	// adc rsi,rcx / xor rdi,5Ah
+	const std::uint8_t bytes7[] = {0x48, 0x11, 0xCE, 0x48, 0x83, 0xF7, 0x5A};
+	Decoder decoder7(64, bytes7, sizeof(bytes7), DecoderOptions::NONE);
+	const Instruction adc = decoder7.decode();
+	CHECK_EQ(adc.rflags_read(), RflagsBits::CF);
+	CHECK_EQ(adc.rflags_written(), RflagsBits::OF | RflagsBits::SF | RflagsBits::ZF | RflagsBits::AF | RflagsBits::CF | RflagsBits::PF);
+	CHECK_EQ(adc.rflags_cleared(), RflagsBits::NONE);
+	CHECK_EQ(adc.rflags_set(), RflagsBits::NONE);
+	CHECK_EQ(adc.rflags_undefined(), RflagsBits::NONE);
+	CHECK_EQ(adc.rflags_modified(), RflagsBits::OF | RflagsBits::SF | RflagsBits::ZF | RflagsBits::AF | RflagsBits::CF | RflagsBits::PF);
+	const Instruction xor_ = decoder7.decode();
+	CHECK_EQ(xor_.rflags_read(), RflagsBits::NONE);
+	CHECK_EQ(xor_.rflags_written(), RflagsBits::SF | RflagsBits::ZF | RflagsBits::PF);
+	CHECK_EQ(xor_.rflags_cleared(), RflagsBits::OF | RflagsBits::CF);
+	CHECK_EQ(xor_.rflags_set(), RflagsBits::NONE);
+	CHECK_EQ(xor_.rflags_undefined(), RflagsBits::AF);
+	CHECK_EQ(xor_.rflags_modified(), RflagsBits::OF | RflagsBits::SF | RflagsBits::ZF | RflagsBits::AF | RflagsBits::CF | RflagsBits::PF);
+
+	CHECK_EQ(code_ext::encoding(Code::Add_rm32_r32), EncodingKind::Legacy);
+	CHECK_EQ(code_ext::encoding(Code::VEX_Vmovups_xmm_xmmm128), EncodingKind::VEX);
+	CHECK_EQ(code_ext::encoding(Code::EVEX_Vmovups_xmm_k1z_xmmm128), EncodingKind::EVEX);
+	CHECK_EQ(code_ext::encoding(Code::XOP_Vpmacssww_xmm_xmm_xmmm128_xmm), EncodingKind::XOP);
+	CHECK_EQ(code_ext::encoding(Code::D3NOW_Pi2fw_mm_mmm64), EncodingKind::D3NOW);
+	CHECK_EQ(code_ext::encoding(Code::MVEX_Vpackstoreld_mt_k1_zmm), EncodingKind::MVEX);
+	CHECK_EQ(code_ext::flow_control(Code::Or_r32_rm32), FlowControl::Next);
+	CHECK_EQ(code_ext::flow_control(Code::Ud0_r64_rm64), FlowControl::Exception);
+	CHECK_EQ(code_ext::flow_control(Code::Call_rm64), FlowControl::IndirectCall);
+	CHECK(!code_ext::is_stack_instruction(Code::Or_r32_rm32));
+	CHECK(code_ext::is_stack_instruction(Code::Push_r64));
+	CHECK(code_ext::is_stack_instruction(Code::Call_rm64));
+}
 
 TEST_CASE("info/make_sure_all_code_values_are_tested") {
 	std::vector<bool> tested(IcedConstants::CODE_ENUM_COUNT, false);
