@@ -64,3 +64,25 @@
 #include "iced_x86/prefix_kind.hpp"
 #include "iced_x86/symbol_flags.hpp"
 #include "iced_x86/symbol_resolver.hpp"
+
+// Decoder
+#include "iced_x86/decoder.hpp"
+#include "iced_x86/decoder_error.hpp"
+#include "iced_x86/decoder_options.hpp"
+
+// Encoder, op code info, block encoder
+#include "iced_x86/block_encoder.hpp"
+#include "iced_x86/block_encoder_options.hpp"
+#include "iced_x86/encoder.hpp"
+#include "iced_x86/mandatory_prefix.hpp"
+#include "iced_x86/memory_operand.hpp"
+#include "iced_x86/op_code_info.hpp"
+#include "iced_x86/op_code_operand_kind.hpp"
+#include "iced_x86/op_code_table_kind.hpp"
+#include "iced_x86/reloc_kind.hpp"
+
+// Instruction info
+#include "iced_x86/instruction_info.hpp"
+#include "iced_x86/op_access.hpp"
+
+// The code assembler isn't included since it's big (thousands of methods), include "iced_x86/code_asm.hpp"
