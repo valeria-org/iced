@@ -186,7 +186,7 @@ namespace Generator.Encoder.Cpp {
 			};
 			int totalOps = tables.Sum(a => a.ops.Length);
 			if (totalOps > 0x100)
-				throw new InvalidOperationException("OpCodeHandler::operands are u8 indexes");
+				throw new InvalidOperationException("EncOpCodeHandler::operands are u8 indexes");
 			writer.WriteLine();
 			writer.WriteLine($"const Op* const OPS_TABLE[{totalOps}] = {{");
 			using (writer.Indent()) {
@@ -378,12 +378,12 @@ namespace Generator.Encoder.Cpp {
 				writer.WriteLine();
 				writer.WriteLine("namespace {");
 				writer.WriteLine("using K = OpCodeHandlerKind;");
-				writer.WriteLine("using H = OpCodeHandler;");
+				writer.WriteLine("using H = EncOpCodeHandler;");
 				writer.WriteLine("} // namespace");
 				writer.WriteLine();
 				writer.WriteLine("// enc_flags3, op_code, kind, operands_len, operands, group_index, rm_group_index, op_size, addr_size, is_2byte_opcode, is_special_instr, u");
 				writer.WriteLine("// clang-format off");
-				writer.WriteLine("ICED_CONSTINIT const OpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT] = {");
+				writer.WriteLine("ICED_CONSTINIT const EncOpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT] = {");
 				using (writer.Indent()) {
 					var ops = new List<uint>();
 					foreach (var data in allData) {

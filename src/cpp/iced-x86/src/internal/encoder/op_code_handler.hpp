@@ -13,10 +13,10 @@
 
 namespace iced_x86::internal {
 
-// All operand handlers (`Op`s) used by the op code handlers (generated). `OpCodeHandler::operands` are indexes into this table.
+// All operand handlers (`Op`s) used by the op code handlers (generated). `EncOpCodeHandler::operands` are indexes into this table.
 extern const Op* const OPS_TABLE[];
 
-// The kind of an `OpCodeHandler` (Rust uses one struct per kind)
+// The kind of an `EncOpCodeHandler` (Rust uses one struct per kind)
 enum class OpCodeHandlerKind : std::uint8_t {
 	Invalid,
 	DeclareData,
@@ -33,7 +33,7 @@ inline constexpr std::size_t OP_CODE_HANDLER_KIND_COUNT = 9;
 // Rust creates one handler object per `Code` value at runtime (in a Vec). C++ uses a compact POD struct
 // whose values are generated (src/encoder/op_code_handlers_table.cpp) so the table lives in read-only
 // memory and no heap memory is used. The handler kind specific data is stored in a union.
-struct OpCodeHandler {
+struct EncOpCodeHandler {
 	static constexpr std::uint32_t MAX_OPERANDS = 5;
 
 	struct DeclareDataData {
@@ -109,14 +109,14 @@ struct OpCodeHandler {
 };
 
 // One handler per `Code` value (generated)
-extern const OpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT];
+extern const EncOpCodeHandler OP_CODE_HANDLERS[IcedConstants::CODE_ENUM_COUNT];
 
-using OpCodeHandlerEncodeFn = void (*)(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction);
+using OpCodeHandlerEncodeFn = void (*)(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction);
 // Index = OpCodeHandlerKind
 extern const OpCodeHandlerEncodeFn OP_CODE_HANDLER_ENCODE_FNS[OP_CODE_HANDLER_KIND_COUNT];
 
-std::optional<std::int8_t> evex_try_convert_to_disp8n(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction, std::int32_t displ);
-std::optional<std::int8_t> mvex_try_convert_to_disp8n(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction, std::int32_t displ);
+std::optional<std::int8_t> evex_try_convert_to_disp8n(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction, std::int32_t displ);
+std::optional<std::int8_t> mvex_try_convert_to_disp8n(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction, std::int32_t displ);
 
 // Error message used by the invalid handler
 inline constexpr const char* INVALID_HANDLER_ERROR_MESSAGE = "Can't encode an invalid instruction";

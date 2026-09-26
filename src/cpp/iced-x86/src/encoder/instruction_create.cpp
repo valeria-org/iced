@@ -50,14 +50,14 @@ IcedError not_enough_operands_error(Code code, std::size_t operand) {
 	return IcedError(code_str(code) + " doesn't have at least " + std::to_string(operand + 1) + " operands");
 }
 
-const internal::OpCodeHandler& get_handler(Code code) noexcept { return internal::OP_CODE_HANDLERS[static_cast<std::size_t>(code)]; }
+const internal::EncOpCodeHandler& get_handler(Code code) noexcept { return internal::OP_CODE_HANDLERS[static_cast<std::size_t>(code)]; }
 
 } // namespace
 
 // These InstructionInternal methods are implemented by the encoder since they use the encoder's op handlers
 
 Result<OpKind> internal::InstructionInternal::get_immediate_op_kind(Code code, std::size_t operand) {
-	const internal::OpCodeHandler& handler = get_handler(code);
+	const internal::EncOpCodeHandler& handler = get_handler(code);
 	const std::size_t operands_len = handler.operands_len;
 	if (operand < operands_len) {
 		const auto op_kind = handler.operand(operand)->immediate_op_kind();
@@ -75,7 +75,7 @@ Result<OpKind> internal::InstructionInternal::get_immediate_op_kind(Code code, s
 }
 
 Result<OpKind> internal::InstructionInternal::get_near_branch_op_kind(Code code, std::size_t operand) {
-	const internal::OpCodeHandler& handler = get_handler(code);
+	const internal::EncOpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
 		if (const auto op_kind = handler.operand(operand)->near_branch_op_kind())
 			return *op_kind;
@@ -85,7 +85,7 @@ Result<OpKind> internal::InstructionInternal::get_near_branch_op_kind(Code code,
 }
 
 Result<OpKind> internal::InstructionInternal::get_far_branch_op_kind(Code code, std::size_t operand) {
-	const internal::OpCodeHandler& handler = get_handler(code);
+	const internal::EncOpCodeHandler& handler = get_handler(code);
 	if (operand < handler.operands_len) {
 		if (const auto op_kind = handler.operand(operand)->far_branch_op_kind())
 			return *op_kind;

@@ -130,7 +130,7 @@ Result<std::size_t> Encoder::encode(const Instruction& instruction, std::uint64_
 	// requires 3 instructions.
 	sib_ = 0;
 
-	const internal::OpCodeHandler* handler = &internal::OP_CODE_HANDLERS[static_cast<std::size_t>(instruction.code())];
+	const internal::EncOpCodeHandler* handler = &internal::OP_CODE_HANDLERS[static_cast<std::size_t>(instruction.code())];
 	handler_ = handler;
 	op_code_ = handler->op_code;
 	const std::int32_t group_index = handler->group_index;
@@ -736,7 +736,7 @@ std::uint32_t EncoderInternal::get_register_op_size(const Instruction& instructi
 }
 
 std::optional<std::int8_t> EncoderInternal::try_convert_to_disp8n(Encoder& e, const Instruction& instruction, std::int32_t displ) {
-	const OpCodeHandler* handler = e.handler_;
+	const EncOpCodeHandler* handler = e.handler_;
 	switch (handler->kind) {
 	case OpCodeHandlerKind::EVEX:
 		return evex_try_convert_to_disp8n(handler, e, instruction, displ);

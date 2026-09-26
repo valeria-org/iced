@@ -38,7 +38,7 @@ struct ExpectedHandler {
 	std::uint32_t op_code = 0;
 	OpCodeHandlerKind kind = OpCodeHandlerKind::Invalid;
 	std::uint32_t operands_len = 0;
-	std::uint32_t operands[OpCodeHandler::MAX_OPERANDS] = {};
+	std::uint32_t operands[EncOpCodeHandler::MAX_OPERANDS] = {};
 	std::int32_t group_index = -1;
 	std::int32_t rm_group_index = -1;
 	CodeSize op_size = CodeSize::Unknown;
@@ -70,7 +70,7 @@ void init_operands(ExpectedHandler& h, std::uint32_t offset, const std::uint32_t
 	}
 	for (std::uint32_t i = len; i < count; i++)
 		CHECK_EQ(ops[i], 0U);
-	REQUIRE(len <= OpCodeHandler::MAX_OPERANDS);
+	REQUIRE(len <= EncOpCodeHandler::MAX_OPERANDS);
 	for (std::uint32_t i = 0; i < len; i++)
 		h.operands[i] = offset + ops[i];
 	h.operands_len = len;
@@ -314,7 +314,7 @@ ExpectedHandler create_handler(Code code) {
 	return h;
 }
 
-void get_data(const OpCodeHandler& h, std::uint32_t (&data)[6]) {
+void get_data(const EncOpCodeHandler& h, std::uint32_t (&data)[6]) {
 	for (auto& d : data)
 		d = 0;
 	switch (h.kind) {
@@ -365,7 +365,7 @@ TEST_CASE("encoder/op_code_handlers_table/matches_enc_flags") {
 	for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
 		const Code code = static_cast<Code>(i);
 		const ExpectedHandler expected = create_handler(code);
-		const OpCodeHandler& h = OP_CODE_HANDLERS[i];
+		const EncOpCodeHandler& h = OP_CODE_HANDLERS[i];
 		std::uint32_t data[6];
 		get_data(h, data);
 		const bool ok = h.enc_flags3 == expected.enc_flags3 && h.op_code == expected.op_code && h.kind == expected.kind &&
@@ -374,7 +374,7 @@ TEST_CASE("encoder/op_code_handlers_table/matches_enc_flags") {
 			h.is_special_instr == expected.is_special_instr;
 		CHECK_EQ(ok ? std::size_t(0) : i, std::size_t(0));
 		if (h.kind != OpCodeHandlerKind::D3NOW) {
-			for (std::uint32_t j = 0; j < OpCodeHandler::MAX_OPERANDS; j++) {
+			for (std::uint32_t j = 0; j < EncOpCodeHandler::MAX_OPERANDS; j++) {
 				const std::uint32_t op = j < h.operands_len ? h.operands[j] : 0;
 				CHECK_EQ(op, expected.operands[j]);
 			}
@@ -385,9 +385,9 @@ TEST_CASE("encoder/op_code_handlers_table/matches_enc_flags") {
 }
 
 TEST_CASE("encoder/op_code_handlers_table/d3now_operands") {
-	const OpCodeHandler& pfadd = OP_CODE_HANDLERS[static_cast<std::size_t>(Code::D3NOW_Pfadd_mm_mmm64)];
+	const EncOpCodeHandler& pfadd = OP_CODE_HANDLERS[static_cast<std::size_t>(Code::D3NOW_Pfadd_mm_mmm64)];
 	for (std::size_t i = 0; i < IcedConstants::CODE_ENUM_COUNT; i++) {
-		const OpCodeHandler& h = OP_CODE_HANDLERS[i];
+		const EncOpCodeHandler& h = OP_CODE_HANDLERS[i];
 		if (h.kind != OpCodeHandlerKind::D3NOW)
 			continue;
 		CHECK_EQ(static_cast<std::uint32_t>(h.operands_len), 2U);

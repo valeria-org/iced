@@ -23,7 +23,7 @@
 
 namespace iced_x86::internal {
 
-static_assert(sizeof(OpCodeHandler) <= 28, "OpCodeHandler should be small since there's one handler per Code value");
+static_assert(sizeof(EncOpCodeHandler) <= 28, "EncOpCodeHandler should be small since there's one handler per Code value");
 
 namespace {
 
@@ -32,12 +32,12 @@ using E = EncoderInternal;
 // ---------------------------------------------------------------------------
 // InvalidHandler
 
-void invalid_encode(const OpCodeHandler*, Encoder& encoder, const Instruction&) { E::set_error_message_str(encoder, INVALID_HANDLER_ERROR_MESSAGE); }
+void invalid_encode(const EncOpCodeHandler*, Encoder& encoder, const Instruction&) { E::set_error_message_str(encoder, INVALID_HANDLER_ERROR_MESSAGE); }
 
 // ---------------------------------------------------------------------------
 // DeclareDataHandler
 
-void declare_data_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+void declare_data_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
 	const std::size_t length = instruction.declare_data_len() * self->u.declare_data.elem_size;
 	for (std::size_t i = 0; i < length; i++) {
 		auto value = instruction.try_get_declare_byte_value(i);
@@ -53,13 +53,13 @@ void declare_data_encode(const OpCodeHandler* self, Encoder& encoder, const Inst
 // ---------------------------------------------------------------------------
 // ZeroBytesHandler
 
-void zero_bytes_encode(const OpCodeHandler*, Encoder&, const Instruction&) {}
+void zero_bytes_encode(const EncOpCodeHandler*, Encoder&, const Instruction&) {}
 
 // ---------------------------------------------------------------------------
 // LegacyHandler
 
-void legacy_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
-	const OpCodeHandler::LegacyData& d = self->u.legacy;
+void legacy_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+	const EncOpCodeHandler::LegacyData& d = self->u.legacy;
 	std::uint32_t b = d.mandatory_prefix;
 	E::write_prefixes(encoder, instruction, b != 0xF3);
 	if (b != 0)
@@ -92,8 +92,8 @@ void legacy_encode(const OpCodeHandler* self, Encoder& encoder, const Instructio
 // ---------------------------------------------------------------------------
 // VexHandler
 
-void vex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
-	const OpCodeHandler::VexData& d = self->u.vex;
+void vex_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+	const EncOpCodeHandler::VexData& d = self->u.vex;
 	E::write_prefixes(encoder, instruction, true);
 	const std::uint32_t encoder_flags = E::encoder_flags(encoder);
 
@@ -131,8 +131,8 @@ void vex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& 
 // ---------------------------------------------------------------------------
 // XopHandler
 
-void xop_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
-	const OpCodeHandler::XopData& d = self->u.xop;
+void xop_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+	const EncOpCodeHandler::XopData& d = self->u.xop;
 	E::write_prefixes(encoder, instruction, true);
 	E::write_byte_internal(encoder, 0x8F);
 
@@ -156,8 +156,8 @@ void xop_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& 
 // ---------------------------------------------------------------------------
 // EvexHandler
 
-void evex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
-	const OpCodeHandler::EvexData& d = self->u.evex;
+void evex_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+	const EncOpCodeHandler::EvexData& d = self->u.evex;
 	E::write_prefixes(encoder, instruction, true);
 	const std::uint32_t encoder_flags = E::encoder_flags(encoder);
 
@@ -228,8 +228,8 @@ void evex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction&
 // ---------------------------------------------------------------------------
 // MvexHandler
 
-void mvex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
-	const OpCodeHandler::MvexData& d = self->u.mvex;
+void mvex_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+	const EncOpCodeHandler::MvexData& d = self->u.mvex;
 	E::write_prefixes(encoder, instruction, true);
 	const std::uint32_t encoder_flags = E::encoder_flags(encoder);
 
@@ -333,7 +333,7 @@ void mvex_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction&
 // ---------------------------------------------------------------------------
 // D3nowHandler
 
-void d3now_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
+void d3now_encode(const EncOpCodeHandler* self, Encoder& encoder, const Instruction& instruction) {
 	E::write_prefixes(encoder, instruction, true);
 	E::write_byte_internal(encoder, 0x0F);
 	E::imm_size(encoder) = ImmSize::Size1OpCode;
@@ -344,7 +344,7 @@ void d3now_encode(const OpCodeHandler* self, Encoder& encoder, const Instruction
 
 } // namespace
 
-std::optional<std::int8_t> evex_try_convert_to_disp8n(const OpCodeHandler* self, Encoder& encoder, const Instruction&, std::int32_t displ) {
+std::optional<std::int8_t> evex_try_convert_to_disp8n(const EncOpCodeHandler* self, Encoder& encoder, const Instruction&, std::int32_t displ) {
 	const std::int32_t n =
 		static_cast<std::int32_t>(get_disp8n(self->u.evex.tuple_type, (E::encoder_flags(encoder) & EncoderFlags::BROADCAST) != 0));
 	const std::int32_t res = displ / n;
@@ -353,7 +353,7 @@ std::optional<std::int8_t> evex_try_convert_to_disp8n(const OpCodeHandler* self,
 	return std::nullopt;
 }
 
-std::optional<std::int8_t> mvex_try_convert_to_disp8n(const OpCodeHandler*, Encoder&, const Instruction& instruction, std::int32_t displ) {
+std::optional<std::int8_t> mvex_try_convert_to_disp8n(const EncOpCodeHandler*, Encoder&, const Instruction& instruction, std::int32_t displ) {
 	const MvexInfo& mvex = get_mvex_info(instruction.code());
 	const MvexRegMemConv conv = instruction.mvex_reg_mem_conv();
 	const std::size_t sss = (static_cast<std::size_t>(conv) - static_cast<std::size_t>(MvexRegMemConv::MemConvNone)) & 7;
