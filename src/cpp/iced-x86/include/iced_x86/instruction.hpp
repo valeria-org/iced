@@ -2988,6 +2988,13 @@ public:
 	/// * `b0`: Byte 0
 	static Instruction with_declare_byte_1(std::uint8_t b0);
 
+	/// Same as `with_declare_byte_1()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	static Result<Instruction> try_with_declare_byte_1(std::uint8_t b0);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -2995,6 +3002,14 @@ public:
 	/// * `b0`: Byte 0
 	/// * `b1`: Byte 1
 	static Instruction with_declare_byte_2(std::uint8_t b0, std::uint8_t b1);
+
+	/// Same as `with_declare_byte_2()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	static Result<Instruction> try_with_declare_byte_2(std::uint8_t b0, std::uint8_t b1);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3004,6 +3019,15 @@ public:
 	/// * `b1`: Byte 1
 	/// * `b2`: Byte 2
 	static Instruction with_declare_byte_3(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2);
+
+	/// Same as `with_declare_byte_3()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	static Result<Instruction> try_with_declare_byte_3(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3015,6 +3039,16 @@ public:
 	/// * `b3`: Byte 3
 	static Instruction with_declare_byte_4(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3);
 
+	/// Same as `with_declare_byte_4()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	static Result<Instruction> try_with_declare_byte_4(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3025,6 +3059,17 @@ public:
 	/// * `b3`: Byte 3
 	/// * `b4`: Byte 4
 	static Instruction with_declare_byte_5(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4);
+
+	/// Same as `with_declare_byte_5()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	static Result<Instruction> try_with_declare_byte_5(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3038,6 +3083,18 @@ public:
 	/// * `b5`: Byte 5
 	static Instruction with_declare_byte_6(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5);
 
+	/// Same as `with_declare_byte_6()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	static Result<Instruction> try_with_declare_byte_6(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3050,6 +3107,19 @@ public:
 	/// * `b5`: Byte 5
 	/// * `b6`: Byte 6
 	static Instruction with_declare_byte_7(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6);
+
+	/// Same as `with_declare_byte_7()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	static Result<Instruction> try_with_declare_byte_7(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3065,6 +3135,20 @@ public:
 	/// * `b7`: Byte 7
 	static Instruction with_declare_byte_8(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7);
 
+	/// Same as `with_declare_byte_8()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	static Result<Instruction> try_with_declare_byte_8(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3079,6 +3163,21 @@ public:
 	/// * `b7`: Byte 7
 	/// * `b8`: Byte 8
 	static Instruction with_declare_byte_9(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8);
+
+	/// Same as `with_declare_byte_9()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	static Result<Instruction> try_with_declare_byte_9(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3096,6 +3195,22 @@ public:
 	/// * `b9`: Byte 9
 	static Instruction with_declare_byte_10(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9);
 
+	/// Same as `with_declare_byte_10()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	static Result<Instruction> try_with_declare_byte_10(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3112,6 +3227,23 @@ public:
 	/// * `b9`: Byte 9
 	/// * `b10`: Byte 10
 	static Instruction with_declare_byte_11(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10);
+
+	/// Same as `with_declare_byte_11()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	static Result<Instruction> try_with_declare_byte_11(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3131,6 +3263,24 @@ public:
 	/// * `b11`: Byte 11
 	static Instruction with_declare_byte_12(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11);
 
+	/// Same as `with_declare_byte_12()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	/// * `b11`: Byte 11
+	static Result<Instruction> try_with_declare_byte_12(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3149,6 +3299,25 @@ public:
 	/// * `b11`: Byte 11
 	/// * `b12`: Byte 12
 	static Instruction with_declare_byte_13(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12);
+
+	/// Same as `with_declare_byte_13()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	/// * `b11`: Byte 11
+	/// * `b12`: Byte 12
+	static Result<Instruction> try_with_declare_byte_13(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3170,6 +3339,26 @@ public:
 	/// * `b13`: Byte 13
 	static Instruction with_declare_byte_14(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13);
 
+	/// Same as `with_declare_byte_14()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	/// * `b11`: Byte 11
+	/// * `b12`: Byte 12
+	/// * `b13`: Byte 13
+	static Result<Instruction> try_with_declare_byte_14(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Arguments
@@ -3190,6 +3379,27 @@ public:
 	/// * `b13`: Byte 13
 	/// * `b14`: Byte 14
 	static Instruction with_declare_byte_15(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14);
+
+	/// Same as `with_declare_byte_15()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	/// * `b11`: Byte 11
+	/// * `b12`: Byte 12
+	/// * `b13`: Byte 13
+	/// * `b14`: Byte 14
+	static Result<Instruction> try_with_declare_byte_15(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14);
 
 	/// Creates a `db`/`.byte` asm directive
 	///
@@ -3213,6 +3423,28 @@ public:
 	/// * `b15`: Byte 15
 	static Instruction with_declare_byte_16(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14, std::uint8_t b15);
 
+	/// Same as `with_declare_byte_16()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `b0`: Byte 0
+	/// * `b1`: Byte 1
+	/// * `b2`: Byte 2
+	/// * `b3`: Byte 3
+	/// * `b4`: Byte 4
+	/// * `b5`: Byte 5
+	/// * `b6`: Byte 6
+	/// * `b7`: Byte 7
+	/// * `b8`: Byte 8
+	/// * `b9`: Byte 9
+	/// * `b10`: Byte 10
+	/// * `b11`: Byte 11
+	/// * `b12`: Byte 12
+	/// * `b13`: Byte 13
+	/// * `b14`: Byte 14
+	/// * `b15`: Byte 15
+	static Result<Instruction> try_with_declare_byte_16(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14, std::uint8_t b15);
+
 	/// Creates a `db`/`.byte` asm directive
 	///
 	/// # Errors
@@ -3232,6 +3464,13 @@ public:
 	/// * `w0`: Word 0
 	static Instruction with_declare_word_1(std::uint16_t w0);
 
+	/// Same as `with_declare_word_1()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	static Result<Instruction> try_with_declare_word_1(std::uint16_t w0);
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Arguments
@@ -3239,6 +3478,14 @@ public:
 	/// * `w0`: Word 0
 	/// * `w1`: Word 1
 	static Instruction with_declare_word_2(std::uint16_t w0, std::uint16_t w1);
+
+	/// Same as `with_declare_word_2()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	static Result<Instruction> try_with_declare_word_2(std::uint16_t w0, std::uint16_t w1);
 
 	/// Creates a `dw`/`.word` asm directive
 	///
@@ -3249,6 +3496,15 @@ public:
 	/// * `w2`: Word 2
 	static Instruction with_declare_word_3(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2);
 
+	/// Same as `with_declare_word_3()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	static Result<Instruction> try_with_declare_word_3(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2);
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Arguments
@@ -3258,6 +3514,16 @@ public:
 	/// * `w2`: Word 2
 	/// * `w3`: Word 3
 	static Instruction with_declare_word_4(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3);
+
+	/// Same as `with_declare_word_4()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	/// * `w3`: Word 3
+	static Result<Instruction> try_with_declare_word_4(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3);
 
 	/// Creates a `dw`/`.word` asm directive
 	///
@@ -3270,6 +3536,17 @@ public:
 	/// * `w4`: Word 4
 	static Instruction with_declare_word_5(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4);
 
+	/// Same as `with_declare_word_5()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	/// * `w3`: Word 3
+	/// * `w4`: Word 4
+	static Result<Instruction> try_with_declare_word_5(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4);
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Arguments
@@ -3281,6 +3558,18 @@ public:
 	/// * `w4`: Word 4
 	/// * `w5`: Word 5
 	static Instruction with_declare_word_6(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5);
+
+	/// Same as `with_declare_word_6()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	/// * `w3`: Word 3
+	/// * `w4`: Word 4
+	/// * `w5`: Word 5
+	static Result<Instruction> try_with_declare_word_6(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5);
 
 	/// Creates a `dw`/`.word` asm directive
 	///
@@ -3295,6 +3584,19 @@ public:
 	/// * `w6`: Word 6
 	static Instruction with_declare_word_7(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6);
 
+	/// Same as `with_declare_word_7()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	/// * `w3`: Word 3
+	/// * `w4`: Word 4
+	/// * `w5`: Word 5
+	/// * `w6`: Word 6
+	static Result<Instruction> try_with_declare_word_7(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6);
+
 	/// Creates a `dw`/`.word` asm directive
 	///
 	/// # Arguments
@@ -3308,6 +3610,20 @@ public:
 	/// * `w6`: Word 6
 	/// * `w7`: Word 7
 	static Instruction with_declare_word_8(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6, std::uint16_t w7);
+
+	/// Same as `with_declare_word_8()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `w0`: Word 0
+	/// * `w1`: Word 1
+	/// * `w2`: Word 2
+	/// * `w3`: Word 3
+	/// * `w4`: Word 4
+	/// * `w5`: Word 5
+	/// * `w6`: Word 6
+	/// * `w7`: Word 7
+	static Result<Instruction> try_with_declare_word_8(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6, std::uint16_t w7);
 
 	/// Creates a `dw`/`.word` asm directive
 	///
@@ -3340,6 +3656,13 @@ public:
 	/// * `d0`: Dword 0
 	static Instruction with_declare_dword_1(std::uint32_t d0);
 
+	/// Same as `with_declare_dword_1()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `d0`: Dword 0
+	static Result<Instruction> try_with_declare_dword_1(std::uint32_t d0);
+
 	/// Creates a `dd`/`.int` asm directive
 	///
 	/// # Arguments
@@ -3347,6 +3670,14 @@ public:
 	/// * `d0`: Dword 0
 	/// * `d1`: Dword 1
 	static Instruction with_declare_dword_2(std::uint32_t d0, std::uint32_t d1);
+
+	/// Same as `with_declare_dword_2()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `d0`: Dword 0
+	/// * `d1`: Dword 1
+	static Result<Instruction> try_with_declare_dword_2(std::uint32_t d0, std::uint32_t d1);
 
 	/// Creates a `dd`/`.int` asm directive
 	///
@@ -3357,6 +3688,15 @@ public:
 	/// * `d2`: Dword 2
 	static Instruction with_declare_dword_3(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2);
 
+	/// Same as `with_declare_dword_3()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `d0`: Dword 0
+	/// * `d1`: Dword 1
+	/// * `d2`: Dword 2
+	static Result<Instruction> try_with_declare_dword_3(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2);
+
 	/// Creates a `dd`/`.int` asm directive
 	///
 	/// # Arguments
@@ -3366,6 +3706,16 @@ public:
 	/// * `d2`: Dword 2
 	/// * `d3`: Dword 3
 	static Instruction with_declare_dword_4(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2, std::uint32_t d3);
+
+	/// Same as `with_declare_dword_4()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `d0`: Dword 0
+	/// * `d1`: Dword 1
+	/// * `d2`: Dword 2
+	/// * `d3`: Dword 3
+	static Result<Instruction> try_with_declare_dword_4(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2, std::uint32_t d3);
 
 	/// Creates a `dd`/`.int` asm directive
 	///
@@ -3398,6 +3748,13 @@ public:
 	/// * `q0`: Qword 0
 	static Instruction with_declare_qword_1(std::uint64_t q0);
 
+	/// Same as `with_declare_qword_1()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `q0`: Qword 0
+	static Result<Instruction> try_with_declare_qword_1(std::uint64_t q0);
+
 	/// Creates a `dq`/`.quad` asm directive
 	///
 	/// # Arguments
@@ -3405,6 +3762,14 @@ public:
 	/// * `q0`: Qword 0
 	/// * `q1`: Qword 1
 	static Instruction with_declare_qword_2(std::uint64_t q0, std::uint64_t q1);
+
+	/// Same as `with_declare_qword_2()` but returns a `Result<Instruction>` (it never fails)
+	///
+	/// # Arguments
+	///
+	/// * `q0`: Qword 0
+	/// * `q1`: Qword 1
+	static Result<Instruction> try_with_declare_qword_2(std::uint64_t q0, std::uint64_t q1);
 
 	/// Creates a `dq`/`.quad` asm directive
 	///

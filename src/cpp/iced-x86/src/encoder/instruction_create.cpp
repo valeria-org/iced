@@ -1136,6 +1136,10 @@ Instruction Instruction::with_declare_byte_1(std::uint8_t b0) {
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_1(std::uint8_t b0) {
+	return with_declare_byte_1(b0);
+}
+
 Instruction Instruction::with_declare_byte_2(std::uint8_t b0, std::uint8_t b1) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1146,6 +1150,10 @@ Instruction Instruction::with_declare_byte_2(std::uint8_t b0, std::uint8_t b1) {
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_2(std::uint8_t b0, std::uint8_t b1) {
+	return with_declare_byte_2(b0, b1);
 }
 
 Instruction Instruction::with_declare_byte_3(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2) {
@@ -1159,6 +1167,10 @@ Instruction Instruction::with_declare_byte_3(std::uint8_t b0, std::uint8_t b1, s
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_3(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2) {
+	return with_declare_byte_3(b0, b1, b2);
 }
 
 Instruction Instruction::with_declare_byte_4(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3) {
@@ -1175,6 +1187,10 @@ Instruction Instruction::with_declare_byte_4(std::uint8_t b0, std::uint8_t b1, s
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_4(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3) {
+	return with_declare_byte_4(b0, b1, b2, b3);
+}
+
 Instruction Instruction::with_declare_byte_5(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1188,6 +1204,10 @@ Instruction Instruction::with_declare_byte_5(std::uint8_t b0, std::uint8_t b1, s
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_5(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4) {
+	return with_declare_byte_5(b0, b1, b2, b3, b4);
 }
 
 Instruction Instruction::with_declare_byte_6(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5) {
@@ -1206,6 +1226,10 @@ Instruction Instruction::with_declare_byte_6(std::uint8_t b0, std::uint8_t b1, s
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_6(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5) {
+	return with_declare_byte_6(b0, b1, b2, b3, b4, b5);
+}
+
 Instruction Instruction::with_declare_byte_7(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1221,6 +1245,10 @@ Instruction Instruction::with_declare_byte_7(std::uint8_t b0, std::uint8_t b1, s
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_7(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6) {
+	return with_declare_byte_7(b0, b1, b2, b3, b4, b5, b6);
 }
 
 Instruction Instruction::with_declare_byte_8(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7) {
@@ -1241,6 +1269,10 @@ Instruction Instruction::with_declare_byte_8(std::uint8_t b0, std::uint8_t b1, s
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_8(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7) {
+	return with_declare_byte_8(b0, b1, b2, b3, b4, b5, b6, b7);
+}
+
 Instruction Instruction::with_declare_byte_9(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1258,6 +1290,10 @@ Instruction Instruction::with_declare_byte_9(std::uint8_t b0, std::uint8_t b1, s
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_9(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8) {
+	return with_declare_byte_9(b0, b1, b2, b3, b4, b5, b6, b7, b8);
 }
 
 Instruction Instruction::with_declare_byte_10(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9) {
@@ -1280,6 +1316,10 @@ Instruction Instruction::with_declare_byte_10(std::uint8_t b0, std::uint8_t b1, 
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_10(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9) {
+	return with_declare_byte_10(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9);
+}
+
 Instruction Instruction::with_declare_byte_11(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1299,6 +1339,10 @@ Instruction Instruction::with_declare_byte_11(std::uint8_t b0, std::uint8_t b1, 
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_11(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10) {
+	return with_declare_byte_11(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10);
 }
 
 Instruction Instruction::with_declare_byte_12(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11) {
@@ -1323,6 +1367,10 @@ Instruction Instruction::with_declare_byte_12(std::uint8_t b0, std::uint8_t b1, 
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_12(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11) {
+	return with_declare_byte_12(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11);
+}
+
 Instruction Instruction::with_declare_byte_13(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1344,6 +1392,10 @@ Instruction Instruction::with_declare_byte_13(std::uint8_t b0, std::uint8_t b1, 
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_13(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12) {
+	return with_declare_byte_13(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12);
 }
 
 Instruction Instruction::with_declare_byte_14(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13) {
@@ -1370,6 +1422,10 @@ Instruction Instruction::with_declare_byte_14(std::uint8_t b0, std::uint8_t b1, 
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_14(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13) {
+	return with_declare_byte_14(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13);
+}
+
 Instruction Instruction::with_declare_byte_15(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareByte);
@@ -1393,6 +1449,10 @@ Instruction Instruction::with_declare_byte_15(std::uint8_t b0, std::uint8_t b1, 
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_byte_15(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14) {
+	return with_declare_byte_15(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14);
 }
 
 Instruction Instruction::with_declare_byte_16(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14, std::uint8_t b15) {
@@ -1421,6 +1481,10 @@ Instruction Instruction::with_declare_byte_16(std::uint8_t b0, std::uint8_t b1, 
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_byte_16(std::uint8_t b0, std::uint8_t b1, std::uint8_t b2, std::uint8_t b3, std::uint8_t b4, std::uint8_t b5, std::uint8_t b6, std::uint8_t b7, std::uint8_t b8, std::uint8_t b9, std::uint8_t b10, std::uint8_t b11, std::uint8_t b12, std::uint8_t b13, std::uint8_t b14, std::uint8_t b15) {
+	return with_declare_byte_16(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15);
+}
+
 Result<Instruction> Instruction::with_declare_byte(const std::uint8_t* data, std::size_t size) {
 	if (size - 1 > 16 - 1)
 		return IcedError("Invalid slice length");
@@ -1447,6 +1511,10 @@ Instruction Instruction::with_declare_word_1(std::uint16_t w0) {
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_word_1(std::uint16_t w0) {
+	return with_declare_word_1(w0);
+}
+
 Instruction Instruction::with_declare_word_2(std::uint16_t w0, std::uint16_t w1) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareWord);
@@ -1457,6 +1525,10 @@ Instruction Instruction::with_declare_word_2(std::uint16_t w0, std::uint16_t w1)
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_word_2(std::uint16_t w0, std::uint16_t w1) {
+	return with_declare_word_2(w0, w1);
 }
 
 Instruction Instruction::with_declare_word_3(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2) {
@@ -1472,6 +1544,10 @@ Instruction Instruction::with_declare_word_3(std::uint16_t w0, std::uint16_t w1,
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_word_3(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2) {
+	return with_declare_word_3(w0, w1, w2);
+}
+
 Instruction Instruction::with_declare_word_4(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareWord);
@@ -1484,6 +1560,10 @@ Instruction Instruction::with_declare_word_4(std::uint16_t w0, std::uint16_t w1,
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_word_4(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3) {
+	return with_declare_word_4(w0, w1, w2, w3);
 }
 
 Instruction Instruction::with_declare_word_5(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4) {
@@ -1501,6 +1581,10 @@ Instruction Instruction::with_declare_word_5(std::uint16_t w0, std::uint16_t w1,
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_word_5(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4) {
+	return with_declare_word_5(w0, w1, w2, w3, w4);
+}
+
 Instruction Instruction::with_declare_word_6(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareWord);
@@ -1515,6 +1599,10 @@ Instruction Instruction::with_declare_word_6(std::uint16_t w0, std::uint16_t w1,
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_word_6(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5) {
+	return with_declare_word_6(w0, w1, w2, w3, w4, w5);
 }
 
 Instruction Instruction::with_declare_word_7(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6) {
@@ -1534,6 +1622,10 @@ Instruction Instruction::with_declare_word_7(std::uint16_t w0, std::uint16_t w1,
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_word_7(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6) {
+	return with_declare_word_7(w0, w1, w2, w3, w4, w5, w6);
+}
+
 Instruction Instruction::with_declare_word_8(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6, std::uint16_t w7) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareWord);
@@ -1550,6 +1642,10 @@ Instruction Instruction::with_declare_word_8(std::uint16_t w0, std::uint16_t w1,
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_word_8(std::uint16_t w0, std::uint16_t w1, std::uint16_t w2, std::uint16_t w3, std::uint16_t w4, std::uint16_t w5, std::uint16_t w6, std::uint16_t w7) {
+	return with_declare_word_8(w0, w1, w2, w3, w4, w5, w6, w7);
 }
 
 Result<Instruction> Instruction::with_declare_word_slice_u8(const std::uint8_t* data, std::size_t size) {
@@ -1595,6 +1691,10 @@ Instruction Instruction::with_declare_dword_1(std::uint32_t d0) {
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_dword_1(std::uint32_t d0) {
+	return with_declare_dword_1(d0);
+}
+
 Instruction Instruction::with_declare_dword_2(std::uint32_t d0, std::uint32_t d1) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareDword);
@@ -1605,6 +1705,10 @@ Instruction Instruction::with_declare_dword_2(std::uint32_t d0, std::uint32_t d1
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_dword_2(std::uint32_t d0, std::uint32_t d1) {
+	return with_declare_dword_2(d0, d1);
 }
 
 Instruction Instruction::with_declare_dword_3(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2) {
@@ -1620,6 +1724,10 @@ Instruction Instruction::with_declare_dword_3(std::uint32_t d0, std::uint32_t d1
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_dword_3(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2) {
+	return with_declare_dword_3(d0, d1, d2);
+}
+
 Instruction Instruction::with_declare_dword_4(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2, std::uint32_t d3) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareDword);
@@ -1632,6 +1740,10 @@ Instruction Instruction::with_declare_dword_4(std::uint32_t d0, std::uint32_t d1
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_dword_4(std::uint32_t d0, std::uint32_t d1, std::uint32_t d2, std::uint32_t d3) {
+	return with_declare_dword_4(d0, d1, d2, d3);
 }
 
 Result<Instruction> Instruction::with_declare_dword_slice_u8(const std::uint8_t* data, std::size_t size) {
@@ -1677,6 +1789,10 @@ Instruction Instruction::with_declare_qword_1(std::uint64_t q0) {
 	return instruction;
 }
 
+Result<Instruction> Instruction::try_with_declare_qword_1(std::uint64_t q0) {
+	return with_declare_qword_1(q0);
+}
+
 Instruction Instruction::with_declare_qword_2(std::uint64_t q0, std::uint64_t q1) {
 	Instruction instruction;
 	instruction.set_code(Code::DeclareQword);
@@ -1687,6 +1803,10 @@ Instruction Instruction::with_declare_qword_2(std::uint64_t q0, std::uint64_t q1
 
 	ICED_DEBUG_ASSERT(instruction.op_count() == 0);
 	return instruction;
+}
+
+Result<Instruction> Instruction::try_with_declare_qword_2(std::uint64_t q0, std::uint64_t q1) {
+	return with_declare_qword_2(q0, q1);
 }
 
 Result<Instruction> Instruction::with_declare_qword_slice_u8(const std::uint8_t* data, std::size_t size) {

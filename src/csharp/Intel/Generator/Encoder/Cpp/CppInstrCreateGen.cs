@@ -391,17 +391,28 @@ namespace Generator.Encoder.Cpp {
 			var (code, setValueName, methodName) = GetDeclareDataInfo(codeType, kind);
 			methodName = methodName + "_" + method.Args.Count.ToString();
 			WriteItemSeparator(writer);
-			if (!WriteMethod(writer, method, methodName, false, null))
-				return;
-			using (writer.Indent()) {
-				WriteInitializeInstruction(writer, Enum(code));
-				writer.WriteLine($"InstructionInternal::internal_set_declare_data_len(instruction, {method.Args.Count});");
-				writer.WriteLine();
-				for (int i = 0; i < method.Args.Count; i++)
-					writer.WriteLine($"instruction.{setValueName}({i}, {ArgName(method.Args[i])});");
-				WriteMethodFooter(writer, 0);
+			if (WriteMethod(writer, method, methodName, false, null)) {
+				using (writer.Indent()) {
+					WriteInitializeInstruction(writer, Enum(code));
+					writer.WriteLine($"InstructionInternal::internal_set_declare_data_len(instruction, {method.Args.Count});");
+					writer.WriteLine();
+					for (int i = 0; i < method.Args.Count; i++)
+						writer.WriteLine($"instruction.{setValueName}({i}, {ArgName(method.Args[i])});");
+					WriteMethodFooter(writer, 0);
+				}
+				WriteMethodEnd(writer);
 			}
-			WriteMethodEnd(writer);
+
+			// Rust also has a (hidden) try_ method that returns a Result
+			WriteItemSeparator(writer);
+			var tryMethod = method.Copy();
+			tryMethod.Docs.Clear();
+			tryMethod.Docs.Add($"Same as `{methodName}()` but returns a `Result<Instruction>` (it never fails)");
+			if (WriteMethod(writer, tryMethod, "try_" + methodName, true, null)) {
+				using (writer.Indent())
+					writer.WriteLine($"return {methodName}({string.Join(", ", method.Args.Select(a => ArgName(a)))});");
+				WriteMethodEnd(writer);
+			}
 		}
 
 		void GenCreateDeclareDataSlice(FileWriter writer, CreateMethod method, int elemSize, EnumValue code, string methodName, string setDeclValueName) {
