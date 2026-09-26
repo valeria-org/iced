@@ -18,6 +18,10 @@ option(ICED_X86_BUILD_BENCH "Build the iced_x86 benchmarks" ${ICED_X86_IS_TOP_LE
 # Embedded users usually pass -fno-exceptions -fno-rtti for the whole program (CMAKE_CXX_FLAGS) instead.
 option(ICED_X86_NO_EXCEPTIONS_RTTI "Build the library with -fno-exceptions -fno-rtti" OFF)
 option(ICED_X86_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+# The gas/intel/masm/nasm formatters' format(const Instruction&, std::string&) uses a second copy of the formatter code
+# that writes to an internal char buffer (all writes are inlined, it's much faster). Turn it off to save code size:
+# the std::string overload then uses the generic FormatterOutput code.
+option(ICED_X86_FORMATTER_STRING_SPECIALIZATION "Faster formatting to a std::string (more code)" ON)
 # Max stack frame size (bytes) before the compiler warns (GCC/Clang). 0 = disabled
 set(ICED_X86_MAX_FRAME_SIZE "1024" CACHE STRING "Warn if a function's stack frame is larger than this")
 
@@ -63,6 +67,9 @@ function(iced_x86_set_warnings target)
 endfunction()
 
 iced_x86_set_warnings(iced_x86)
+if(NOT ICED_X86_FORMATTER_STRING_SPECIALIZATION)
+	target_compile_definitions(iced_x86 PRIVATE ICED_X86_NO_FORMATTER_STRING_SPECIALIZATION)
+endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# GCC's SLP vectorizer merges the decoder's modrm/reg/mod/rm state stores into SIMD shuffles + one 16-byte store,
 	# which makes the decoder ~4% slower. Clang doesn't do it.

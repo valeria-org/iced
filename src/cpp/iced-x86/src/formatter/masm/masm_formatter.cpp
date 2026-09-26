@@ -28,6 +28,7 @@
 #include "iced_x86/prefix_kind.hpp"
 #include "iced_x86/rounding_control.hpp"
 #include "iced_x86/symbol_flags.hpp"
+#include "internal/formatter/buffered_string_output.hpp"
 #include "internal/formatter/fmt_common.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/fmt_utils.hpp"
@@ -47,7 +48,7 @@ namespace iced_x86 {
 
 namespace internal::masm {
 
-// `TOutput` is `FormatterOutput` or `StringFormatterOutput`. The latter is used by `format(const Instruction&, std::string&)`:
+// `TOutput` is `FormatterOutput` or `BufferedStringOutput`. The latter is used by `format(const Instruction&, std::string&)`:
 // all writes are inlined (Rust gets the same result with LTO since only one `FormatterOutput` is used)
 template <typename TOutput>
 struct MasmFormatterImpl {
@@ -1108,7 +1109,9 @@ struct MasmFormatterImpl {
 } // namespace internal::masm
 
 using MasmFormatterImpl = internal::masm::MasmFormatterImpl<FormatterOutput>;
-using MasmFormatterStringImpl = internal::masm::MasmFormatterImpl<StringFormatterOutput>;
+#ifndef ICED_X86_NO_FORMATTER_STRING_SPECIALIZATION
+using MasmFormatterStringImpl = internal::masm::MasmFormatterImpl<internal::BufferedStringOutput>;
+#endif
 
 MasmFormatter::MasmFormatter() : MasmFormatter(nullptr, nullptr) {}
 
@@ -1192,7 +1195,13 @@ void MasmFormatter::format(const Instruction& instruction, FormatterOutput& outp
 }
 
 void MasmFormatter::format(const Instruction& instruction, std::string& output_string) {
+#ifdef ICED_X86_NO_FORMATTER_STRING_SPECIALIZATION
 	StringFormatterOutput output(output_string);
+	format(instruction, output);
+#else
+	if (ICED_UNLIKELY(!string_buffer_))
+		string_buffer_ = std::make_unique<internal::FormatterStringBuffer>();
+	internal::BufferedStringOutput output(*string_buffer_);
 	const auto op_info = MasmFormatterStringImpl::get_op_info(*this, instruction);
 
 	std::uint32_t column = 0;
@@ -1202,6 +1211,8 @@ void MasmFormatter::format(const Instruction& instruction, std::string& output_s
 		MasmFormatterStringImpl::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
 		MasmFormatterStringImpl::format_operands(*this, instruction, output, op_info);
 	}
+	output.flush(output_string);
+#endif
 }
 
 std::string_view MasmFormatter::format_register(Register register_) { return MasmFormatterImpl::get_reg_str(*this, register_); }

@@ -29,6 +29,7 @@
 #include "iced_x86/prefix_kind.hpp"
 #include "iced_x86/rounding_control.hpp"
 #include "iced_x86/symbol_flags.hpp"
+#include "internal/formatter/buffered_string_output.hpp"
 #include "internal/formatter/fmt_common.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/fmt_utils.hpp"
@@ -80,12 +81,129 @@ std::string_view format_unsigned(NumberFormatter& number_formatter, const Format
 
 } // namespace
 
-struct IntelFormatterImpl {
+// Methods that don't depend on the output type
+struct IntelFormatterCommon {
 	static InstrOpInfo get_op_info(const IntelFormatter& self, const Instruction& instruction) noexcept {
 		return self.instr_infos_[static_cast<std::size_t>(instruction.code())]->op_info(self.options_, instruction);
 	}
 
-	static void format_mnemonic(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	static bool show_segment_prefix(const IntelFormatter& self, const Instruction& instruction, const InstrOpInfo& op_info) noexcept {
+		if ((op_info.flags & InstrOpInfoFlags::IGNORE_SEGMENT_PREFIX) != 0)
+			return false;
+
+		switch (instruction.code()) {
+		case Code::Monitorw:
+		case Code::Monitord:
+		case Code::Monitorq:
+		case Code::Monitorxw:
+		case Code::Monitorxd:
+		case Code::Monitorxq:
+		case Code::Clzerow:
+		case Code::Clzerod:
+		case Code::Clzeroq:
+		case Code::Umonitor_r16:
+		case Code::Umonitor_r32:
+		case Code::Umonitor_r64:
+			return internal::show_segment_prefix(Register::DS, instruction, self.options_);
+
+		default:
+			break;
+		}
+
+		for (std::uint32_t i = 0; i < op_info.op_count; i++) {
+			switch (op_info.op_kind(i)) {
+			case InstrOpKind::Register:
+			case InstrOpKind::NearBranch16:
+			case InstrOpKind::NearBranch32:
+			case InstrOpKind::NearBranch64:
+			case InstrOpKind::FarBranch16:
+			case InstrOpKind::FarBranch32:
+			case InstrOpKind::Immediate8:
+			case InstrOpKind::Immediate8_2nd:
+			case InstrOpKind::Immediate16:
+			case InstrOpKind::Immediate32:
+			case InstrOpKind::Immediate64:
+			case InstrOpKind::Immediate8to16:
+			case InstrOpKind::Immediate8to32:
+			case InstrOpKind::Immediate8to64:
+			case InstrOpKind::Immediate32to64:
+			case InstrOpKind::MemoryESDI:
+			case InstrOpKind::MemoryESEDI:
+			case InstrOpKind::MemoryESRDI:
+			case InstrOpKind::DeclareByte:
+			case InstrOpKind::DeclareWord:
+			case InstrOpKind::DeclareDword:
+			case InstrOpKind::DeclareQword:
+				break;
+
+			case InstrOpKind::MemorySegSI:
+			case InstrOpKind::MemorySegESI:
+			case InstrOpKind::MemorySegRSI:
+			case InstrOpKind::MemorySegDI:
+			case InstrOpKind::MemorySegEDI:
+			case InstrOpKind::MemorySegRDI:
+			case InstrOpKind::Memory:
+				return false;
+
+			default:
+				ICED_UNREACHABLE();
+			}
+		}
+		return self.options_.show_useless_prefixes();
+	}
+
+	// Calls the symbol resolver (if any)
+	static void get_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
+						   std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
+		if (self.symbol_resolver_)
+			get_symbol_core(self, symbol, instruction, operand, instruction_operand, address, size);
+	}
+
+	ICED_NOINLINE static void get_symbol_core(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
+											   std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+											   std::uint32_t size) {
+		symbol.set(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size));
+	}
+
+	// The resolver will be called again before the symbol is used so the symbol result is an owned copy (the text is stored in `vec`)
+	ICED_NOINLINE static void get_owned_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
+												std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+												std::uint32_t size, std::vector<SymResTextPart>& vec) {
+		if (self.symbol_resolver_)
+			symbol.set(to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size), vec));
+	}
+
+	static std::string_view get_reg_str(const IntelFormatter& self, Register reg) noexcept {
+		if (self.options_.prefer_st0() && reg == REGISTER_ST)
+			reg = Register::ST0;
+		const FormatterString& reg_str = self.all_registers_[static_cast<std::size_t>(reg)];
+		return reg_str.get(self.options_.uppercase_registers() || self.options_.uppercase_all());
+	}
+
+	static bool is_same_mem_size(const IntelFormatter& self, FormatterStringSlice mem_size_strings, const SymbolResult& symbol) noexcept {
+		const MemorySize symbol_size = symbol.symbol_size.value_or(MemorySize::Unknown);
+		ICED_DEBUG_ASSERT(static_cast<std::size_t>(symbol_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
+		const MemSizeInfo& symbol_mem_info = self.all_memory_sizes_[static_cast<std::size_t>(symbol_size)];
+		const FormatterStringSlice symbol_mem_size_strings = symbol_mem_info.keywords;
+		return is_same_mem_size_slice(mem_size_strings, symbol_mem_size_strings);
+	}
+
+	static bool is_same_mem_size_slice(FormatterStringSlice a, FormatterStringSlice b) noexcept {
+		if (a.size() != b.size())
+			return false;
+		for (std::size_t i = 0; i < a.size(); i++) {
+			if (a[i]->lower() != b[i]->lower())
+				return false;
+		}
+		return true;
+	}
+};
+
+// `TOutput` is `FormatterOutput` or `BufferedStringOutput`. The latter is used by `format(const Instruction&, std::string&)`:
+// all writes are inlined (Rust gets the same result with LTO since only one `FormatterOutput` is used)
+template <typename TOutput>
+struct IntelFormatterImpl : IntelFormatterCommon {
+	static void format_mnemonic(IntelFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 								std::uint32_t& column, std::uint32_t mnemonic_options) {
 		const FormatterOptions& options = self.options_;
 		const FormatterConstants& str = *self.str_;
@@ -166,72 +284,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static bool show_segment_prefix(const IntelFormatter& self, const Instruction& instruction, const InstrOpInfo& op_info) noexcept {
-		if ((op_info.flags & InstrOpInfoFlags::IGNORE_SEGMENT_PREFIX) != 0)
-			return false;
-
-		switch (instruction.code()) {
-		case Code::Monitorw:
-		case Code::Monitord:
-		case Code::Monitorq:
-		case Code::Monitorxw:
-		case Code::Monitorxd:
-		case Code::Monitorxq:
-		case Code::Clzerow:
-		case Code::Clzerod:
-		case Code::Clzeroq:
-		case Code::Umonitor_r16:
-		case Code::Umonitor_r32:
-		case Code::Umonitor_r64:
-			return internal::show_segment_prefix(Register::DS, instruction, self.options_);
-
-		default:
-			break;
-		}
-
-		for (std::uint32_t i = 0; i < op_info.op_count; i++) {
-			switch (op_info.op_kind(i)) {
-			case InstrOpKind::Register:
-			case InstrOpKind::NearBranch16:
-			case InstrOpKind::NearBranch32:
-			case InstrOpKind::NearBranch64:
-			case InstrOpKind::FarBranch16:
-			case InstrOpKind::FarBranch32:
-			case InstrOpKind::Immediate8:
-			case InstrOpKind::Immediate8_2nd:
-			case InstrOpKind::Immediate16:
-			case InstrOpKind::Immediate32:
-			case InstrOpKind::Immediate64:
-			case InstrOpKind::Immediate8to16:
-			case InstrOpKind::Immediate8to32:
-			case InstrOpKind::Immediate8to64:
-			case InstrOpKind::Immediate32to64:
-			case InstrOpKind::MemoryESDI:
-			case InstrOpKind::MemoryESEDI:
-			case InstrOpKind::MemoryESRDI:
-			case InstrOpKind::DeclareByte:
-			case InstrOpKind::DeclareWord:
-			case InstrOpKind::DeclareDword:
-			case InstrOpKind::DeclareQword:
-				break;
-
-			case InstrOpKind::MemorySegSI:
-			case InstrOpKind::MemorySegESI:
-			case InstrOpKind::MemorySegRSI:
-			case InstrOpKind::MemorySegDI:
-			case InstrOpKind::MemorySegEDI:
-			case InstrOpKind::MemorySegRDI:
-			case InstrOpKind::Memory:
-				return false;
-
-			default:
-				ICED_UNREACHABLE();
-			}
-		}
-		return self.options_.show_useless_prefixes();
-	}
-
-	static void format_prefix(const FormatterOptions& options, FormatterOutput& output, const Instruction& instruction, std::uint32_t& column,
+	static void format_prefix(const FormatterOptions& options, TOutput& output, const Instruction& instruction, std::uint32_t& column,
 							  const FormatterString& prefix, PrefixKind prefix_kind, bool& need_space) {
 		if (need_space) {
 			column++;
@@ -242,7 +295,7 @@ struct IntelFormatterImpl {
 		need_space = true;
 	}
 
-	static void format_operands(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info) {
+	static void format_operands(IntelFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info) {
 		for (std::uint32_t i = 0; i < op_info.op_count; i++) {
 			if (i > 0) {
 				output.write(",", FormatterTextKind::Punctuation);
@@ -253,20 +306,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	// Calls the symbol resolver (if any)
-	static void get_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
-						   std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
-		if (self.symbol_resolver_)
-			get_symbol_core(self, symbol, instruction, operand, instruction_operand, address, size);
-	}
-
-	ICED_NOINLINE static void get_symbol_core(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
-											   std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
-											   std::uint32_t size) {
-		symbol.set(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size));
-	}
-
-	static void format_operand(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	static void format_operand(IntelFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 							   std::uint32_t operand) {
 		ICED_DEBUG_ASSERT(operand < op_info.op_count);
 
@@ -453,7 +493,7 @@ struct IntelFormatterImpl {
 
 	// The following methods are part of format_operand() in Rust. They're not inlined so format_operand()'s stack frame stays small.
 
-	ICED_NOINLINE static void format_near_branch(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	ICED_NOINLINE static void format_near_branch(IntelFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 												  InstrOpKind op_kind, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand) {
 		const FormatterOptions& options = self.options_;
 		std::uint32_t imm_size;
@@ -501,15 +541,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	// The resolver will be called again before the symbol is used so the symbol result is an owned copy (the text is stored in `vec`)
-	ICED_NOINLINE static void get_owned_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
-												std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
-												std::uint32_t size, std::vector<SymResTextPart>& vec) {
-		if (self.symbol_resolver_)
-			symbol.set(to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size), vec));
-	}
-
-	ICED_NOINLINE static void format_far_branch_symbol(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output,
+	ICED_NOINLINE static void format_far_branch_symbol(IntelFormatter& self, const Instruction& instruction, TOutput& output,
 														const InstrOpInfo& op_info, std::uint32_t operand,
 														std::optional<std::uint32_t> instruction_operand, FormatterOperandOptions& operand_options,
 														std::uint64_t imm64, const SymbolResult& symbol) {
@@ -543,7 +575,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	ICED_NOINLINE static void format_far_branch(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
+	ICED_NOINLINE static void format_far_branch(IntelFormatter& self, const Instruction& instruction, TOutput& output, const InstrOpInfo& op_info,
 												 InstrOpKind op_kind, std::uint32_t operand, std::optional<std::uint32_t> instruction_operand) {
 		const FormatterOptions& options = self.options_;
 		std::uint32_t imm_size;
@@ -596,7 +628,7 @@ struct IntelFormatterImpl {
 
 	// Immediate8/16/32/64 and db/dw/dd/dq (T = std::uint8_t/16/32/64)
 	template <typename T>
-	ICED_NOINLINE static void format_immediate(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, std::uint32_t operand,
+	ICED_NOINLINE static void format_immediate(IntelFormatter& self, const Instruction& instruction, TOutput& output, std::uint32_t operand,
 												std::optional<std::uint32_t> instruction_operand, T imm) {
 		using S = std::make_signed_t<T>;
 		const FormatterOptions& options = self.options_;
@@ -628,7 +660,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static void format_flow_control(const IntelFormatter& self, FormatterOutput& output, std::uint32_t flags, FormatterOperandOptions operand_options) {
+	static void format_flow_control(const IntelFormatter& self, TOutput& output, std::uint32_t flags, FormatterOperandOptions operand_options) {
 		if (!operand_options.branch_size())
 			return;
 		const auto& keywords = self.vec_->intel_branch_infos[(static_cast<std::size_t>(flags) >> InstrOpInfoFlags::BRANCH_SIZE_INFO_SHIFT) &
@@ -639,26 +671,19 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static void format_decorator(const FormatterOptions& options, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_decorator(const FormatterOptions& options, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 								 std::optional<std::uint32_t> instruction_operand, const FormatterString& text, DecoratorKind decorator) {
 		output.write("{", FormatterTextKind::Punctuation);
 		output.write_decorator(instruction, operand, instruction_operand, text.get(options.uppercase_decorators() || options.uppercase_all()), decorator);
 		output.write("}", FormatterTextKind::Punctuation);
 	}
 
-	static std::string_view get_reg_str(const IntelFormatter& self, Register reg) noexcept {
-		if (self.options_.prefer_st0() && reg == REGISTER_ST)
-			reg = Register::ST0;
-		const FormatterString& reg_str = self.all_registers_[static_cast<std::size_t>(reg)];
-		return reg_str.get(self.options_.uppercase_registers() || self.options_.uppercase_all());
-	}
-
-	static void format_register_internal(const IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_register_internal(const IntelFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 										 std::optional<std::uint32_t> instruction_operand, Register reg) {
 		output.write_register(instruction, operand, instruction_operand, get_reg_str(self, reg), reg);
 	}
 
-	ICED_NOINLINE static void format_memory(IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	ICED_NOINLINE static void format_memory(IntelFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 											 std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg, Register index_reg,
 											 std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size,
 											 std::uint32_t flags) {
@@ -779,7 +804,7 @@ struct IntelFormatterImpl {
 	}
 
 	// Part of format_memory() in Rust (not inlined to keep the stack frames small): formats the symbol or the displacement
-	static void format_memory_displ(IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_memory_displ(IntelFormatter& self, TOutput& output, const Instruction& instruction, std::uint32_t operand,
 												   std::optional<std::uint32_t> instruction_operand, const NumberFormattingOptions& number_options,
 												   const OptionalSymbolResult& symbol, bool need_plus, std::uint32_t displ_size, std::int64_t displ,
 												   std::uint32_t addr_size, std::uint64_t abs_addr) {
@@ -864,7 +889,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static void format_memory_size(const IntelFormatter& self, FormatterOutput& output, const OptionalSymbolResult& symbol, MemorySize mem_size,
+	static void format_memory_size(const IntelFormatter& self, TOutput& output, const OptionalSymbolResult& symbol, MemorySize mem_size,
 								   std::uint32_t flags, FormatterOperandOptions operand_options) {
 		const MemorySizeOptions mem_size_options = operand_options.memory_size_options();
 		if (mem_size_options == MemorySizeOptions::Never)
@@ -898,33 +923,26 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static bool is_same_mem_size(const IntelFormatter& self, FormatterStringSlice mem_size_strings, const SymbolResult& symbol) noexcept {
-		const MemorySize symbol_size = symbol.symbol_size.value_or(MemorySize::Unknown);
-		ICED_DEBUG_ASSERT(static_cast<std::size_t>(symbol_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
-		const MemSizeInfo& symbol_mem_info = self.all_memory_sizes_[static_cast<std::size_t>(symbol_size)];
-		const FormatterStringSlice symbol_mem_size_strings = symbol_mem_info.keywords;
-		return is_same_mem_size_slice(mem_size_strings, symbol_mem_size_strings);
-	}
-
-	static bool is_same_mem_size_slice(FormatterStringSlice a, FormatterStringSlice b) noexcept {
-		if (a.size() != b.size())
-			return false;
-		for (std::size_t i = 0; i < a.size(); i++) {
-			if (a[i]->lower() != b[i]->lower())
-				return false;
-		}
-		return true;
-	}
-
-	static void format_keyword(const FormatterOptions& options, FormatterOutput& output, const FormatterString& keyword) {
+	static void format_keyword(const FormatterOptions& options, TOutput& output, const FormatterString& keyword) {
 		output.write(keyword.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Keyword);
+	}
+
+	static void add_tabs(TOutput& output, std::uint32_t column, std::uint32_t first_operand_char_index, std::uint32_t tab_size) {
+		// Fast path (default options): same as `internal::add_tabs()` but the write can be inlined
+		if (tab_size == 0 && first_operand_char_index <= column)
+			output.write(" ", FormatterTextKind::Text);
+		else
+			internal::add_tabs(output, column, first_operand_char_index, tab_size);
 	}
 };
 
 } // namespace internal::intel
 
 using internal::intel::InstrOpInfo;
-using internal::intel::IntelFormatterImpl;
+using IntelFormatterImpl = internal::intel::IntelFormatterImpl<FormatterOutput>;
+#ifndef ICED_X86_NO_FORMATTER_STRING_SPECIALIZATION
+using IntelFormatterStringImpl = internal::intel::IntelFormatterImpl<internal::BufferedStringOutput>;
+#endif
 
 IntelFormatter::IntelFormatter() : IntelFormatter(nullptr, nullptr) {}
 
@@ -1002,9 +1020,30 @@ void IntelFormatter::format(const Instruction& instruction, FormatterOutput& out
 	IntelFormatterImpl::format_mnemonic(*this, instruction, output, op_info, column, FormatMnemonicOptions::NONE);
 
 	if (op_info.op_count != 0) {
-		internal::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
+		IntelFormatterImpl::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
 		IntelFormatterImpl::format_operands(*this, instruction, output, op_info);
 	}
+}
+
+void IntelFormatter::format(const Instruction& instruction, std::string& output_string) {
+#ifdef ICED_X86_NO_FORMATTER_STRING_SPECIALIZATION
+	StringFormatterOutput output(output_string);
+	format(instruction, output);
+#else
+	if (ICED_UNLIKELY(!string_buffer_))
+		string_buffer_ = std::make_unique<internal::FormatterStringBuffer>();
+	internal::BufferedStringOutput output(*string_buffer_);
+	const InstrOpInfo op_info = IntelFormatterStringImpl::get_op_info(*this, instruction);
+
+	std::uint32_t column = 0;
+	IntelFormatterStringImpl::format_mnemonic(*this, instruction, output, op_info, column, FormatMnemonicOptions::NONE);
+
+	if (op_info.op_count != 0) {
+		IntelFormatterStringImpl::add_tabs(output, column, options_.first_operand_char_index(), options_.tab_size());
+		IntelFormatterStringImpl::format_operands(*this, instruction, output, op_info);
+	}
+	output.flush(output_string);
+#endif
 }
 
 std::string_view IntelFormatter::format_register(Register register_) { return IntelFormatterImpl::get_reg_str(*this, register_); }

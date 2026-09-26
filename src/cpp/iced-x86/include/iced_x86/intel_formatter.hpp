@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "iced_x86/formatter.hpp"
@@ -23,11 +24,14 @@ class Instruction;
 namespace internal {
 class FormatterString;
 class NumberFormatter;
+struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace intel {
 class InstrInfo;
 struct MemSizeInfo;
+struct IntelFormatterCommon;
+template <typename TOutput>
 struct IntelFormatterImpl;
 } // namespace intel
 } // namespace internal
@@ -109,6 +113,14 @@ public:
 	/// - `instruction`: Instruction
 	/// - `output`: Output, eg. a `StringFormatterOutput`
 	void format(const Instruction& instruction, FormatterOutput& output) override;
+
+	/// Formats the whole instruction: prefixes, mnemonic, operands
+	///
+	/// # Arguments
+	///
+	/// - `instruction`: Instruction
+	/// - `output`: The formatted instruction is appended to this string
+	void format(const Instruction& instruction, std::string& output) override;
 
 	/// Gets the formatter options (immutable)
 	const FormatterOptions& options() const noexcept override { return options_; }
@@ -327,6 +339,8 @@ public:
 	std::string_view format_u64_options(std::uint64_t value, const NumberFormattingOptions& number_options) override;
 
 private:
+	friend struct internal::intel::IntelFormatterCommon;
+	template <typename TOutput>
 	friend struct internal::intel::IntelFormatterImpl;
 
 	FormatterOptions options_;
@@ -337,6 +351,8 @@ private:
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;
 	std::unique_ptr<internal::NumberFormatter> number_formatter_;
+	// Used by `format(const Instruction&, std::string&)` (allocated the first time it's called)
+	std::unique_ptr<internal::FormatterStringBuffer> string_buffer_;
 	std::unique_ptr<SymbolResolver> symbol_resolver_;
 	std::unique_ptr<FormatterOptionsProvider> options_provider_;
 };
