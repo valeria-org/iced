@@ -75,9 +75,13 @@ struct InstrOpInfo {
 							  op_kinds[0] == InstrOpKind::DeclareDword || op_kinds[0] == InstrOpKind::DeclareQword);
 			instruction_operand = -1;
 		}
+		// Read the result from a table: if it's created with `std::optional(value)`, some compilers (eg. GCC) write the
+		// value and the flag with 2 stores and then read it with one 8-byte load which causes a store forwarding stall.
+		static constexpr std::optional<std::uint32_t> INSTRUCTION_OPERANDS[IcedConstants::MAX_OP_COUNT + 1] = {std::nullopt, 0, 1, 2, 3, 4};
 		if (instruction_operand < 0)
-			return std::nullopt;
-		return static_cast<std::uint32_t>(instruction_operand);
+			return INSTRUCTION_OPERANDS[0];
+		ICED_ASSERT(instruction_operand < static_cast<std::int8_t>(IcedConstants::MAX_OP_COUNT));
+		return INSTRUCTION_OPERANDS[static_cast<std::size_t>(instruction_operand) + 1];
 	}
 
 	std::optional<OpAccess> op_access(std::uint32_t operand) const noexcept {

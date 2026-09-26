@@ -9,6 +9,8 @@
 
 #include "iced_x86/decoder.hpp"
 #include "iced_x86/fast_formatter.hpp"
+#include "iced_x86/gas_formatter.hpp"
+#include "iced_x86/intel_formatter.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -148,6 +150,14 @@ int main(int argc, char** argv) {
 	bench("SpecializedFormatter:", code, text_address, loops, [&specialized_formatter](const Instruction& instruction, std::string& output) {
 		specialized_formatter.format(instruction, output);
 	});
+
+	GasFormatter gas_formatter;
+	bench("GasFormatter:", code, text_address, loops,
+		  [&gas_formatter](const Instruction& instruction, std::string& output) { gas_formatter.format(instruction, output); });
+
+	IntelFormatter intel_formatter;
+	bench("IntelFormatter:", code, text_address, loops,
+		  [&intel_formatter](const Instruction& instruction, std::string& output) { intel_formatter.format(instruction, output); });
 
 	return 0;
 }

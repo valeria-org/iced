@@ -35,6 +35,7 @@
 #include "internal/formatter/gas/regs.hpp"
 #include "internal/formatter/gas/size_override.hpp"
 #include "internal/formatter/num_fmt.hpp"
+#include "internal/formatter/optional_symbol_result.hpp"
 #include "internal/formatter/regs_tbl_ls.hpp"
 #include "internal/iced_assert.hpp"
 #include "internal/instruction_internal.hpp"
@@ -293,11 +294,16 @@ struct GasFormatterImpl {
 		}
 	}
 
-	static std::optional<SymbolResult> get_symbol(GasFormatter& self, const Instruction& instruction, std::uint32_t operand,
-												  std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
-		if (!self.symbol_resolver_)
-			return std::nullopt;
-		return self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size);
+	// Calls the symbol resolver (if any)
+	static void get_symbol(GasFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
+						   std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
+		if (self.symbol_resolver_)
+			get_symbol_core(self, symbol, instruction, operand, instruction_operand, address, size);
+	}
+
+	ICED_NOINLINE static void get_symbol_core(GasFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
+											   std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
+		symbol.set(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size));
 	}
 
 	static void format_operand(GasFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
@@ -525,7 +531,8 @@ struct GasFormatterImpl {
 		FormatterOperandOptions operand_options;
 		if (self.options_provider_)
 			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, imm64, imm_size);
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, imm64, imm_size);
 		if (symbol) {
 			FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, *self.number_formatter_, number_options, imm64,
 										   *symbol, options.show_symbol_address());
@@ -553,7 +560,8 @@ struct GasFormatterImpl {
 		FormatterOperandOptions operand_options;
 		if (self.options_provider_)
 			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, imm, sizeof(T));
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, imm, sizeof(T));
 		if (symbol) {
 			FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, *self.number_formatter_, number_options, imm,
 										   *symbol, options.show_symbol_address());
@@ -576,11 +584,12 @@ struct GasFormatterImpl {
 		}
 	}
 
-	// The resolver will be called again before the symbol is used so the returned symbol result is an owned copy (the text is stored in `vec`)
-	ICED_NOINLINE static std::optional<SymbolResult> get_owned_symbol(GasFormatter& self, const Instruction& instruction, std::uint32_t operand,
-																	   std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
-																	   std::uint32_t size, std::vector<SymResTextPart>& vec) {
-		return to_owned(get_symbol(self, instruction, operand, instruction_operand, address, size), vec);
+	// The resolver will be called again before the symbol is used so the symbol result is an owned copy (the text is stored in `vec`)
+	ICED_NOINLINE static void get_owned_symbol(GasFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
+												std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size,
+												std::vector<SymResTextPart>& vec) {
+		if (self.symbol_resolver_)
+			symbol.set(to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size), vec));
 	}
 
 	ICED_NOINLINE static void format_far_branch_symbol(GasFormatter& self, const Instruction& instruction, FormatterOutput& output,
@@ -589,8 +598,8 @@ struct GasFormatterImpl {
 		const FormatterOptions& options = self.options_;
 		output.write(IMMEDIATE_VALUE_PREFIX, FormatterTextKind::Operator);
 		ICED_DEBUG_ASSERT(operand + 1 == 1);
-		const std::optional<SymbolResult> selector_symbol =
-			get_symbol(self, instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
+		OptionalSymbolResult selector_symbol;
+		get_symbol(self, selector_symbol, instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
 		if (selector_symbol) {
 			FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, *self.number_formatter_, number_options,
 										   instruction.far_branch_selector(), *selector_symbol, options.show_symbol_address());
@@ -628,8 +637,8 @@ struct GasFormatterImpl {
 		if (self.options_provider_)
 			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
 		std::vector<SymResTextPart> vec;
-		const std::optional<SymbolResult> symbol =
-			get_owned_symbol(self, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size, vec);
+		OptionalSymbolResult symbol;
+		get_owned_symbol(self, symbol, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size, vec);
 		if (symbol) {
 			format_far_branch_symbol(self, instruction, output, operand, instruction_operand, number_options, imm64, *symbol);
 		} else {
@@ -672,9 +681,9 @@ struct GasFormatterImpl {
 	}
 
 	// Part of format_memory() in Rust (not inlined to keep the stack frames small): formats the symbol or the displacement
-	ICED_NOINLINE static void format_memory_displ(GasFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_memory_displ(GasFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
 												   std::optional<std::uint32_t> instruction_operand, const NumberFormattingOptions& number_options,
-												   const std::optional<SymbolResult>& symbol, bool has_base_or_index_reg, std::uint32_t displ_size,
+												   const OptionalSymbolResult& symbol, bool has_base_or_index_reg, std::uint32_t displ_size,
 												   std::int64_t displ, std::uint32_t addr_size, std::uint64_t abs_addr) {
 		const FormatterOptions& options = self.options_;
 		if (symbol) {
@@ -766,7 +775,8 @@ struct GasFormatterImpl {
 		} else
 			abs_addr = static_cast<std::uint64_t>(displ);
 
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, abs_addr, addr_size);
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, abs_addr, addr_size);
 
 		const bool use_scale = addr_size == 2 || !show_index_scale(instruction, options) ? false : scale != 0 || options.always_show_scale();
 

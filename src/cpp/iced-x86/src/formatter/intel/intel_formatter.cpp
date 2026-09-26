@@ -37,6 +37,7 @@
 #include "internal/formatter/intel/instr_op_kind.hpp"
 #include "internal/formatter/intel/mem_size_tbl.hpp"
 #include "internal/formatter/num_fmt.hpp"
+#include "internal/formatter/optional_symbol_result.hpp"
 #include "internal/formatter/regs_tbl_ls.hpp"
 #include "internal/iced_assert.hpp"
 #include "internal/instruction_internal.hpp"
@@ -252,11 +253,17 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static std::optional<SymbolResult> get_symbol(IntelFormatter& self, const Instruction& instruction, std::uint32_t operand,
-												  std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
-		if (!self.symbol_resolver_)
-			return std::nullopt;
-		return self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size);
+	// Calls the symbol resolver (if any)
+	static void get_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction, std::uint32_t operand,
+						   std::optional<std::uint32_t> instruction_operand, std::uint64_t address, std::uint32_t size) {
+		if (self.symbol_resolver_)
+			get_symbol_core(self, symbol, instruction, operand, instruction_operand, address, size);
+	}
+
+	ICED_NOINLINE static void get_symbol_core(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
+											   std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+											   std::uint32_t size) {
+		symbol.set(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size));
 	}
 
 	static void format_operand(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output, const InstrOpInfo& op_info,
@@ -467,7 +474,8 @@ struct IntelFormatterImpl {
 		}
 		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
 																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, imm64, imm_size);
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, imm64, imm_size);
 		if (symbol) {
 			format_flow_control(self, output, op_info.flags, operand_options);
 			auto number_options = NumberFormattingOptions::with_branch(options);
@@ -493,11 +501,12 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	// The resolver will be called again before the symbol is used so the returned symbol result is an owned copy (the text is stored in `vec`)
-	ICED_NOINLINE static std::optional<SymbolResult> get_owned_symbol(IntelFormatter& self, const Instruction& instruction, std::uint32_t operand,
-																	   std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
-																	   std::uint32_t size, std::vector<SymResTextPart>& vec) {
-		return to_owned(get_symbol(self, instruction, operand, instruction_operand, address, size), vec);
+	// The resolver will be called again before the symbol is used so the symbol result is an owned copy (the text is stored in `vec`)
+	ICED_NOINLINE static void get_owned_symbol(IntelFormatter& self, OptionalSymbolResult& symbol, const Instruction& instruction,
+												std::uint32_t operand, std::optional<std::uint32_t> instruction_operand, std::uint64_t address,
+												std::uint32_t size, std::vector<SymResTextPart>& vec) {
+		if (self.symbol_resolver_)
+			symbol.set(to_owned(self.symbol_resolver_->symbol(instruction, operand, instruction_operand, address, size), vec));
 	}
 
 	ICED_NOINLINE static void format_far_branch_symbol(IntelFormatter& self, const Instruction& instruction, FormatterOutput& output,
@@ -515,8 +524,8 @@ struct IntelFormatterImpl {
 		if (options.space_after_operand_separator())
 			output.write(" ", FormatterTextKind::Text);
 		ICED_DEBUG_ASSERT(operand + 1 == 1);
-		const std::optional<SymbolResult> selector_symbol =
-			get_symbol(self, instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
+		OptionalSymbolResult selector_symbol;
+		get_symbol(self, selector_symbol, instruction, operand + 1, instruction_operand, instruction.far_branch_selector(), 2);
 		if (selector_symbol) {
 			number_options = NumberFormattingOptions::with_branch(options);
 			if (self.options_provider_)
@@ -552,8 +561,8 @@ struct IntelFormatterImpl {
 		FormatterOperandOptions operand_options(options.show_branch_size() ? FormatterOperandOptionsFlags::NONE
 																		   : FormatterOperandOptionsFlags::NO_BRANCH_SIZE);
 		std::vector<SymResTextPart> vec;
-		const std::optional<SymbolResult> symbol =
-			get_owned_symbol(self, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size, vec);
+		OptionalSymbolResult symbol;
+		get_owned_symbol(self, symbol, instruction, operand, instruction_operand, static_cast<std::uint32_t>(imm64), imm_size, vec);
 		if (symbol)
 			format_far_branch_symbol(self, instruction, output, op_info, operand, instruction_operand, operand_options, imm64, *symbol);
 		else {
@@ -592,7 +601,8 @@ struct IntelFormatterImpl {
 		using S = std::make_signed_t<T>;
 		const FormatterOptions& options = self.options_;
 		FormatterOperandOptions operand_options;
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, imm, sizeof(T));
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, imm, sizeof(T));
 		auto number_options = NumberFormattingOptions::with_immediate(options);
 		if (self.options_provider_)
 			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
@@ -684,7 +694,8 @@ struct IntelFormatterImpl {
 		} else
 			abs_addr = static_cast<std::uint64_t>(displ);
 
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, abs_addr, addr_size);
+		OptionalSymbolResult symbol;
+		get_symbol(self, symbol, instruction, operand, instruction_operand, abs_addr, addr_size);
 
 		bool use_scale = scale != 0 || options.always_show_scale();
 		if (!use_scale) {
@@ -768,9 +779,9 @@ struct IntelFormatterImpl {
 	}
 
 	// Part of format_memory() in Rust (not inlined to keep the stack frames small): formats the symbol or the displacement
-	ICED_NOINLINE static void format_memory_displ(IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+	static void format_memory_displ(IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
 												   std::optional<std::uint32_t> instruction_operand, const NumberFormattingOptions& number_options,
-												   const std::optional<SymbolResult>& symbol, bool need_plus, std::uint32_t displ_size, std::int64_t displ,
+												   const OptionalSymbolResult& symbol, bool need_plus, std::uint32_t displ_size, std::int64_t displ,
 												   std::uint32_t addr_size, std::uint64_t abs_addr) {
 		const FormatterOptions& options = self.options_;
 		if (symbol) {
@@ -853,7 +864,7 @@ struct IntelFormatterImpl {
 		}
 	}
 
-	static void format_memory_size(const IntelFormatter& self, FormatterOutput& output, const std::optional<SymbolResult>& symbol, MemorySize mem_size,
+	static void format_memory_size(const IntelFormatter& self, FormatterOutput& output, const OptionalSymbolResult& symbol, MemorySize mem_size,
 								   std::uint32_t flags, FormatterOperandOptions operand_options) {
 		const MemorySizeOptions mem_size_options = operand_options.memory_size_options();
 		if (mem_size_options == MemorySizeOptions::Never)
