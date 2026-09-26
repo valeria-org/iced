@@ -80,6 +80,28 @@ jobs:
   #############################################################################
   #############################################################################
 
+  build-cpp:
+    name: C++ (${{matrix.os}})
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install ninja
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Build and test
+        shell: bash
+        run: ./build/build-cpp
+
+  #############################################################################
+  #############################################################################
+  #############################################################################
+
   build-java:
     name: Java (${{matrix.os}})
     runs-on: ${{matrix.os}}

@@ -1,0 +1,83 @@
+#!/bin/sh
+set -e
+
+root_dir=$(dirname "$0")
+root_dir=$(cd "$root_dir/.." && pwd)
+if [ ! -f "$root_dir/LICENSE.txt" ]; then
+	echo "Couldn't find the root dir"
+	exit 1
+fi
+
+full_check=y
+test_code=y
+build_dir="$root_dir/src/cpp/iced-x86/build-ci"
+compilers="g++ clang++"
+
+new_func() {
+	echo
+	echo "****************************************************************"
+	echo "$1"
+	echo "****************************************************************"
+	echo
+}
+
+# $1 = C++ compiler, $2 = build type, $3... = extra cmake args
+build_test() {
+	cxx=$1
+	build_type=$2
+	shift 2
+	new_func "Build, test: $cxx $build_type $*"
+
+	dir="$build_dir/$(basename "$cxx")-$build_type"
+	rm -rf "$dir"
+	CXX="$cxx" cmake -S "$root_dir/src/cpp/iced-x86" -B "$dir" -G Ninja \
+		-DCMAKE_BUILD_TYPE="$build_type" \
+		-DICED_X86_WARNINGS_AS_ERRORS=ON \
+		-DICED_X86_BUILD_TESTS=$test_code \
+		"$@"
+	cmake --build "$dir"
+	if [ "$test_code" = "y" ]; then
+		(cd "$dir" && ctest --output-on-failure)
+	fi
+	rm -rf "$dir"
+}
+
+while [ "$#" -gt 0 ]; do
+	case $1 in
+	--quick-check) full_check=n ;;
+	--no-test) test_code=n ;;
+	--compilers) shift; compilers=$1 ;;
+	*) echo "Unknown arg: $1"; exit 1 ;;
+	esac
+	shift
+done
+
+echo
+echo "=================================================="
+echo "C++ build"
+echo "=================================================="
+echo
+
+cmake --version
+for cxx in $compilers; do
+	$cxx --version | head -1
+done
+
+if [ "$test_code" = "y" ]; then
+	test_code=ON
+else
+	test_code=OFF
+fi
+
+for cxx in $compilers; do
+	# Release build + all tests, library built without exceptions/RTTI (embedded config)
+	build_test "$cxx" Release -DICED_X86_NO_EXCEPTIONS_RTTI=ON
+	if [ "$full_check" = "y" ]; then
+		# Debug build: also verifies that no stack frame is > 1KB at -O0
+		build_test "$cxx" Debug
+		# Smallest code, formatter std::string specialization disabled
+		build_test "$cxx" MinSizeRel -DICED_X86_NO_EXCEPTIONS_RTTI=ON -DICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF
+	fi
+done
+
+rm -rf "$build_dir"

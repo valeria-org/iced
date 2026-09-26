@@ -6,7 +6,7 @@ iced is a blazing fast and correct x86 (16/32/64-bit) instruction decoder, disas
 
 - 👍 Supports all Intel and AMD instructions
 - 👍 Correct: All instructions are tested and iced has been tested against other disassemblers/assemblers (xed, gas, objdump, masm, dumpbin, nasm, ndisasm) and fuzzed
-- 👍 Supports .NET, Rust, Python, JavaScript (WebAssembly)
+- 👍 Supports .NET, Rust, C++, Python, JavaScript (WebAssembly)
 - 👍 The formatter supports masm, nasm, gas (AT&T), Intel (XED) and there are many options to customize the output
 - 👍 Blazing fast: Decodes >250 MB/s and decode+format >130 MB/s (Rust, [see here](https://github.com/icedland/disas-bench/tree/a865849deacfb6c33ee0e78f3a3ad7f4c82099f5#results))
 - 👍 Small decoded instructions, only 40 bytes and the decoder doesn't allocate any memory
@@ -20,6 +20,7 @@ iced is a blazing fast and correct x86 (16/32/64-bit) instruction decoder, disas
 - Rust: [README](https://github.com/icedland/iced/blob/master/src/rust/iced-x86/README.md)
 - .NET: [README](https://github.com/icedland/iced/blob/master/src/csharp/Intel/README.md)
 - Java: [README](https://github.com/icedland/iced/blob/master/src/java/iced-x86/README.md)
+- C++: [README](src/cpp/iced-x86/README.md)
 - Python: [README](https://github.com/icedland/iced/blob/master/src/rust/iced-x86-py/README.md)
 - JavaScript + WebAssembly: [README](https://github.com/icedland/iced/blob/master/src/rust/iced-x86-js/README.md)
 - Lua: [README](https://github.com/icedland/iced/blob/master/src/rust/iced-x86-lua/README.md)
