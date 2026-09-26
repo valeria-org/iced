@@ -1045,6 +1045,432 @@ TEST_CASE("encoder/verify_gpr_rrxb_bits") {
 	}
 }
 
-// DEC_ENC_PART3
+TEST_CASE("encoder/verify_k_reg_rrxb_bits") {
+	for (const auto& info : decoder_tests(false, false)) {
+		if ((info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) != 0)
+			continue;
+
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+
+		switch (op_code.encoding()) {
+		case EncodingKind::Legacy:
+		case EncodingKind::D3NOW:
+			continue;
+		case EncodingKind::VEX:
+		case EncodingKind::EVEX:
+		case EncodingKind::XOP:
+		case EncodingKind::MVEX:
+			break;
+		}
+
+		bool uses_rm = false;
+		bool maybe_uses_rm = false;
+		bool uses_reg = false;
+		bool other_rm = false;
+		bool other_reg = false;
+		for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+			switch (op_kind) {
+			case OpCodeOperandKind::mem:
+				maybe_uses_rm = true;
+				break;
+			case OpCodeOperandKind::k_or_mem:
+			case OpCodeOperandKind::k_rm:
+				uses_rm = true;
+				break;
+			case OpCodeOperandKind::k_reg:
+			case OpCodeOperandKind::kp1_reg:
+				uses_reg = true;
+				break;
+			case OpCodeOperandKind::r32_or_mem:
+			case OpCodeOperandKind::r64_or_mem:
+			case OpCodeOperandKind::r32_or_mem_mpx:
+			case OpCodeOperandKind::r64_or_mem_mpx:
+			case OpCodeOperandKind::r32_rm:
+			case OpCodeOperandKind::r64_rm:
+			case OpCodeOperandKind::xmm_or_mem:
+			case OpCodeOperandKind::ymm_or_mem:
+			case OpCodeOperandKind::zmm_or_mem:
+			case OpCodeOperandKind::xmm_rm:
+			case OpCodeOperandKind::ymm_rm:
+			case OpCodeOperandKind::zmm_rm:
+			case OpCodeOperandKind::tmm_rm:
+				other_rm = true;
+				break;
+			case OpCodeOperandKind::xmm_reg:
+			case OpCodeOperandKind::ymm_reg:
+			case OpCodeOperandKind::zmm_reg:
+			case OpCodeOperandKind::tmm_reg:
+			case OpCodeOperandKind::r32_reg:
+			case OpCodeOperandKind::r64_reg:
+				other_reg = true;
+				break;
+			default:
+				break;
+			}
+		}
+		if (uses_reg && maybe_uses_rm)
+			uses_rm = true;
+		if (!uses_rm && !uses_reg && op_code.op_count() > 0)
+			continue;
+
+		if (op_code.encoding() == EncodingKind::VEX || op_code.encoding() == EncodingKind::XOP) {
+			auto bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t vex_index = get_vex_xop_index(bytes);
+			const bool is_vex2 = bytes[vex_index] == 0xC5;
+			const std::size_t mrmi = vex_index + 3 + (is_vex2 ? 0 : 1);
+			const bool is_reg_only = mrmi >= bytes.size() || (bytes[mrmi] >> 6) == 3;
+			const std::uint8_t b1 = bytes[vex_index + 1];
+
+			const Instruction orig_instr = decode_one(info.bitness(), bytes, info.decoder_options());
+			CHECK_EQ(orig_instr.code(), info.code());
+			if (uses_rm && !is_vex2) {
+				bytes[vex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x20);
+				{
+					const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), info.code());
+					if (is_reg_only && info.bitness() != 64)
+						CHECK(orig_instr.eq_all_bits(instruction));
+				}
+				bytes[vex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x40);
+				if (info.bitness() == 64) {
+					const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), info.code());
+					if (is_reg_only)
+						CHECK(orig_instr.eq_all_bits(instruction));
+				}
+			}
+			else if (!other_rm && !is_vex2) {
+				bytes[vex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x60);
+				if (info.bitness() != 64)
+					bytes[vex_index + 1] |= 0x40;
+				const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+				CHECK_EQ(instruction.code(), info.code());
+				CHECK(orig_instr.eq_all_bits(instruction));
+			}
+			if (uses_reg) {
+				bytes[vex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x80);
+				if (info.bitness() == 64) {
+					{
+						const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+					{
+						const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+						CHECK_EQ(instruction.code(), info.code());
+						if (is_reg_only)
+							CHECK(orig_instr.eq_all_bits(instruction));
+					}
+				}
+			}
+			else if (!other_reg) {
+				bytes[vex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x80);
+				if (info.bitness() != 64)
+					bytes[vex_index + 1] |= 0x80;
+				const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+				CHECK_EQ(instruction.code(), info.code());
+				CHECK(orig_instr.eq_all_bits(instruction));
+			}
+		}
+		else if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX) {
+			auto bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t evex_index = get_evex_index(bytes);
+			const bool is_reg_only = (bytes[evex_index + 5] >> 6) == 3;
+			const std::uint8_t b1 = bytes[evex_index + 1];
+
+			const Instruction orig_instr = decode_one(info.bitness(), bytes, info.decoder_options());
+			CHECK_EQ(orig_instr.code(), info.code());
+			if (uses_rm) {
+				bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x20);
+				{
+					const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), info.code());
+					if (is_reg_only && info.bitness() != 64)
+						CHECK(orig_instr.eq_all_bits(instruction));
+				}
+				bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x40);
+				if (info.bitness() == 64) {
+					const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), info.code());
+					if (is_reg_only)
+						CHECK(orig_instr.eq_all_bits(instruction));
+				}
+			}
+			else if (!other_rm) {
+				bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x60);
+				if (info.bitness() != 64)
+					bytes[evex_index + 1] |= 0x40;
+				const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+				CHECK_EQ(instruction.code(), info.code());
+				CHECK(orig_instr.eq_all_bits(instruction));
+			}
+			if (uses_reg) {
+				if (info.bitness() == 64) {
+					bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x10);
+					{
+						const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+					{
+						const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+						CHECK_EQ(instruction.code(), info.code());
+						CHECK(orig_instr.eq_all_bits(instruction));
+					}
+					bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x80);
+					{
+						const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+					{
+						const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+						CHECK_EQ(instruction.code(), info.code());
+						CHECK(orig_instr.eq_all_bits(instruction));
+					}
+				}
+				else {
+					bytes[evex_index + 1] = static_cast<std::uint8_t>(b1 ^ 0x10);
+					const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), info.code());
+					CHECK(orig_instr.eq_all_bits(instruction));
+				}
+			}
+		}
+		else
+			FAIL("unreachable");
+	}
+}
+
+namespace {
+
+// All Vk_VSIB instructions, eg. EVEX_Vpgatherdd_xmm_k1_vm32x
+bool can_have_invalid_index_register_evex(const OpCodeInfo& op_code) {
+	if (op_code.encoding() != EncodingKind::EVEX && op_code.encoding() != EncodingKind::MVEX)
+		return false;
+
+	switch (op_code.op0_kind()) {
+	case OpCodeOperandKind::xmm_reg:
+	case OpCodeOperandKind::ymm_reg:
+	case OpCodeOperandKind::zmm_reg:
+		break;
+	default:
+		return false;
+	}
+	return op_code.requires_unique_reg_nums();
+}
+
+// All VX_VSIB_HX instructions, eg. VEX_Vpgatherdd_xmm_vm32x_xmm
+bool can_have_invalid_index_mask_dest_register_vex(const OpCodeInfo& op_code) {
+	if (op_code.encoding() != EncodingKind::VEX && op_code.encoding() != EncodingKind::XOP)
+		return false;
+
+	switch (op_code.op0_kind()) {
+	case OpCodeOperandKind::xmm_reg:
+	case OpCodeOperandKind::ymm_reg:
+	case OpCodeOperandKind::zmm_reg:
+		break;
+	default:
+		return false;
+	}
+
+	return op_code.requires_unique_reg_nums();
+}
+
+// Returns (is_vsib32, is_vsib64) if it's a VSIB instruction
+std::optional<std::pair<bool, bool>> get_vsib(const OpCodeInfo& op_code) {
+	for (const OpCodeOperandKind op_kind : op_code.op_kinds()) {
+		switch (op_kind) {
+		case OpCodeOperandKind::mem_vsib32x:
+		case OpCodeOperandKind::mem_vsib32y:
+		case OpCodeOperandKind::mem_vsib32z:
+			return std::make_pair(true, false);
+		case OpCodeOperandKind::mem_vsib64x:
+		case OpCodeOperandKind::mem_vsib64y:
+		case OpCodeOperandKind::mem_vsib64z:
+			return std::make_pair(false, true);
+		default:
+			break;
+		}
+	}
+	return std::nullopt;
+}
+
+bool is_vsib(const OpCodeInfo& op_code) { return get_vsib(op_code).has_value(); }
+
+} // namespace
+
+TEST_CASE("encoder/verify_vsib_with_invalid_index_register_evex") {
+	for (const auto& info : decoder_tests(false, false)) {
+		if ((info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) != 0)
+			continue;
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (!can_have_invalid_index_register_evex(op_code))
+			continue;
+
+		if (op_code.encoding() == EncodingKind::EVEX || op_code.encoding() == EncodingKind::MVEX) {
+			auto bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t evex_index = get_evex_index(bytes);
+			const std::uint8_t p0 = bytes[evex_index + 1];
+			const std::uint8_t p2 = bytes[evex_index + 3];
+			const std::uint8_t m = bytes[evex_index + 5];
+			const std::uint8_t s = bytes[evex_index + 6];
+			for (std::uint32_t i = 0; i < 32; i++) {
+				const std::uint32_t reg_num = info.bitness() == 64 ? i : i & 7;
+				const bool always_invalid = info.bitness() != 64 && (i & 0x10) != 0;
+				const std::uint32_t t = i ^ 0x1F;
+				// reg  = R' R modrm.reg
+				// vidx = V' X sib.index
+				bytes[evex_index + 1] = static_cast<std::uint8_t>((p0 & ~0xD0U) | /*R'*/ (t & 0x10) | /*R*/ ((t & 0x08) << 4) | /*X*/ ((t & 0x08) << 3));
+				if (info.bitness() != 64)
+					bytes[evex_index + 1] |= 0xC0;
+				bytes[evex_index + 3] = static_cast<std::uint8_t>((p2 & ~0x08U) | /*V'*/ ((t & 0x10) >> 1));
+				bytes[evex_index + 5] = static_cast<std::uint8_t>((m & 0xC7) | /*modrm.reg*/ ((i & 7) << 3));
+				bytes[evex_index + 6] = static_cast<std::uint8_t>((s & 0xC7) | /*sib.index*/ ((i & 7) << 3));
+
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+					CHECK_EQ(instruction.code(), Code::INVALID);
+					CHECK(error != DecoderError::None);
+				}
+				{
+					const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+					if (always_invalid) {
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+					else {
+						CHECK_EQ(instruction.code(), info.code());
+						CHECK_EQ(instruction.op0_kind(), OpKind::Register);
+						CHECK_EQ(instruction.op1_kind(), OpKind::Memory);
+						CHECK(instruction.memory_index() != Register::None);
+						CHECK_EQ(reg_number(instruction.op0_register()), reg_num);
+						CHECK_EQ(reg_number(instruction.memory_index()), reg_num);
+					}
+				}
+			}
+		}
+		else
+			FAIL("unreachable");
+	}
+}
+
+TEST_CASE("encoder/verify_vsib_with_invalid_index_mask_dest_register_vex") {
+	enum class TestKind {
+		reg_eq_vvvv,
+		reg_eq_vidx,
+		vvvv_eq_vidx,
+		all_eq_all,
+	};
+	for (const auto& info : decoder_tests(false, false)) {
+		if ((info.decoder_options() & DecoderOptions::NO_INVALID_CHECK) != 0)
+			continue;
+		const OpCodeInfo& op_code = code_ext::op_code(info.code());
+		if (!can_have_invalid_index_mask_dest_register_vex(op_code))
+			continue;
+
+		if (op_code.encoding() == EncodingKind::VEX || op_code.encoding() == EncodingKind::XOP) {
+			auto bytes = to_vec_u8(info.hex_bytes());
+			const std::size_t vex_index = get_vex_xop_index(bytes);
+
+			const bool is_vex2 = bytes[vex_index] == 0xC5;
+			const std::size_t r_index = vex_index + 1;
+			const std::size_t v_index = is_vex2 ? r_index : r_index + 1;
+			const std::size_t m_index = v_index + 2;
+			const std::size_t s_index = v_index + 3;
+
+			const std::uint8_t r = bytes[r_index];
+			const std::uint8_t v = bytes[v_index];
+			const std::uint8_t m = bytes[m_index];
+			const std::uint8_t s = bytes[s_index];
+
+			for (const TestKind test_kind : {TestKind::reg_eq_vvvv, TestKind::reg_eq_vidx, TestKind::vvvv_eq_vidx, TestKind::all_eq_all}) {
+				for (std::uint32_t i = 0; i < 16; i++) {
+					const std::uint32_t reg_num = info.bitness() == 64 ? i : i & 7;
+					// Use a small number (0-7) in case it's vex2 and 'other' is vidx (uses VEX.X bit)
+					const std::uint32_t other = reg_num == 0 ? 1 : 0;
+					std::uint32_t new_reg;
+					std::uint32_t new_vvvv;
+					std::uint32_t new_vidx;
+
+					switch (test_kind) {
+					case TestKind::reg_eq_vvvv:
+						new_vvvv = reg_num;
+						new_reg = reg_num;
+						new_vidx = other;
+						break;
+					case TestKind::reg_eq_vidx:
+						new_vidx = reg_num;
+						new_reg = reg_num;
+						new_vvvv = other;
+						break;
+					case TestKind::vvvv_eq_vidx:
+						new_vidx = reg_num;
+						new_vvvv = reg_num;
+						new_reg = other;
+						break;
+					case TestKind::all_eq_all:
+					default:
+						new_vidx = reg_num;
+						new_vvvv = reg_num;
+						new_reg = reg_num;
+						break;
+					}
+
+					// reg  = R modrm.reg
+					// vidx = X sib.index
+					if (is_vex2) {
+						if (new_vidx >= 8)
+							continue;
+						bytes[r_index] = static_cast<std::uint8_t>((r & 0x07) | /*R*/ (((new_reg ^ 8) & 0x8) << 4) | /*vvvv*/ (((new_vvvv ^ 0xF) & 0xF) << 3));
+					}
+					else {
+						bytes[r_index] = static_cast<std::uint8_t>((r & 0x3F) | /*R*/ (((new_reg ^ 8) & 8) << 4) | /*X*/ (((new_vidx ^ 8) & 8) << 3));
+						bytes[v_index] = static_cast<std::uint8_t>((v & 0x87) | /*vvvv*/ (((new_vvvv ^ 0xF) & 0xF) << 3));
+					}
+					bytes[m_index] = static_cast<std::uint8_t>((m & 0xC7) | /*modrm.reg*/ ((new_reg & 7) << 3));
+					bytes[s_index] = static_cast<std::uint8_t>((s & 0xC7) | /*sib.index*/ ((new_vidx & 7) << 3));
+
+					{
+						const auto [instruction, error] = decode_one_err(info.bitness(), bytes, info.decoder_options());
+						CHECK_EQ(instruction.code(), Code::INVALID);
+						CHECK(error != DecoderError::None);
+					}
+					{
+						const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options() | DecoderOptions::NO_INVALID_CHECK);
+						CHECK_EQ(instruction.code(), info.code());
+						CHECK_EQ(instruction.op0_kind(), OpKind::Register);
+						CHECK_EQ(instruction.op1_kind(), OpKind::Memory);
+						CHECK_EQ(instruction.op2_kind(), OpKind::Register);
+						CHECK(instruction.memory_index() != Register::None);
+						CHECK_EQ(reg_number(instruction.op0_register()), new_reg);
+						CHECK_EQ(reg_number(instruction.memory_index()), new_vidx);
+						CHECK_EQ(reg_number(instruction.op2_register()), new_vvvv);
+					}
+				}
+			}
+		}
+		else
+			FAIL("unreachable");
+	}
+}
+
+TEST_CASE("encoder/test_vsib_props") {
+	for (const auto& info : decoder_tests(false, false)) {
+		const auto bytes = to_vec_u8(info.hex_bytes());
+		const Instruction instruction = decode_one(info.bitness(), bytes, info.decoder_options());
+		CHECK_EQ(instruction.code(), info.code());
+
+		const auto vsib = get_vsib(code_ext::op_code(info.code()));
+		const bool is_vsib_ = vsib.has_value();
+		const bool is_vsib32 = vsib ? vsib->first : false;
+		const bool is_vsib64 = vsib ? vsib->second : false;
+		CHECK_EQ(is_vsib_, instruction.is_vsib());
+		CHECK_EQ(is_vsib32, instruction.is_vsib32());
+		CHECK_EQ(is_vsib64, instruction.is_vsib64());
+	}
+}
+
+// DEC_ENC_PART4
 
 } // namespace iced_x86::tests
