@@ -9,7 +9,10 @@
 
 namespace iced_x86::internal::gas {
 
-/// Gets all register names with a `%` prefix (Rust: `ALL_REGISTERS`). It's created the first time it's called.
-const RegsTbl& get_all_registers();
+/// All register names with a `%` prefix (Rust: `ALL_REGISTERS`). Generated constant data (src/formatter/gas/regs.cpp)
+extern const RegsTbl ALL_REGISTERS;
+
+/// Gets all register names with a `%` prefix (Rust: `ALL_REGISTERS`)
+inline const RegsTbl& get_all_registers() noexcept { return ALL_REGISTERS; }
 
 } // namespace iced_x86::internal::gas

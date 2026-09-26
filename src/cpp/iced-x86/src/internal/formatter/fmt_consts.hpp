@@ -7,7 +7,6 @@
 
 #include <array>
 #include <string_view>
-#include <vector>
 
 #include "iced_x86/iced_constants.hpp"
 #include "internal/formatter/formatter_string.hpp"
@@ -36,7 +35,7 @@ struct MvexFormatterConstants {
 	FormatterString mem_sint16;
 	FormatterString eh;
 
-	MvexFormatterConstants();
+	constexpr MvexFormatterConstants() noexcept;
 };
 
 struct FormatterConstants {
@@ -118,11 +117,14 @@ struct FormatterConstants {
 	FormatterString o64;
 	MvexFormatterConstants mvex;
 
-	FormatterConstants();
+	constexpr FormatterConstants() noexcept;
 };
 
-/// Gets the formatter constants (created the first time it's called)
-const FormatterConstants& get_formatter_constants();
+/// The formatter constants (constant data)
+extern const FormatterConstants FORMATTER_CONSTANTS;
+
+/// Gets the formatter constants
+inline const FormatterConstants& get_formatter_constants() noexcept { return FORMATTER_CONSTANTS; }
 
 struct FormatterArrayConstants {
 	std::array<const FormatterString*, 0> nothing;
@@ -154,22 +156,25 @@ struct FormatterArrayConstants {
 	std::array<const FormatterString*, intel::InstrOpInfoFlags::SIZE_OVERRIDE_MASK + 1> intel_addr_size_strings;
 	std::array<const FormatterString*, IcedConstants::ROUNDING_CONTROL_ENUM_COUNT> intel_rc_strings;
 	std::array<const FormatterString*, IcedConstants::ROUNDING_CONTROL_ENUM_COUNT> intel_rc_sae_strings;
-	std::array<std::vector<const FormatterString*>, intel::InstrOpInfoFlags::BRANCH_SIZE_INFO_MASK + 1> intel_branch_infos;
+	std::array<FormatterStringSlice, intel::InstrOpInfoFlags::BRANCH_SIZE_INFO_MASK + 1> intel_branch_infos;
 	std::array<const FormatterString*, IcedConstants::ROUNDING_CONTROL_ENUM_COUNT> masm_rc_strings;
 	std::array<const FormatterString*, IcedConstants::ROUNDING_CONTROL_ENUM_COUNT> masm_rc_sae_strings;
 	std::array<const FormatterString*, nasm::InstrOpInfoFlags::SIZE_OVERRIDE_MASK + 1> nasm_op_size_strings;
 	std::array<const FormatterString*, nasm::InstrOpInfoFlags::SIZE_OVERRIDE_MASK + 1> nasm_addr_size_strings;
-	std::array<std::vector<const FormatterString*>, nasm::InstrOpInfoFlags::BRANCH_SIZE_INFO_MASK + 1> nasm_branch_infos;
+	std::array<FormatterStringSlice, nasm::InstrOpInfoFlags::BRANCH_SIZE_INFO_MASK + 1> nasm_branch_infos;
 	std::array<const FormatterString*, nasm::InstrOpInfoFlags::MEMORY_SIZE_INFO_MASK + 1> nasm_mem_size_infos;
 	std::array<const FormatterString*, nasm::InstrOpInfoFlags::FAR_MEMORY_SIZE_INFO_MASK + 1> nasm_far_mem_size_infos;
 	std::array<const FormatterString*, IcedConstants::MVEX_REG_MEM_CONV_ENUM_COUNT> mvex_reg_mem_consts_32;
 	std::array<const FormatterString*, IcedConstants::MVEX_REG_MEM_CONV_ENUM_COUNT> mvex_reg_mem_consts_64;
 
-	explicit FormatterArrayConstants(const FormatterConstants& c);
+	constexpr explicit FormatterArrayConstants(const FormatterConstants& c) noexcept;
 };
 
-/// Gets the formatter array constants (created the first time it's called)
-const FormatterArrayConstants& get_array_constants();
+/// The formatter array constants (constant data)
+extern const FormatterArrayConstants ARRAY_CONSTANTS;
+
+/// Gets the formatter array constants
+inline const FormatterArrayConstants& get_array_constants() noexcept { return ARRAY_CONSTANTS; }
 
 /// Scale strings (index = scale value 0-3)
 inline constexpr std::string_view SCALE_NUMBERS[4] = {"1", "2", "4", "8"};

@@ -16,7 +16,8 @@ namespace Generator.Formatters.Cpp {
 	/// <list type="bullet">
 	/// <item><c>src/internal/formatter/&lt;syntax&gt;/mem_size_tbl_data.hpp</c>: memory size keywords + broadcast data (all 5 formatters)</item>
 	/// <item><c>src/internal/formatter/fmt_consts.hpp</c> + <c>src/formatter/fmt_consts.cpp</c>: generated regions (formatter string constants)</item>
-	/// <item><c>src/formatter/regs_tbl.cpp</c> + <c>src/internal/formatter/regs_tbl.hpp</c>: register names</item>
+	/// <item><c>src/formatter/regs_tbl.cpp</c> + <c>src/internal/formatter/regs_tbl.hpp</c>: register names (fast formatter)</item>
+	/// <item><c>src/formatter/regs_tbl_ls.cpp</c>, <c>src/formatter/gas/regs.cpp</c>, <c>src/formatter/nasm/regs.cpp</c>: register name <c>FormatterString</c> tables</item>
 	/// <item><c>src/formatter/fmt_flow_control.cpp</c>: <c>get_flow_control()</c></item>
 	/// </list>
 	/// </summary>
@@ -49,9 +50,13 @@ namespace Generator.Formatters.Cpp {
 				foreach (var kv in consts1)
 					writer.WriteLine($"FormatterString {kv.Key};");
 			});
+			new FileUpdater(TargetLanguage.Cpp, "FormatterConstantsData", srcFilename).Generate(writer => {
+				foreach (var kv in consts1)
+					writer.WriteLine($"ICED_FMT_STR({kv.Key}, \"{CppConstants.EscapeString(kv.Value)}\");");
+			});
 			new FileUpdater(TargetLanguage.Cpp, "FormatterConstantsInit", srcFilename).Generate(writer => {
 				foreach (var kv in consts1)
-					writer.WriteLine($", {kv.Key}(\"{CppConstants.EscapeString(kv.Value)}\")");
+					writer.WriteLine($", {kv.Key}(STR_{kv.Key})");
 			});
 			new FileUpdater(TargetLanguage.Cpp, "FormatterArrayConstantsDef", headerFilename).Generate(writer => {
 				foreach (var kv in consts2)
@@ -123,7 +128,7 @@ namespace Generator.Formatters.Cpp {
 		void WriteBroadcastToKindSwitch(FileWriter writer) {
 			var broadcastToKindValues = genTypes[TypeIds.BroadcastToKind].Values;
 			writer.WriteLine("/// Converts a `BroadcastToKind` value to its string (eg. `1to8`)");
-			writer.WriteLine("inline const FormatterString& get_bcst_to_string(const FormatterConstants& c, std::uint32_t bcst_to_kind) noexcept {");
+			writer.WriteLine("constexpr const FormatterString& get_bcst_to_string(const FormatterConstants& c, std::uint32_t bcst_to_kind) noexcept {");
 			using (writer.Indent()) {
 				writer.WriteLine("switch (bcst_to_kind) {");
 				foreach (var kw in broadcastToKindValues) {
@@ -190,7 +195,7 @@ namespace Generator.Formatters.Cpp {
 
 		void WriteMemoryKeywordsSwitch(FileWriter writer, EnumValue[] keywords, Func<EnumValue, bool> isNone, Dictionary<string, string> fmtConsts1, Dictionary<string, string[]> fmtConsts2) {
 			writer.WriteLine("/// Converts a memory keywords value to its keywords (eg. `dword ptr`)");
-			writer.WriteLine("inline FormatterStringSlice get_memory_keywords(const FormatterArrayConstants& ac, std::uint32_t memory_keywords) noexcept {");
+			writer.WriteLine("constexpr FormatterStringSlice get_memory_keywords(const FormatterArrayConstants& ac, std::uint32_t memory_keywords) noexcept {");
 			using (writer.Indent()) {
 				writer.WriteLine("switch (memory_keywords) {");
 				foreach (var kw in keywords) {
@@ -269,7 +274,7 @@ namespace Generator.Formatters.Cpp {
 				WriteByteArray(writer, "MEM_SIZE_TBL_DATA", "std::uint8_t", defs.Select(a => checked((uint)(byte)a.Nasm.Value)), defs.Length, a => $"0x{a:X2}");
 				writer.WriteLine();
 				writer.WriteLine("/// Converts a memory keyword value to its keyword (eg. `dword`)");
-				writer.WriteLine("inline const FormatterString& get_memory_keyword(const FormatterConstants& c, std::uint32_t memory_keyword) noexcept {");
+				writer.WriteLine("constexpr const FormatterString& get_memory_keyword(const FormatterConstants& c, std::uint32_t memory_keyword) noexcept {");
 				using (writer.Indent()) {
 					writer.WriteLine("switch (memory_keyword) {");
 					foreach (var kw in nasmKeywords) {
@@ -351,6 +356,50 @@ namespace Generator.Formatters.Cpp {
 						writer.WriteCommentLine("No padding needed");
 				}
 				writer.WriteLine("};");
+				writer.WriteLine("// clang-format on");
+				CppConstants.WriteNamespaceEnd(writer, ns);
+			}
+
+			// The FormatterString tables used by the gas/intel/masm/nasm formatters (constant data)
+			var st0 = (int)genTypes[TypeIds.Register]["ST0"].Value;
+			var gasRegisters = registers.Select(a => "%" + a).ToArray();
+			var nasmRegisters = registers.ToArray();
+			for (int i = 0; i < 8; i++) {
+				if (nasmRegisters[st0 + i] != $"st({i})")
+					throw new InvalidOperationException();
+				nasmRegisters[st0 + i] = $"st{i}";
+			}
+			WriteRegsTbl(CppConstants.GetSrcFilename(genTypes, "formatter", "regs_tbl_ls.cpp"), "internal/formatter/regs_tbl_ls.hpp",
+				CppConstants.InternalNamespace, "REGS_TBL", registers);
+			WriteRegsTbl(CppConstants.GetSrcFilename(genTypes, "formatter", "gas", "regs.cpp"), "internal/formatter/gas/regs.hpp",
+				CppConstants.InternalNamespace + "::gas", "ALL_REGISTERS", gasRegisters);
+			WriteRegsTbl(CppConstants.GetSrcFilename(genTypes, "formatter", "nasm", "regs.cpp"), "internal/formatter/nasm/regs.hpp",
+				CppConstants.InternalNamespace + "::nasm", "ALL_REGISTERS", nasmRegisters);
+		}
+
+		void WriteRegsTbl(string filename, string includeFile, string ns, string name, string[] registers) {
+			var strings = new CppFormatterStrings();
+			var offsets = registers.Select(a => strings.Add(a)).ToArray();
+			using (var writer = new FileWriter(TargetLanguage.Cpp, FileUtils.OpenWrite(filename))) {
+				writer.WriteFileHeader();
+				writer.WriteLine($"#include \"{includeFile}\"");
+				writer.WriteLine();
+				writer.WriteLine("#include \"internal/encoder/const_init.hpp\"");
+				writer.WriteLine();
+				CppConstants.WriteNamespaceBegin(writer, ns);
+				writer.WriteLine("namespace {");
+				strings.Write(writer, "constexpr char", "STRINGS");
+				writer.WriteLine("} // namespace");
+				writer.WriteLine();
+				writer.WriteLine("// clang-format off");
+				writer.WriteLine($"ICED_CONSTINIT const RegsTbl {name} = {{{{");
+				using (writer.Indent()) {
+					for (int i = 0; i < registers.Length; i++) {
+						writer.Write($"FormatterString(STRINGS + 0x{offsets[i]:X4}),");
+						writer.WriteCommentLine(registers[i]);
+					}
+				}
+				writer.WriteLine("}};");
 				writer.WriteLine("// clang-format on");
 				CppConstants.WriteNamespaceEnd(writer, ns);
 			}

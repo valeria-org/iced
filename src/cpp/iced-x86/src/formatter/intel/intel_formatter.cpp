@@ -84,7 +84,7 @@ std::string_view format_unsigned(NumberFormatter& number_formatter, const Format
 // Methods that don't depend on the output type
 struct IntelFormatterCommon {
 	static InstrOpInfo get_op_info(const IntelFormatter& self, const Instruction& instruction) noexcept {
-		return self.instr_infos_[static_cast<std::size_t>(instruction.code())]->op_info(self.options_, instruction);
+		return internal::intel::get_op_info(self.options_, instruction);
 	}
 
 	static bool show_segment_prefix(const IntelFormatter& self, const Instruction& instruction, const InstrOpInfo& op_info) noexcept {
@@ -268,7 +268,7 @@ struct IntelFormatterImpl : IntelFormatterCommon {
 				output.write(" ", FormatterTextKind::Text);
 				column++;
 			}
-			const FormatterString& mnemonic = *op_info.mnemonic;
+			const FormatterString mnemonic = op_info.mnemonic;
 			if ((op_info.flags & InstrOpInfoFlags::MNEMONIC_IS_DIRECTIVE) != 0)
 				output.write(mnemonic.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Directive);
 			else
@@ -949,7 +949,6 @@ IntelFormatter::IntelFormatter() : IntelFormatter(nullptr, nullptr) {}
 IntelFormatter::IntelFormatter(std::unique_ptr<SymbolResolver> symbol_resolver, std::unique_ptr<FormatterOptionsProvider> options_provider)
 	: options_(FormatterOptions::with_intel())
 	, all_registers_(internal::get_regs_tbl().data())
-	, instr_infos_(internal::intel::get_all_infos().data())
 	, all_memory_sizes_(internal::intel::get_mem_size_tbl().data())
 	, str_(&internal::get_formatter_constants())
 	, vec_(&internal::get_array_constants())

@@ -8,7 +8,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <optional>
 
 #include "iced_x86/formatter_options.hpp"
@@ -33,7 +32,7 @@ struct InstrInfoConstants {
 
 /// Operands, mnemonic and flags of an instruction (the operands are in gas order)
 struct InstrOpInfo {
-	const FormatterString* mnemonic;
+	FormatterString mnemonic;
 	std::uint16_t flags; // InstrOpInfoFlags
 	std::uint8_t op_count;
 	std::array<InstrOpKind, IcedConstants::MAX_OP_COUNT> op_kinds;
@@ -41,11 +40,11 @@ struct InstrOpInfo {
 	std::array<std::int8_t, IcedConstants::MAX_OP_COUNT> op_indexes;
 
 	/// Rust: `InstrOpInfo::default()`
-	explicit InstrOpInfo(const FormatterString& mnemonic_) noexcept
-		: mnemonic(&mnemonic_), flags(0), op_count(0), op_kinds{}, op_registers{}, op_indexes{} {}
+	explicit InstrOpInfo(FormatterString mnemonic_) noexcept
+		: mnemonic(mnemonic_), flags(0), op_count(0), op_kinds{}, op_registers{}, op_indexes{} {}
 
 	/// Rust: `InstrOpInfo::new()`
-	InstrOpInfo(const FormatterString& mnemonic_, const Instruction& instruction, std::uint32_t flags_) noexcept;
+	InstrOpInfo(FormatterString mnemonic_, const Instruction& instruction, std::uint32_t flags_) noexcept;
 
 	static InstrOpKind to_instr_op_kind(OpKind op_kind) noexcept {
 		// All OpKind values are valid InstrOpKind values
@@ -117,21 +116,8 @@ struct InstrOpInfo {
 	}
 };
 
-/// Creates the `InstrOpInfo` of an instruction (Rust: `trait InstrInfo`)
-class InstrInfo {
-public:
-	virtual ~InstrInfo() = default;
-	virtual InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept = 0;
-
-protected:
-	InstrInfo() = default;
-	InstrInfo(const InstrInfo&) = delete;
-	InstrInfo& operator=(const InstrInfo&) = delete;
-};
-
-using InstrInfos = std::array<std::unique_ptr<InstrInfo>, IcedConstants::CODE_ENUM_COUNT>;
-
-/// Gets the `InstrInfo` of each `Code` value (Rust: `ALL_INFOS`). It's created the first time it's called.
-const InstrInfos& get_all_infos();
+/// Creates the `InstrOpInfo` of an instruction (Rust: `ALL_INFOS[code].op_info()`). The instruction infos are constant data
+/// (`INSTR_INFOS` in the generated fmt_data.cpp).
+InstrOpInfo get_op_info(const FormatterOptions& options, const Instruction& instruction) noexcept;
 
 } // namespace iced_x86::internal::gas

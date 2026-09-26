@@ -84,7 +84,7 @@ struct GasFormatterCommon {
 	}
 
 	static InstrOpInfo get_op_info(const GasFormatter& self, const Instruction& instruction) noexcept {
-		return self.instr_infos_[static_cast<std::size_t>(instruction.code())]->op_info(self.options_, instruction);
+		return internal::gas::get_op_info(self.options_, instruction);
 	}
 
 	static bool show_segment_prefix(const GasFormatter& self, const Instruction& instruction, const InstrOpInfo& op_info) noexcept {
@@ -285,7 +285,7 @@ struct GasFormatterImpl : GasFormatterCommon {
 				output.write(" ", FormatterTextKind::Text);
 				column++;
 			}
-			const FormatterString& mnemonic = *op_info.mnemonic;
+			const FormatterString mnemonic = op_info.mnemonic;
 			if ((op_info.flags & InstrOpInfoFlags::MNEMONIC_IS_DIRECTIVE) != 0)
 				output.write(mnemonic.get(options.uppercase_keywords() || options.uppercase_all()), FormatterTextKind::Directive);
 			else
@@ -869,7 +869,6 @@ GasFormatter::GasFormatter(std::unique_ptr<SymbolResolver> symbol_resolver, std:
 	: options_(FormatterOptions::with_gas())
 	, all_registers_(internal::gas::get_all_registers().data())
 	, all_registers_naked_(internal::get_regs_tbl().data())
-	, instr_infos_(internal::gas::get_all_infos().data())
 	, all_memory_sizes_(internal::gas::get_mem_size_tbl().data())
 	, str_(&internal::get_formatter_constants())
 	, vec_(&internal::get_array_constants())

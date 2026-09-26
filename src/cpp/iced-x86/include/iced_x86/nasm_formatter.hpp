@@ -27,7 +27,6 @@ struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace nasm {
-class InstrInfo;
 struct MemSizeInfo;
 template <typename TOutput>
 struct NasmFormatterImpl;
@@ -349,9 +348,8 @@ public:
 
 private:
 	FormatterOptions options_;
-	// Read-only tables (created the first time a formatter is created)
+	// Read-only tables (constant data)
 	const internal::FormatterString* all_registers_;
-	const internal::nasm::InstrInfo* const* instr_infos_;
 	const internal::nasm::MemSizeInfo* all_memory_sizes_;
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;

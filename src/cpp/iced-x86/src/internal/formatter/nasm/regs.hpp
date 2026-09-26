@@ -5,12 +5,15 @@
 
 #pragma once
 
-#include "internal/formatter/formatter_string.hpp"
+#include "internal/formatter/regs_tbl_ls.hpp"
 
 namespace iced_x86::internal::nasm {
 
-/// Gets the register names (index = `Register` value). Same as `get_regs_tbl()` except `st0`-`st7` are used instead of
-/// `st(0)`-`st(7)`. The table is created the first time it's called.
-const FormatterString* get_all_registers();
+/// The register names (index = `Register` value). Same as `REGS_TBL` except `st0`-`st7` are used instead of
+/// `st(0)`-`st(7)`. Generated constant data (src/formatter/nasm/regs.cpp)
+extern const RegsTbl ALL_REGISTERS;
+
+/// Gets the register names (see `ALL_REGISTERS`)
+inline const FormatterString* get_all_registers() noexcept { return ALL_REGISTERS.data(); }
 
 } // namespace iced_x86::internal::nasm

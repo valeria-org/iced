@@ -32,7 +32,7 @@ struct InstrInfoConstants {
 
 /// Formatter operands of an instruction (Rust: `InstrOpInfo`)
 struct InstrOpInfo {
-	const FormatterString* mnemonic;
+	FormatterString mnemonic;
 	// It's a u16 in Rust but GCC can load 32 bits after a 16-bit store (store forwarding stall)
 	std::uint32_t flags; // InstrOpInfoFlags
 	std::uint8_t op_count;
@@ -106,9 +106,9 @@ struct InstrOpInfo {
 	}
 
 	/// Rust: `InstrOpInfo::default()`
-	static InstrOpInfo with_default(const FormatterString& mnemonic) noexcept {
+	static InstrOpInfo with_default(FormatterString mnemonic) noexcept {
 		InstrOpInfo res;
-		res.mnemonic = &mnemonic;
+		res.mnemonic = mnemonic;
 		res.flags = 0;
 		res.op_count = 0;
 		for (std::size_t i = 0; i < IcedConstants::MAX_OP_COUNT; i++) {
@@ -120,10 +120,10 @@ struct InstrOpInfo {
 	}
 
 	/// Rust: `InstrOpInfo::new()`
-	static InstrOpInfo with_instruction(const FormatterString& mnemonic, const Instruction& instruction, std::uint32_t flags) noexcept {
+	static InstrOpInfo with_instruction(FormatterString mnemonic, const Instruction& instruction, std::uint32_t flags) noexcept {
 		static_assert(IcedConstants::MAX_OP_COUNT == 5, "");
 		InstrOpInfo res;
-		res.mnemonic = &mnemonic;
+		res.mnemonic = mnemonic;
 		res.flags = flags;
 		res.op_kinds[0] = to_instr_op_kind(instruction.op0_kind());
 		res.op_kinds[1] = to_instr_op_kind(instruction.op1_kind());
@@ -193,19 +193,8 @@ private:
 	}
 };
 
-/// Creates the formatter operands of an instruction (Rust: `trait InstrInfo`)
-class InstrInfo {
-public:
-	virtual ~InstrInfo() = default;
-	virtual InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept = 0;
-
-protected:
-	InstrInfo() = default;
-	InstrInfo(const InstrInfo&) = default;
-	InstrInfo& operator=(const InstrInfo&) = default;
-};
-
-/// Gets the instruction infos (index = `Code` value). The table is created the first time it's called.
-const InstrInfo* const* get_all_infos();
+/// Creates the formatter operands of an instruction (Rust: `ALL_INFOS[code].op_info()`). The instruction infos are constant
+/// data (`INSTR_INFOS` in the generated fmt_data.cpp).
+InstrOpInfo get_op_info(const FormatterOptions& options, const Instruction& instruction) noexcept;
 
 } // namespace iced_x86::internal::masm

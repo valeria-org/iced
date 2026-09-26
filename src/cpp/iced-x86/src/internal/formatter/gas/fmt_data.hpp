@@ -8,11 +8,64 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "iced_x86/iced_constants.hpp"
+
 namespace iced_x86::internal::gas {
 
-/// Serialized formatter table data (one entry per `Code` value)
-extern const std::uint8_t FORMATTER_TBL_DATA[];
-/// Size of `FORMATTER_TBL_DATA` in bytes
-extern const std::size_t FORMATTER_TBL_DATA_SIZE;
+/// The kind of an `InstrInfo` (the fields' meaning depend on it)
+enum class InstrInfoKind : std::uint8_t {
+	Simple,
+	cc,
+	AamAad,
+	nop,
+	STIG1,
+	STi_ST,
+	ST_STi,
+	as,
+	maskmovq,
+	pblendvb,
+	OpSize,
+	OpSize2_bnd,
+	OpSize3,
+	os2,
+	os,
+	os_mem2,
+	Reg16,
+	mem16,
+	os_loop,
+	os_jcc,
+	movabs,
+	er,
+	sae,
+	far,
+	bnd,
+	pops,
+	pclmulqdq,
+	imul,
+	Reg32,
+	DeclareData,
+};
+
+/// Creates the `InstrOpInfo` of an instruction (Rust: `Box<dyn InstrInfo>`). Constant data, one per `Code` value.
+/// Strings are offsets in `STRINGS` (`FormatterString` data), `ARGS` has extra data (see `kind`)
+struct InstrInfo {
+	/// Offset in `STRINGS` of the (first) mnemonic
+	std::uint16_t mnemonic;
+	/// Depends on `kind`
+	std::uint16_t arg1;
+	/// Depends on `kind`
+	std::uint16_t arg2;
+	InstrInfoKind kind;
+	/// Depends on `kind`
+	std::uint8_t arg3;
+};
+static_assert(sizeof(InstrInfo) == 8, "");
+
+/// All strings (`FormatterString` data: a length byte followed by the lowercase and the uppercase chars)
+extern const char STRINGS[];
+/// Extra data used by some `InstrInfoKind`s
+extern const std::uint16_t ARGS[];
+/// The `InstrInfo` of each `Code` value (Rust: `ALL_INFOS`)
+extern const InstrInfo INSTR_INFOS[IcedConstants::CODE_ENUM_COUNT];
 
 } // namespace iced_x86::internal::gas

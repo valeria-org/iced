@@ -166,19 +166,15 @@ namespace Generator.Enums.Cpp {
 			// Internal enums: formatters
 			Int(TypeIds.PseudoOpsKind, "formatter/pseudo_ops_kind");
 			Int(TypeIds.FormatterFlowControl, "formatter/formatter_flow_control");
-			Int(TypeIds.GasCtorKind, "formatter/gas/ctor_kind", "gas");
 			Int(TypeIds.GasSizeOverride, "formatter/gas/size_override", "gas");
 			Int(TypeIds.GasInstrOpInfoFlags, "formatter/gas/instr_op_info_flags", "gas");
 			Int(TypeIds.GasInstrOpKind, "formatter/gas/instr_op_kind", "gas");
-			Int(TypeIds.IntelCtorKind, "formatter/intel/ctor_kind", "intel");
 			Int(TypeIds.IntelSizeOverride, "formatter/intel/size_override", "intel");
 			Int(TypeIds.IntelBranchSizeInfo, "formatter/intel/branch_size_info", "intel");
 			Int(TypeIds.IntelInstrOpInfoFlags, "formatter/intel/instr_op_info_flags", "intel");
 			Int(TypeIds.IntelInstrOpKind, "formatter/intel/instr_op_kind", "intel");
-			Int(TypeIds.MasmCtorKind, "formatter/masm/ctor_kind", "masm");
 			Int(TypeIds.MasmInstrOpInfoFlags, "formatter/masm/instr_op_info_flags", "masm");
 			Int(TypeIds.MasmInstrOpKind, "formatter/masm/instr_op_kind", "masm");
-			Int(TypeIds.NasmCtorKind, "formatter/nasm/ctor_kind", "nasm");
 			Int(TypeIds.NasmSignExtendInfo, "formatter/nasm/sign_extend_info", "nasm");
 			Int(TypeIds.NasmSizeOverride, "formatter/nasm/size_override", "nasm");
 			Int(TypeIds.NasmBranchSizeInfo, "formatter/nasm/branch_size_info", "nasm");
@@ -198,6 +194,11 @@ namespace Generator.Enums.Cpp {
 
 			// Not used by the C++ code
 			toFileInfo.Add(TypeIds.FormatterSyntax, null);
+			// The C++ gas/intel/masm/nasm instruction info tables are generated constant data (see CppInstrInfoTableGen)
+			toFileInfo.Add(TypeIds.GasCtorKind, null);
+			toFileInfo.Add(TypeIds.IntelCtorKind, null);
+			toFileInfo.Add(TypeIds.MasmCtorKind, null);
+			toFileInfo.Add(TypeIds.NasmCtorKind, null);
 		}
 
 		void Pub(TypeId typeId, string name) => Add(typeId, FileKind.Public, name, CppConstants.Namespace);

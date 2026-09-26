@@ -28,7 +28,6 @@ struct FormatterStringBuffer;
 struct FormatterConstants;
 struct FormatterArrayConstants;
 namespace gas {
-class InstrInfo;
 struct GasFormatterCommon;
 template <typename TOutput>
 struct GasFormatterImpl;
@@ -343,10 +342,9 @@ private:
 	friend struct internal::gas::GasFormatterImpl;
 
 	FormatterOptions options_;
-	// Read-only static data (created the first time a formatter is created)
+	// Read-only tables (constant data)
 	const internal::FormatterString* all_registers_;
 	const internal::FormatterString* all_registers_naked_;
-	const std::unique_ptr<internal::gas::InstrInfo>* instr_infos_;
 	const internal::FormatterString* const* all_memory_sizes_;
 	const internal::FormatterConstants* str_;
 	const internal::FormatterArrayConstants* vec_;

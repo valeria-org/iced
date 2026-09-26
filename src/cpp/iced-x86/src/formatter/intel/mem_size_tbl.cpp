@@ -7,6 +7,7 @@
 
 #include <cstddef>
 
+#include "internal/encoder/const_init.hpp"
 #include "internal/formatter/fmt_consts.hpp"
 #include "internal/formatter/intel/mem_size_tbl_data.hpp"
 #include "internal/iced_assert.hpp"
@@ -19,9 +20,9 @@ namespace {
 struct MemSizeTblHolder {
 	MemSizeTbl tbl;
 
-	MemSizeTblHolder() {
-		const FormatterConstants& c = get_formatter_constants();
-		const FormatterArrayConstants& ac = get_array_constants();
+	constexpr MemSizeTblHolder() noexcept : tbl{} {
+		const FormatterConstants& c = FORMATTER_CONSTANTS;
+		const FormatterArrayConstants& ac = ARRAY_CONSTANTS;
 		std::size_t i = 0;
 		for (const auto d : MEM_SIZE_TBL_DATA) {
 			const FormatterStringSlice keywords = get_memory_keywords(ac, d & MEMORY_KEYWORDS_MASK);
@@ -31,11 +32,11 @@ struct MemSizeTblHolder {
 		ICED_ASSERT(i == tbl.size());
 	}
 };
+ICED_CONSTINIT const MemSizeTblHolder HOLDER;
 } // namespace
 
-const MemSizeTbl& get_mem_size_tbl() {
-	static const MemSizeTblHolder holder;
-	return holder.tbl;
+const MemSizeTbl& get_mem_size_tbl() noexcept {
+	return HOLDER.tbl;
 }
 
 } // namespace iced_x86::internal::intel

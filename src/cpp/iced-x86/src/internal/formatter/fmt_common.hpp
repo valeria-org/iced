@@ -63,22 +63,22 @@ inline std::optional<SymbolResult> to_owned(const std::optional<SymbolResult>& s
 	return sym_res->to_owned(vec);
 }
 
-/// Gets the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction. `cc_index` is the condition code (0-15) and `mnemonics`
-/// contains all mnemonic variants (eg. `jb`, `jc`, `jnae`), see the `CC_*` options.
-const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index, const FormatterString* mnemonics,
-									   std::size_t mnemonics_size) noexcept;
-
-/// Same as above
-inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
-											  const std::vector<FormatterString>& mnemonics) noexcept {
-	return get_mnemonic_cc(options, cc_index, mnemonics.data(), mnemonics.size());
+/// Gets the number of mnemonic variants of a condition code (`cc_index` = 0-15, eg. 3 if it's 2: `b`, `c`, `nae`)
+constexpr std::size_t get_cc_mnemonics_count(std::uint32_t cc_index) noexcept {
+	constexpr std::uint8_t COUNTS[16] = {1, 1, 3, 3, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2};
+	return COUNTS[cc_index & 0xF];
 }
 
-/// Same as above (eg. `FormatterConstants::repe`)
+/// Gets the index of the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction. `cc_index` is the condition code (0-15) and
+/// `mnemonics_size` is the number of mnemonic variants (eg. 3: `jb`, `jc`, `jnae`), see the `CC_*` options.
+std::size_t get_mnemonic_cc_index(const FormatterOptions& options, std::uint32_t cc_index, std::size_t mnemonics_size) noexcept;
+
+/// Gets the mnemonic of a `Jcc`/`SETcc`/`CMOVcc`/... instruction. `cc_index` is the condition code (0-15) and `mnemonics`
+/// contains all mnemonic variants (eg. `jb`, `jc`, `jnae`), see the `CC_*` options.
 template <std::size_t N>
 inline const FormatterString& get_mnemonic_cc(const FormatterOptions& options, std::uint32_t cc_index,
 											  const std::array<FormatterString, N>& mnemonics) noexcept {
-	return get_mnemonic_cc(options, cc_index, mnemonics.data(), N);
+	return mnemonics[get_mnemonic_cc_index(options, cc_index, N)];
 }
 
 } // namespace iced_x86::internal
