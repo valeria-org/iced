@@ -10,6 +10,7 @@
 #include "iced_x86/block_encoder.hpp"
 #include "iced_x86/encoder.hpp"
 #include "iced_x86/iced_error.hpp"
+#include "internal/encoder/encoder_internal.hpp"
 
 namespace iced_x86::internal {
 
@@ -46,8 +47,8 @@ public:
 	void initialize_data(std::uint64_t base_addr);
 	Result<void> write_data();
 
-	std::size_t buffer_pos() const noexcept { return encoder.position(); }
-	void write_byte(std::uint32_t value) { encoder.write_byte_internal(value); }
+	std::size_t buffer_pos() const noexcept { return EncoderInternal::position(encoder); }
+	void write_byte(std::uint32_t value) { EncoderInternal::write_byte_internal(encoder, value); }
 	std::vector<std::uint8_t> take_buffer() { return encoder.take_buffer(); }
 	std::vector<RelocInfo> take_reloc_infos();
 	void dispose() noexcept;

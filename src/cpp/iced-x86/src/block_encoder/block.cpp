@@ -41,7 +41,7 @@ Result<void> Block::write_data() {
 	if (valid_data_.empty())
 		return {};
 	for (std::uint64_t i = 0, count = valid_data_address_aligned_ - valid_data_address_; i < count; i++)
-		encoder.write_byte_internal(0xCC);
+		EncoderInternal::write_byte_internal(encoder, 0xCC);
 	switch (alignment_) {
 	case 8:
 		for (auto index : valid_data_) {
@@ -54,15 +54,15 @@ Result<void> Block::write_data() {
 			}
 			std::uint64_t d64 = data.data;
 			auto d = static_cast<std::uint32_t>(d64);
-			encoder.write_byte_internal(d);
-			encoder.write_byte_internal(d >> 8);
-			encoder.write_byte_internal(d >> 16);
-			encoder.write_byte_internal(d >> 24);
+			EncoderInternal::write_byte_internal(encoder, d);
+			EncoderInternal::write_byte_internal(encoder, d >> 8);
+			EncoderInternal::write_byte_internal(encoder, d >> 16);
+			EncoderInternal::write_byte_internal(encoder, d >> 24);
 			d = static_cast<std::uint32_t>(d64 >> 32);
-			encoder.write_byte_internal(d);
-			encoder.write_byte_internal(d >> 8);
-			encoder.write_byte_internal(d >> 16);
-			encoder.write_byte_internal(d >> 24);
+			EncoderInternal::write_byte_internal(encoder, d);
+			EncoderInternal::write_byte_internal(encoder, d >> 8);
+			EncoderInternal::write_byte_internal(encoder, d >> 16);
+			EncoderInternal::write_byte_internal(encoder, d >> 24);
 		}
 		break;
 

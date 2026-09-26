@@ -9,11 +9,12 @@
 #include "iced_x86/op_kind.hpp"
 #include "iced_x86/register.hpp"
 #include "iced_x86/reloc_kind.hpp"
+#include "internal/encoder/encoder_internal.hpp"
 
 namespace iced_x86::internal {
 
 std::uint32_t BlockEncInt::get_instruction_size(const Instruction& instruction, std::uint64_t ip) {
-	null_encoder.clear_buffer();
+	EncoderInternal::clear_buffer(null_encoder);
 	auto result = null_encoder.encode(instruction, ip);
 	if (result.is_err())
 		return static_cast<std::uint32_t>(IcedConstants::MAX_INSTRUCTION_LENGTH);
