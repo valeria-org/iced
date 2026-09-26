@@ -1,0 +1,13 @@
+[package]
+name = "iced_x86_rust_diff"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+iced-x86 = { path = "../../../../../rust/iced-x86", features = ["mvex"] }
+
+[profile.release]
+opt-level = 3

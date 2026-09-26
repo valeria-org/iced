@@ -33,7 +33,7 @@ build_test() {
 	CXX="$cxx" cmake -S "$root_dir/src/cpp/iced-x86" -B "$dir" -G Ninja \
 		-DCMAKE_BUILD_TYPE="$build_type" \
 		-DICED_X86_WARNINGS_AS_ERRORS=ON \
-		-DICED_X86_BUILD_TESTS=$test_code \
+		-DICED_X86_BUILD_TESTS=$cmake_tests \
 		"$@"
 	cmake --build "$dir"
 	if [ "$test_code" = "y" ]; then
@@ -64,9 +64,9 @@ for cxx in $compilers; do
 done
 
 if [ "$test_code" = "y" ]; then
-	test_code=ON
+	cmake_tests=ON
 else
-	test_code=OFF
+	cmake_tests=OFF
 fi
 
 for cxx in $compilers; do
