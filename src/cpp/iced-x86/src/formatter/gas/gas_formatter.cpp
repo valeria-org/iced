@@ -671,58 +671,12 @@ struct GasFormatterImpl {
 		output.write_register(instruction, operand, instruction_operand, get_reg_str(self, reg), reg);
 	}
 
-	ICED_NOINLINE static void format_memory(GasFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
-							  std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg, Register index_reg,
-							  std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size) {
-		ICED_DEBUG_ASSERT(scale < sizeof(SCALE_NUMBERS) / sizeof(SCALE_NUMBERS[0]));
-		ICED_DEBUG_ASSERT(InstructionInternal::get_address_size_in_bytes(base_reg, index_reg, displ_size, instruction.code_size()) == addr_size);
-
+	// Part of format_memory() in Rust (not inlined to keep the stack frames small): formats the symbol or the displacement
+	ICED_NOINLINE static void format_memory_displ(GasFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+												   std::optional<std::uint32_t> instruction_operand, const NumberFormattingOptions& number_options,
+												   const std::optional<SymbolResult>& symbol, bool has_base_or_index_reg, std::uint32_t displ_size,
+												   std::int64_t displ, std::uint32_t addr_size, std::uint64_t abs_addr) {
 		const FormatterOptions& options = self.options_;
-		auto operand_options = FormatterOperandOptions::with_memory_size_options(options.memory_size_options());
-		operand_options.set_rip_relative_addresses(options.rip_relative_addresses());
-		auto number_options = NumberFormattingOptions::with_displacement(options);
-		if (self.options_provider_)
-			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
-
-		std::uint64_t abs_addr;
-		if (base_reg == Register::RIP) {
-			abs_addr = static_cast<std::uint64_t>(displ);
-			if (options.rip_relative_addresses())
-				displ = static_cast<std::int64_t>(static_cast<std::uint64_t>(displ) - instruction.next_ip());
-			else {
-				ICED_DEBUG_ASSERT(index_reg == Register::None);
-				base_reg = Register::None;
-			}
-			displ_size = 8;
-		} else if (base_reg == Register::EIP) {
-			abs_addr = static_cast<std::uint32_t>(displ);
-			if (options.rip_relative_addresses())
-				displ = static_cast<std::int32_t>(static_cast<std::uint32_t>(displ) - instruction.next_ip32());
-			else {
-				ICED_DEBUG_ASSERT(index_reg == Register::None);
-				base_reg = Register::None;
-			}
-			displ_size = 4;
-		} else
-			abs_addr = static_cast<std::uint64_t>(displ);
-
-		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, abs_addr, addr_size);
-
-		const bool use_scale = addr_size == 2 || !show_index_scale(instruction, options) ? false : scale != 0 || options.always_show_scale();
-
-		const bool has_base_or_index_reg = base_reg != Register::None || index_reg != Register::None;
-
-		const CodeSize code_size = instruction.code_size();
-		const Register seg_override = instruction.segment_prefix();
-		const bool notrack_prefix = seg_override == Register::DS && is_notrack_prefix_branch(instruction.code()) &&
-									!((code_size == CodeSize::Code16 || code_size == CodeSize::Code32) &&
-									  (base_reg == Register::BP || base_reg == Register::EBP || base_reg == Register::ESP));
-		if (options.always_show_segment_register() ||
-			(seg_override != Register::None && !notrack_prefix && internal::show_segment_prefix(Register::None, instruction, options))) {
-			format_register_internal(self, output, instruction, operand, instruction_operand, seg_reg);
-			output.write(":", FormatterTextKind::Punctuation);
-		}
-
 		if (symbol) {
 			FormatterOutputMethods::write1(output, instruction, operand, instruction_operand, options, *self.number_formatter_, number_options, abs_addr,
 										   *symbol, options.show_symbol_address());
@@ -775,6 +729,62 @@ struct GasFormatterImpl {
 				ICED_UNREACHABLE();
 			output.write_number(instruction, operand, instruction_operand, s, orig_displ, displ_kind, FormatterTextKind::Number);
 		}
+	}
+
+	ICED_NOINLINE static void format_memory(GasFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+							  std::optional<std::uint32_t> instruction_operand, Register seg_reg, Register base_reg, Register index_reg,
+							  std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size) {
+		ICED_DEBUG_ASSERT(scale < sizeof(SCALE_NUMBERS) / sizeof(SCALE_NUMBERS[0]));
+		ICED_DEBUG_ASSERT(InstructionInternal::get_address_size_in_bytes(base_reg, index_reg, displ_size, instruction.code_size()) == addr_size);
+
+		const FormatterOptions& options = self.options_;
+		auto operand_options = FormatterOperandOptions::with_memory_size_options(options.memory_size_options());
+		operand_options.set_rip_relative_addresses(options.rip_relative_addresses());
+		auto number_options = NumberFormattingOptions::with_displacement(options);
+		if (self.options_provider_)
+			self.options_provider_->operand_options(instruction, operand, instruction_operand, operand_options, number_options);
+
+		std::uint64_t abs_addr;
+		if (base_reg == Register::RIP) {
+			abs_addr = static_cast<std::uint64_t>(displ);
+			if (options.rip_relative_addresses())
+				displ = static_cast<std::int64_t>(static_cast<std::uint64_t>(displ) - instruction.next_ip());
+			else {
+				ICED_DEBUG_ASSERT(index_reg == Register::None);
+				base_reg = Register::None;
+			}
+			displ_size = 8;
+		} else if (base_reg == Register::EIP) {
+			abs_addr = static_cast<std::uint32_t>(displ);
+			if (options.rip_relative_addresses())
+				displ = static_cast<std::int32_t>(static_cast<std::uint32_t>(displ) - instruction.next_ip32());
+			else {
+				ICED_DEBUG_ASSERT(index_reg == Register::None);
+				base_reg = Register::None;
+			}
+			displ_size = 4;
+		} else
+			abs_addr = static_cast<std::uint64_t>(displ);
+
+		const std::optional<SymbolResult> symbol = get_symbol(self, instruction, operand, instruction_operand, abs_addr, addr_size);
+
+		const bool use_scale = addr_size == 2 || !show_index_scale(instruction, options) ? false : scale != 0 || options.always_show_scale();
+
+		const bool has_base_or_index_reg = base_reg != Register::None || index_reg != Register::None;
+
+		const CodeSize code_size = instruction.code_size();
+		const Register seg_override = instruction.segment_prefix();
+		const bool notrack_prefix = seg_override == Register::DS && is_notrack_prefix_branch(instruction.code()) &&
+									!((code_size == CodeSize::Code16 || code_size == CodeSize::Code32) &&
+									  (base_reg == Register::BP || base_reg == Register::EBP || base_reg == Register::ESP));
+		if (options.always_show_segment_register() ||
+			(seg_override != Register::None && !notrack_prefix && internal::show_segment_prefix(Register::None, instruction, options))) {
+			format_register_internal(self, output, instruction, operand, instruction_operand, seg_reg);
+			output.write(":", FormatterTextKind::Punctuation);
+		}
+
+		format_memory_displ(self, output, instruction, operand, instruction_operand, number_options, symbol, has_base_or_index_reg, displ_size, displ,
+							addr_size, abs_addr);
 
 		if (has_base_or_index_reg) {
 			output.write("(", FormatterTextKind::Punctuation);

@@ -751,6 +751,28 @@ struct IntelFormatterImpl {
 			}
 		}
 
+		format_memory_displ(self, output, instruction, operand, instruction_operand, number_options, symbol, need_plus, displ_size, displ, addr_size,
+							abs_addr);
+
+		if (options.space_after_memory_bracket())
+			output.write(" ", FormatterTextKind::Text);
+		output.write("]", FormatterTextKind::Punctuation);
+
+		const MemorySize mem_size = instruction.memory_size();
+		ICED_DEBUG_ASSERT(static_cast<std::size_t>(mem_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
+		const FormatterString& bcst_to = *self.all_memory_sizes_[static_cast<std::size_t>(mem_size)].bcst_to;
+		if (!bcst_to.is_default())
+			format_decorator(options, output, instruction, operand, instruction_operand, bcst_to, DecoratorKind::Broadcast);
+		if (instruction.is_mvex_eviction_hint())
+			format_decorator(options, output, instruction, operand, instruction_operand, self.str_->mvex.eh, DecoratorKind::EvictionHint);
+	}
+
+	// Part of format_memory() in Rust (not inlined to keep the stack frames small): formats the symbol or the displacement
+	ICED_NOINLINE static void format_memory_displ(IntelFormatter& self, FormatterOutput& output, const Instruction& instruction, std::uint32_t operand,
+												   std::optional<std::uint32_t> instruction_operand, const NumberFormattingOptions& number_options,
+												   const std::optional<SymbolResult>& symbol, bool need_plus, std::uint32_t displ_size, std::int64_t displ,
+												   std::uint32_t addr_size, std::uint64_t abs_addr) {
+		const FormatterOptions& options = self.options_;
 		if (symbol) {
 			if (need_plus) {
 				if (options.space_between_memory_add_operators())
@@ -829,18 +851,6 @@ struct IntelFormatterImpl {
 				ICED_UNREACHABLE();
 			output.write_number(instruction, operand, instruction_operand, s, orig_displ, displ_kind, FormatterTextKind::Number);
 		}
-
-		if (options.space_after_memory_bracket())
-			output.write(" ", FormatterTextKind::Text);
-		output.write("]", FormatterTextKind::Punctuation);
-
-		const MemorySize mem_size = instruction.memory_size();
-		ICED_DEBUG_ASSERT(static_cast<std::size_t>(mem_size) < IcedConstants::MEMORY_SIZE_ENUM_COUNT);
-		const FormatterString& bcst_to = *self.all_memory_sizes_[static_cast<std::size_t>(mem_size)].bcst_to;
-		if (!bcst_to.is_default())
-			format_decorator(options, output, instruction, operand, instruction_operand, bcst_to, DecoratorKind::Broadcast);
-		if (instruction.is_mvex_eviction_hint())
-			format_decorator(options, output, instruction, operand, instruction_operand, self.str_->mvex.eh, DecoratorKind::EvictionHint);
 	}
 
 	static void format_memory_size(const IntelFormatter& self, FormatterOutput& output, const std::optional<SymbolResult>& symbol, MemorySize mem_size,
