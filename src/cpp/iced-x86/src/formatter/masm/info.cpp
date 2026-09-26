@@ -30,6 +30,16 @@ namespace iced_x86::internal::masm {
 
 namespace {
 
+// The instruction infos are only created once so the code should be small: these functions aren't inlined
+
+ICED_NOINLINE FormatterString create_formatter_string(std::string&& s) { return FormatterString(std::move(s)); }
+
+ICED_NOINLINE FormatterString create_formatter_string(const char* s) { return FormatterString(s); }
+
+ICED_NOINLINE std::vector<FormatterString> create_formatter_strings(std::vector<std::string>&& strings) {
+	return FormatterString::with_strings(std::move(strings));
+}
+
 std::uint32_t get_bitness(CodeSize code_size) noexcept {
 	static constexpr std::uint32_t CODESIZE_TO_BITNESS[4] = {0, 16, 32, 64};
 	static_assert(static_cast<std::uint32_t>(CodeSize::Unknown) == 0, "");
@@ -49,8 +59,8 @@ struct PseudoOps {
 
 class SimpleInstrInfo final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo(std::string mnemonic) : mnemonic_(std::move(mnemonic)), flags_(InstrOpInfoFlags::NONE) {}
-	SimpleInstrInfo(std::string mnemonic, std::uint32_t flags) : mnemonic_(std::move(mnemonic)), flags_(flags) {}
+	explicit SimpleInstrInfo(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(InstrOpInfoFlags::NONE) {}
+	SimpleInstrInfo(std::string&& mnemonic, std::uint32_t flags) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -65,9 +75,9 @@ private:
 class SimpleInstrInfo_cc final : public InstrInfo {
 public:
 	SimpleInstrInfo_cc(std::uint32_t cc_index, std::vector<std::string>&& mnemonics)
-		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), cc_index_(cc_index), flags_(InstrOpInfoFlags::NONE) {}
+		: mnemonics_(create_formatter_strings(std::move(mnemonics))), cc_index_(cc_index), flags_(InstrOpInfoFlags::NONE) {}
 	SimpleInstrInfo_cc(std::uint32_t cc_index, std::vector<std::string>&& mnemonics, std::uint32_t flags)
-		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), cc_index_(cc_index), flags_(flags) {}
+		: mnemonics_(create_formatter_strings(std::move(mnemonics))), cc_index_(cc_index), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		const auto& mnemonic = get_mnemonic_cc(options, cc_index_, mnemonics_);
@@ -82,7 +92,8 @@ private:
 
 class SimpleInstrInfo_memsize final : public InstrInfo {
 public:
-	SimpleInstrInfo_memsize(std::uint32_t bitness, std::string mnemonic) : mnemonic_(std::move(mnemonic)), bitness_(bitness) {}
+	SimpleInstrInfo_memsize(std::uint32_t bitness, std::string&& mnemonic)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), bitness_(bitness) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -101,7 +112,7 @@ private:
 
 class SimpleInstrInfo_AamAad final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_AamAad(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_AamAad(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -116,7 +127,7 @@ private:
 
 class SimpleInstrInfo_Int3 final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_Int3(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_Int3(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -137,8 +148,9 @@ constexpr std::uint32_t FLAGS_STRING_SHORT_FORM = InstrOpInfoFlags::SHOW_NO_MEM_
 // Base class of the string instruction infos that have a short form without operands (eg. `movsb`)
 class StringInstrInfo : public InstrInfo {
 protected:
-	StringInstrInfo(std::string mnemonic_args, std::string mnemonic_no_args)
-		: mnemonic_args_(std::move(mnemonic_args)), mnemonic_no_args_(std::move(mnemonic_no_args)) {}
+	StringInstrInfo(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: mnemonic_args_(create_formatter_string(std::move(mnemonic_args)))
+		, mnemonic_no_args_(create_formatter_string(std::move(mnemonic_no_args))) {}
 
 	FormatterString mnemonic_args_;
 	FormatterString mnemonic_no_args_;
@@ -146,7 +158,8 @@ protected:
 
 class SimpleInstrInfo_YD final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_YD(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_YD(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -177,7 +190,8 @@ public:
 
 class SimpleInstrInfo_DX final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_DX(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_DX(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		OpKind short_form_op_kind;
@@ -208,7 +222,8 @@ public:
 
 class SimpleInstrInfo_YX final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_YX(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_YX(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		OpKind short_form_op_kind;
@@ -239,7 +254,8 @@ public:
 
 class SimpleInstrInfo_XY final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_XY(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_XY(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		OpKind short_form_op_kind;
@@ -270,7 +286,8 @@ public:
 
 class SimpleInstrInfo_YA final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_YA(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_YA(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -306,7 +323,8 @@ public:
 
 class SimpleInstrInfo_AX final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_AX(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_AX(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		OpKind short_form_op_kind;
@@ -343,7 +361,8 @@ public:
 
 class SimpleInstrInfo_AY final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_AY(std::string mnemonic_args, std::string mnemonic_no_args) : StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
+	SimpleInstrInfo_AY(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
+		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		OpKind short_form_op_kind;
@@ -380,7 +399,7 @@ public:
 
 class SimpleInstrInfo_XLAT final : public StringInstrInfo {
 public:
-	SimpleInstrInfo_XLAT(std::string mnemonic_args, std::string mnemonic_no_args)
+	SimpleInstrInfo_XLAT(std::string&& mnemonic_args, std::string&& mnemonic_no_args)
 		: StringInstrInfo(std::move(mnemonic_args), std::move(mnemonic_no_args)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
@@ -411,8 +430,11 @@ public:
 
 class SimpleInstrInfo_nop final : public InstrInfo {
 public:
-	SimpleInstrInfo_nop(std::uint32_t bitness, std::string mnemonic, Register register_)
-		: mnemonic_(std::move(mnemonic)), bitness_(bitness), register_(register_), str_xchg_("xchg") {}
+	SimpleInstrInfo_nop(std::uint32_t bitness, std::string&& mnemonic, Register register_)
+		: mnemonic_(create_formatter_string(std::move(mnemonic)))
+		, bitness_(bitness)
+		, register_(register_)
+		, str_xchg_(create_formatter_string("xchg")) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -440,7 +462,7 @@ private:
 
 class SimpleInstrInfo_STIG1 final : public InstrInfo {
 public:
-	SimpleInstrInfo_STIG1(std::string mnemonic, bool pseudo_op) : mnemonic_(std::move(mnemonic)), pseudo_op_(pseudo_op) {}
+	SimpleInstrInfo_STIG1(std::string&& mnemonic, bool pseudo_op) : mnemonic_(create_formatter_string(std::move(mnemonic))), pseudo_op_(pseudo_op) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		auto info = InstrOpInfo::with_default(mnemonic_);
@@ -463,7 +485,7 @@ private:
 
 class SimpleInstrInfo_STi_ST final : public InstrInfo {
 public:
-	SimpleInstrInfo_STi_ST(std::string mnemonic, bool pseudo_op) : mnemonic_(std::move(mnemonic)), pseudo_op_(pseudo_op) {}
+	SimpleInstrInfo_STi_ST(std::string&& mnemonic, bool pseudo_op) : mnemonic_(create_formatter_string(std::move(mnemonic))), pseudo_op_(pseudo_op) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		constexpr std::uint32_t FLAGS = 0;
@@ -482,7 +504,7 @@ private:
 
 class SimpleInstrInfo_ST_STi final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_ST_STi(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_ST_STi(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -498,8 +520,8 @@ private:
 
 class SimpleInstrInfo_monitor final : public InstrInfo {
 public:
-	SimpleInstrInfo_monitor(std::string mnemonic, Register register1, Register register2, Register register3)
-		: mnemonic_(std::move(mnemonic)), register1_(register1), register2_(register2), register3_(register3) {}
+	SimpleInstrInfo_monitor(std::string&& mnemonic, Register register1, Register register2, Register register3)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), register1_(register1), register2_(register2), register3_(register3) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -531,7 +553,7 @@ private:
 
 class SimpleInstrInfo_mwait final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_mwait(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_mwait(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -567,7 +589,7 @@ private:
 
 class SimpleInstrInfo_mwaitx final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_mwaitx(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_mwaitx(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -608,7 +630,7 @@ private:
 
 class SimpleInstrInfo_maskmovq final : public InstrInfo {
 public:
-	SimpleInstrInfo_maskmovq(std::string mnemonic, std::uint32_t flags) : mnemonic_(std::move(mnemonic)), flags_(flags) {}
+	SimpleInstrInfo_maskmovq(std::string&& mnemonic, std::uint32_t flags) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		ICED_DEBUG_ASSERT(instruction.op_count() == 3);
@@ -651,7 +673,7 @@ private:
 
 class SimpleInstrInfo_pblendvb final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_pblendvb(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_pblendvb(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -675,7 +697,7 @@ private:
 
 class SimpleInstrInfo_reverse final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_reverse(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_reverse(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -696,9 +718,9 @@ private:
 
 class SimpleInstrInfo_OpSize final : public InstrInfo {
 public:
-	SimpleInstrInfo_OpSize(CodeSize code_size, std::string mnemonic, std::string mnemonic16, std::string mnemonic32, std::string mnemonic64)
-		: mnemonics_{FormatterString(std::move(mnemonic)), FormatterString(std::move(mnemonic16)), FormatterString(std::move(mnemonic32)),
-					 FormatterString(std::move(mnemonic64))}
+	SimpleInstrInfo_OpSize(CodeSize code_size, std::string&& mnemonic, std::string&& mnemonic16, std::string&& mnemonic32, std::string&& mnemonic64)
+		: mnemonics_{create_formatter_string(std::move(mnemonic)), create_formatter_string(std::move(mnemonic16)),
+					 create_formatter_string(std::move(mnemonic32)), create_formatter_string(std::move(mnemonic64))}
 		, code_size_(code_size) {
 		static_assert(static_cast<std::uint32_t>(CodeSize::Unknown) == 0, "");
 		static_assert(static_cast<std::uint32_t>(CodeSize::Code16) == 1, "");
@@ -720,9 +742,10 @@ private:
 
 class SimpleInstrInfo_OpSize_cc final : public InstrInfo {
 public:
-	SimpleInstrInfo_OpSize_cc(CodeSize code_size, std::uint32_t cc_index, std::vector<std::string>&& mnemonics, std::vector<std::string>&& mnemonics_other)
-		: mnemonics_(FormatterString::with_strings(std::move(mnemonics)))
-		, mnemonics_other_(FormatterString::with_strings(std::move(mnemonics_other)))
+	SimpleInstrInfo_OpSize_cc(CodeSize code_size, std::uint32_t cc_index, std::vector<std::string>&& mnemonics,
+							  std::vector<std::string>&& mnemonics_other)
+		: mnemonics_(create_formatter_strings(std::move(mnemonics)))
+		, mnemonics_other_(create_formatter_strings(std::move(mnemonics_other)))
 		, cc_index_(cc_index)
 		, code_size_(code_size) {}
 
@@ -741,9 +764,9 @@ private:
 
 class SimpleInstrInfo_OpSize2 final : public InstrInfo {
 public:
-	SimpleInstrInfo_OpSize2(std::string mnemonic, std::string mnemonic16, std::string mnemonic32, std::string mnemonic64, bool can_use_bnd)
-		: mnemonics_{FormatterString(std::move(mnemonic)), FormatterString(std::move(mnemonic16)), FormatterString(std::move(mnemonic32)),
-					 FormatterString(std::move(mnemonic64))}
+	SimpleInstrInfo_OpSize2(std::string&& mnemonic, std::string&& mnemonic16, std::string&& mnemonic32, std::string&& mnemonic64, bool can_use_bnd)
+		: mnemonics_{create_formatter_string(std::move(mnemonic)), create_formatter_string(std::move(mnemonic16)),
+					 create_formatter_string(std::move(mnemonic32)), create_formatter_string(std::move(mnemonic64))}
 		, can_use_bnd_(can_use_bnd) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
@@ -762,8 +785,11 @@ private:
 
 class SimpleInstrInfo_fword final : public InstrInfo {
 public:
-	SimpleInstrInfo_fword(CodeSize code_size, std::uint32_t flags, std::string mnemonic, std::string mnemonic2)
-		: mnemonic_(std::move(mnemonic)), mnemonic2_(std::move(mnemonic2)), code_size_(code_size), flags_(flags) {}
+	SimpleInstrInfo_fword(CodeSize code_size, std::uint32_t flags, std::string&& mnemonic, std::string&& mnemonic2)
+		: mnemonic_(create_formatter_string(std::move(mnemonic)))
+		, mnemonic2_(create_formatter_string(std::move(mnemonic2)))
+		, code_size_(code_size)
+		, flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -782,7 +808,7 @@ private:
 class SimpleInstrInfo_jcc final : public InstrInfo {
 public:
 	SimpleInstrInfo_jcc(std::uint32_t cc_index, std::vector<std::string>&& mnemonics)
-		: mnemonics_(FormatterString::with_strings(std::move(mnemonics))), cc_index_(cc_index) {}
+		: mnemonics_(create_formatter_strings(std::move(mnemonics))), cc_index_(cc_index) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		std::uint32_t flags = InstrOpInfoFlags::NONE;
@@ -804,7 +830,7 @@ private:
 
 class SimpleInstrInfo_bnd final : public InstrInfo {
 public:
-	SimpleInstrInfo_bnd(std::string mnemonic, std::uint32_t flags) : mnemonic_(std::move(mnemonic)), flags_(flags) {}
+	SimpleInstrInfo_bnd(std::string&& mnemonic, std::uint32_t flags) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -835,9 +861,10 @@ void remove_last_op(InstrOpInfo& info) noexcept {
 
 class SimpleInstrInfo_pops final : public InstrInfo {
 public:
-	SimpleInstrInfo_pops(std::string mnemonic, PseudoOps pseudo_ops) : mnemonic_(std::move(mnemonic)), pseudo_ops_(pseudo_ops), flags_(InstrOpInfoFlags::NONE) {}
-	SimpleInstrInfo_pops(std::string mnemonic, PseudoOps pseudo_ops, std::uint32_t flags)
-		: mnemonic_(std::move(mnemonic)), pseudo_ops_(pseudo_ops), flags_(flags) {}
+	SimpleInstrInfo_pops(std::string&& mnemonic, PseudoOps pseudo_ops)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), pseudo_ops_(pseudo_ops), flags_(InstrOpInfoFlags::NONE) {}
+	SimpleInstrInfo_pops(std::string&& mnemonic, PseudoOps pseudo_ops, std::uint32_t flags)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), pseudo_ops_(pseudo_ops), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		auto info = InstrOpInfo::with_instruction(mnemonic_, instruction, flags_);
@@ -857,7 +884,8 @@ private:
 
 class SimpleInstrInfo_pclmulqdq final : public InstrInfo {
 public:
-	SimpleInstrInfo_pclmulqdq(std::string mnemonic, PseudoOps pseudo_ops) : mnemonic_(std::move(mnemonic)), pseudo_ops_(pseudo_ops) {}
+	SimpleInstrInfo_pclmulqdq(std::string&& mnemonic, PseudoOps pseudo_ops)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), pseudo_ops_(pseudo_ops) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		auto info = InstrOpInfo::with_instruction(mnemonic_, instruction, InstrOpInfoFlags::NONE);
@@ -893,7 +921,7 @@ private:
 
 class SimpleInstrInfo_imul final : public InstrInfo {
 public:
-	explicit SimpleInstrInfo_imul(std::string mnemonic) : mnemonic_(std::move(mnemonic)) {}
+	explicit SimpleInstrInfo_imul(std::string&& mnemonic) : mnemonic_(create_formatter_string(std::move(mnemonic))) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		auto info = InstrOpInfo::with_instruction(mnemonic_, instruction, InstrOpInfoFlags::NONE);
@@ -915,7 +943,7 @@ private:
 
 class SimpleInstrInfo_Reg16 final : public InstrInfo {
 public:
-	SimpleInstrInfo_Reg16(std::string mnemonic, std::uint32_t flags) : mnemonic_(std::move(mnemonic)), flags_(flags) {}
+	SimpleInstrInfo_Reg16(std::string&& mnemonic, std::uint32_t flags) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -933,7 +961,7 @@ private:
 
 class SimpleInstrInfo_Reg32 final : public InstrInfo {
 public:
-	SimpleInstrInfo_Reg32(std::string mnemonic, std::uint32_t flags) : mnemonic_(std::move(mnemonic)), flags_(flags) {}
+	SimpleInstrInfo_Reg32(std::string&& mnemonic, std::uint32_t flags) : mnemonic_(create_formatter_string(std::move(mnemonic))), flags_(flags) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -951,7 +979,7 @@ private:
 
 class SimpleInstrInfo_reg final : public InstrInfo {
 public:
-	SimpleInstrInfo_reg(std::string mnemonic, Register register_) : mnemonic_(std::move(mnemonic)), register_(register_) {}
+	SimpleInstrInfo_reg(std::string&& mnemonic, Register register_) : mnemonic_(create_formatter_string(std::move(mnemonic))), register_(register_) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -971,7 +999,8 @@ private:
 
 class SimpleInstrInfo_invlpga final : public InstrInfo {
 public:
-	SimpleInstrInfo_invlpga(std::uint32_t bitness, std::string mnemonic) : mnemonic_(std::move(mnemonic)), bitness_(bitness) {}
+	SimpleInstrInfo_invlpga(std::uint32_t bitness, std::string&& mnemonic)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), bitness_(bitness) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -1006,7 +1035,8 @@ private:
 
 class SimpleInstrInfo_DeclareData final : public InstrInfo {
 public:
-	SimpleInstrInfo_DeclareData(Code code, std::string mnemonic) : mnemonic_(std::move(mnemonic)), op_kind_(to_op_kind(code)) {}
+	SimpleInstrInfo_DeclareData(Code code, std::string&& mnemonic)
+		: mnemonic_(create_formatter_string(std::move(mnemonic))), op_kind_(to_op_kind(code)) {}
 
 	InstrOpInfo op_info(const FormatterOptions& options, const Instruction& instruction) const noexcept override {
 		static_cast<void>(options);
@@ -1061,7 +1091,11 @@ struct AllInfosHolder {
 	// Creates an instruction info and stores it in `infos_storage` (a function so its temporaries aren't in the caller's stack frame)
 	template <typename T, typename... Args>
 	ICED_NOINLINE InstrInfo* add(Args&&... args) {
-		infos_storage.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+		return store(std::make_unique<T>(std::forward<Args>(args)...));
+	}
+
+	ICED_NOINLINE InstrInfo* store(std::unique_ptr<InstrInfo> info) {
+		infos_storage.push_back(std::move(info));
 		return infos_storage.back().get();
 	}
 
@@ -1315,7 +1349,9 @@ struct AllInfosHolder {
 				c = static_cast<char>(reader.read_u8());
 				add_suffix(s2, s, c);
 				const CodeSize code_size = read_code_size();
-				info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), s2, s2, s2);
+				s3 = s2;
+				s4 = s2;
+				info = add<SimpleInstrInfo_OpSize>(code_size, std::move(s), std::move(s2), std::move(s3), std::move(s4));
 				break;
 			}
 
