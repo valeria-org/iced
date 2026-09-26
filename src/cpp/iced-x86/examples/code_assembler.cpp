@@ -49,9 +49,8 @@ static Result<void> how_to_use_code_assembler() {
 	a.xor_(byte_ptr(rdx + r14 * 4 + 123), 0x10);
 	// Prefixes are also methods
 	a.rep().stosd();
-	// Sometimes, you must help the compiler pick the right overload. 64-bit immediates must be
-	// std::int64_t/std::uint64_t (a `ULL` suffix is ambiguous if std::uint64_t is `unsigned long`):
-	a.mov(rax, std::uint64_t{0x1234'5678'9ABC'DEF0});
+	// Immediates can be any integer type (eg. `int`, `unsigned`, `long long`, `std::uint64_t`):
+	a.mov(rax, 0x1234'5678'9ABC'DEF0ULL);
 
 	// Errors are sticky: instead of checking the result of each call, the first error is
 	// saved, the following calls are ignored and assemble() returns the error. You can
@@ -95,7 +94,7 @@ static Result<void> how_to_use_code_assembler() {
 	auto bytes = a.assemble(0x1234'5678);
 	if (!bytes)
 		return bytes.error();
-	check(bytes.value().size() == 82, "bytes.size() == 82");
+	check(bytes->size() == 82, "bytes.size() == 82");
 	// If you don't want to encode them, you can get all instructions by calling
 	// one of these methods:
 	const std::vector<Instruction>& instrs = a.instructions(); // Get a reference to the internal vector

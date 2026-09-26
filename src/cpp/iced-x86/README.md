@@ -107,7 +107,8 @@ TODO(integrator)
 - [Create and encode instructions](#create-and-encode-instructions)
 
 Methods that can fail return an `iced_x86::Result<T>` (similar to Rust's `Result<T, IcedError>`): check it with
-`is_ok()`/`is_err()` (or `if (result)`) and then get the value with `value()` or the `IcedError` with `error()`.
+`is_ok()`/`is_err()` (or `if (result)`, `has_value()`) and then get the value with `value()`, `*result` or `result->member`
+or the `IcedError` with `error()` (accessing the value of an error result aborts).
 The library never throws exceptions.
 
 ### Disassemble (decode and format instructions)
@@ -156,8 +157,8 @@ This function produces the following output:
 00007FFAC46ACDE0 33FF                 xor       edi,edi
 */
 static void how_to_disassemble() {
-	const std::uint8_t* bytes = EXAMPLE_CODE;
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, bytes, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	const auto& bytes = EXAMPLE_CODE;
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, bytes, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	// Formatters: Masm*, Nasm*, Gas* (AT&T) and Intel* (XED).
 	// For fastest code, see `SpecializedFormatter` which is ~3.3x faster. Use it if formatting
@@ -264,9 +265,8 @@ static Result<void> how_to_use_code_assembler() {
 	a.xor_(byte_ptr(rdx + r14 * 4 + 123), 0x10);
 	// Prefixes are also methods
 	a.rep().stosd();
-	// Sometimes, you must help the compiler pick the right overload. 64-bit immediates must be
-	// std::int64_t/std::uint64_t (a `ULL` suffix is ambiguous if std::uint64_t is `unsigned long`):
-	a.mov(rax, std::uint64_t{0x1234'5678'9ABC'DEF0});
+	// Immediates can be any integer type (eg. `int`, `unsigned`, `long long`, `std::uint64_t`):
+	a.mov(rax, 0x1234'5678'9ABC'DEF0ULL);
 
 	// Errors are sticky: instead of checking the result of each call, the first error is
 	// saved, the following calls are ignored and assemble() returns the error. You can
@@ -310,7 +310,7 @@ static Result<void> how_to_use_code_assembler() {
 	auto bytes = a.assemble(0x1234'5678);
 	if (!bytes)
 		return bytes.error();
-	check(bytes.value().size() == 82, "bytes.size() == 82");
+	check(bytes->size() == 82, "bytes.size() == 82");
 	// If you don't want to encode them, you can get all instructions by calling
 	// one of these methods:
 	const std::vector<Instruction>& instrs = a.instructions(); // Get a reference to the internal vector
@@ -375,7 +375,7 @@ private:
 
 static void how_to_resolve_symbols() {
 	static const std::uint8_t bytes[] = {0x48, 0x8B, 0x8A, 0xA5, 0x5A, 0xA5, 0x5A};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 	Instruction instr = decoder.decode();
 
 	std::unordered_map<std::uint64_t, std::string> sym_map;
@@ -463,7 +463,7 @@ static const char* get_color(FormatterTextKind kind) {
 static constexpr const char* RESET_COLOR = "\x1B[0m";
 
 static void how_to_colorize_text() {
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	IntelFormatter formatter;
 	formatter.options_mut().set_first_operand_char_index(8);
@@ -635,7 +635,7 @@ static Result<void> how_to_move_code() {
 		auto jmp = Instruction::with_branch(Code::Jmp_rel32_64, jmp_back_addr);
 		if (!jmp)
 			return jmp.error();
-		orig_instructions.push_back(jmp.value());
+		orig_instructions.push_back(*jmp);
 	}
 
 	// Relocate the code to some new location. It can fix short/near branches and
@@ -654,7 +654,7 @@ static Result<void> how_to_move_code() {
 	auto result = BlockEncoder::encode(decoder.bitness(), block, BlockEncoderOptions::NONE);
 	if (!result)
 		return result.error();
-	const std::vector<std::uint8_t>& new_code = result.value().code_buffer;
+	const std::vector<std::uint8_t>& new_code = result->code_buffer;
 
 	// Patch the original code. Pretend that we use some OS API to write to memory...
 	// We could use the BlockEncoder/Encoder for this but it's easy to do yourself too.
@@ -963,7 +963,7 @@ This function produces the following output:
     Used reg: RDI:Write
 */
 static void how_to_get_instruction_info() {
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	// Use a factory to create the instruction info if you need register and
 	// memory usage. If it's something else, eg. encoding, flags, etc, there
@@ -1080,7 +1080,7 @@ static void check(bool condition, const char* message) {
 static void how_to_get_virtual_address() {
 	// add [rdi+r12*8-5AA5EDCCh],esi
 	static const std::uint8_t bytes[] = {0x42, 0x01, 0xB4, 0xE7, 0x34, 0x12, 0x5A, 0xA5};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 	Instruction instr = decoder.decode();
 
 	auto va = instr.virtual_address(
@@ -1168,7 +1168,7 @@ static void how_to_disassemble_old_instrs() {
 	// some of these old instructions.
 	constexpr std::uint32_t DECODER_OPTIONS =
 		DecoderOptions::MPX | DecoderOptions::MOV_TR | DecoderOptions::CYRIX | DecoderOptions::CYRIX_DMI | DecoderOptions::ALTINST;
-	auto decoder = Decoder::with_ip(32, bytes, sizeof(bytes), 0x731E'0A03, DECODER_OPTIONS);
+	auto decoder = Decoder::with_ip(32, bytes, 0x731E'0A03, DECODER_OPTIONS);
 
 	NasmFormatter formatter;
 	formatter.options_mut().set_space_after_operand_separator(true);
@@ -1221,7 +1221,7 @@ using MyFormatter = SpecializedFormatter<MyTraitOptions>;
 static void how_to_disassemble_really_fast() {
 	// Assume this is a big array and not just one instruction
 	static const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 
 	std::string output;
 	Instruction instruction;
@@ -1297,7 +1297,7 @@ static Result<void> how_to_encode_instructions() {
 	auto create_label = [&label_id]() { return label_id++; };
 	auto add_label = [](std::uint64_t id, Result<Instruction> instruction) {
 		if (instruction)
-			instruction.value().set_ip(id);
+			instruction->set_ip(id);
 		return instruction;
 	};
 
@@ -1329,13 +1329,13 @@ static Result<void> how_to_encode_instructions() {
 	results.push_back(Instruction::with2(Code::Lea_r64_m, Register::R14, MemoryOperand::with_base_displ(Register::RIP, static_cast<std::int64_t>(data1))));
 	results.push_back(Instruction::with(Code::Nopd));
 	static const std::uint8_t raw_data[] = {0x12, 0x34, 0x56, 0x78};
-	results.push_back(add_label(data1, Instruction::with_declare_byte(raw_data, sizeof(raw_data))));
+	results.push_back(add_label(data1, Instruction::with_declare_byte(raw_data)));
 
 	std::vector<Instruction> instructions;
 	for (const Result<Instruction>& result : results) {
 		if (!result)
 			return result.error();
-		instructions.push_back(result.value());
+		instructions.push_back(*result);
 	}
 
 	// Use BlockEncoder to encode a block of instructions. This block can contain any
@@ -1355,7 +1355,7 @@ static Result<void> how_to_encode_instructions() {
 	// Now disassemble the encoded instructions. Note that the 'jmp near'
 	// instruction was turned into a 'jmp short' instruction because we
 	// didn't disable branch optimizations.
-	const std::vector<std::uint8_t>& bytes = result.value().code_buffer;
+	const std::vector<std::uint8_t>& bytes = result->code_buffer;
 	std::string output;
 	const std::uint8_t* bytes_code = bytes.data();
 	const std::size_t bytes_code_len = bytes.size() - sizeof(raw_data);
@@ -1372,7 +1372,7 @@ static Result<void> how_to_encode_instructions() {
 	if (!db)
 		return db.error();
 	output.clear();
-	formatter.format(db.value(), output);
+	formatter.format(*db, output);
 	std::printf("%016" PRIX64 " %s\n", decoder.ip(), output.c_str());
 	return {};
 }

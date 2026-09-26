@@ -38,8 +38,8 @@ This function produces the following output:
 00007FFAC46ACDE0 33FF                 xor       edi,edi
 */
 static void how_to_disassemble() {
-	const std::uint8_t* bytes = EXAMPLE_CODE;
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, bytes, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	const auto& bytes = EXAMPLE_CODE;
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, bytes, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	// Formatters: Masm*, Nasm*, Gas* (AT&T) and Intel* (XED).
 	// For fastest code, see `SpecializedFormatter` which is ~3.3x faster. Use it if formatting

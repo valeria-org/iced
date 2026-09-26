@@ -143,7 +143,7 @@ static Result<void> how_to_move_code() {
 		auto jmp = Instruction::with_branch(Code::Jmp_rel32_64, jmp_back_addr);
 		if (!jmp)
 			return jmp.error();
-		orig_instructions.push_back(jmp.value());
+		orig_instructions.push_back(*jmp);
 	}
 
 	// Relocate the code to some new location. It can fix short/near branches and
@@ -162,7 +162,7 @@ static Result<void> how_to_move_code() {
 	auto result = BlockEncoder::encode(decoder.bitness(), block, BlockEncoderOptions::NONE);
 	if (!result)
 		return result.error();
-	const std::vector<std::uint8_t>& new_code = result.value().code_buffer;
+	const std::vector<std::uint8_t>& new_code = result->code_buffer;
 
 	// Patch the original code. Pretend that we use some OS API to write to memory...
 	// We could use the BlockEncoder/Encoder for this but it's easy to do yourself too.

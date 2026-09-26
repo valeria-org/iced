@@ -132,7 +132,7 @@ public:
 	/// // sbb r9d,ebx
 	/// const std::uint8_t bytes[] = {0x75, 0xFC, 0x00, 0xCE, 0x41, 0x19, 0xD9};
 	/// std::vector<Instruction> instructions;
-	/// Decoder decoder = Decoder::with_ip(64, bytes, sizeof(bytes), 0x1234'5678'9ABC'DEF0, DecoderOptions::NONE);
+	/// Decoder decoder = Decoder::with_ip(64, bytes, 0x1234'5678'9ABC'DEF0, DecoderOptions::NONE);
 	/// while (decoder.can_decode())
 	///     instructions.push_back(decoder.decode());
 	///

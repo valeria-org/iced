@@ -35,7 +35,7 @@ namespace internal {
 
 /// Either a value (`is_ok()`) or an `IcedError` (`is_err()`), similar to Rust's `Result<T, IcedError>`.
 ///
-/// Accessing `value()` when it's an error (or `error()` when it's a value) aborts the process.
+/// Accessing `value()`, `*result` or `result->` when it's an error (or `error()` when it's a value) aborts the process.
 template <typename T>
 class [[nodiscard]] Result {
 public:
@@ -86,6 +86,8 @@ public:
 	bool is_ok() const noexcept { return ok_; }
 	/// `true` if it contains an error
 	bool is_err() const noexcept { return !ok_; }
+	/// `true` if it contains a value (same as `is_ok()`, `std::optional`-like name)
+	bool has_value() const noexcept { return ok_; }
 	/// `true` if it contains a value
 	explicit operator bool() const noexcept { return ok_; }
 
@@ -109,6 +111,17 @@ public:
 	}
 	/// Gets the value or `default_value` if it's an error
 	T value_or(T default_value) const& { return ok_ ? value_ : std::move(default_value); }
+
+	/// Gets the value (same as `value()`). Aborts if it's an error.
+	T& operator*() & noexcept { return value(); }
+	/// Gets the value (same as `value()`). Aborts if it's an error.
+	const T& operator*() const& noexcept { return value(); }
+	/// Gets the value (same as `value()`). Aborts if it's an error.
+	T&& operator*() && noexcept { return std::move(*this).value(); }
+	/// Accesses a member of the value, eg. `result->size()`. Aborts if it's an error.
+	T* operator->() noexcept { return &value(); }
+	/// Accesses a member of the value, eg. `result->size()`. Aborts if it's an error.
+	const T* operator->() const noexcept { return &value(); }
 
 	/// Gets the error. Aborts if it's a value.
 	const IcedError& error() const& noexcept {
@@ -145,6 +158,8 @@ public:
 	bool is_ok() const noexcept { return ok_; }
 	/// `true` if it contains an error
 	bool is_err() const noexcept { return !ok_; }
+	/// `true` if it's a success result (same as `is_ok()`)
+	bool has_value() const noexcept { return ok_; }
 	/// `true` if it's a success result
 	explicit operator bool() const noexcept { return ok_; }
 	/// Aborts if it's an error

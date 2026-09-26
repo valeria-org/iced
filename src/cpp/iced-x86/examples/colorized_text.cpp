@@ -55,7 +55,7 @@ static const char* get_color(FormatterTextKind kind) {
 static constexpr const char* RESET_COLOR = "\x1B[0m";
 
 static void how_to_colorize_text() {
-	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, sizeof(EXAMPLE_CODE), EXAMPLE_CODE_RIP, DecoderOptions::NONE);
+	auto decoder = Decoder::with_ip(EXAMPLE_CODE_BITNESS, EXAMPLE_CODE, EXAMPLE_CODE_RIP, DecoderOptions::NONE);
 
 	IntelFormatter formatter;
 	formatter.options_mut().set_first_operand_char_index(8);

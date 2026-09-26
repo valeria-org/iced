@@ -35,7 +35,7 @@ private:
 
 static void how_to_resolve_symbols() {
 	static const std::uint8_t bytes[] = {0x48, 0x8B, 0x8A, 0xA5, 0x5A, 0xA5, 0x5A};
-	Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	Decoder decoder(64, bytes, DecoderOptions::NONE);
 	Instruction instr = decoder.decode();
 
 	std::unordered_map<std::uint64_t, std::string> sym_map;

@@ -300,7 +300,7 @@ public:
 	/// ```cpp
 	/// // add [rdi+r12*8-5AA5EDCCh],esi
 	/// const std::uint8_t bytes[] = {0x42, 0x01, 0xB4, 0xE7, 0x34, 0x12, 0x5A, 0xA5};
-	/// Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	/// Decoder decoder(64, bytes, DecoderOptions::NONE);
 	///
 	/// // This allocates two vectors but they get re-used every time you call info() and info_options().
 	/// InstructionInfoFactory info_factory;
@@ -330,7 +330,7 @@ public:
 	/// ```cpp
 	/// // add [rdi+r12*8-5AA5EDCCh],esi
 	/// const std::uint8_t bytes[] = {0x42, 0x01, 0xB4, 0xE7, 0x34, 0x12, 0x5A, 0xA5};
-	/// Decoder decoder(64, bytes, sizeof(bytes), DecoderOptions::NONE);
+	/// Decoder decoder(64, bytes, DecoderOptions::NONE);
 	/// InstructionInfoFactory info_factory;
 	///
 	/// Instruction instr = decoder.decode();

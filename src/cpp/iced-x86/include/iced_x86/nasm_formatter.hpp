@@ -43,7 +43,7 @@ struct NasmFormatterImpl;
 /// #include "iced_x86/nasm_formatter.hpp"
 ///
 /// const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
-/// iced_x86::Decoder decoder(64, bytes, sizeof(bytes), iced_x86::DecoderOptions::NONE);
+/// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 /// const iced_x86::Instruction instr = decoder.decode();
 ///
 /// std::string output;
@@ -79,7 +79,7 @@ struct NasmFormatterImpl;
 /// };
 ///
 /// const std::uint8_t bytes[] = {0x48, 0x8B, 0x8A, 0xA5, 0x5A, 0xA5, 0x5A};
-/// iced_x86::Decoder decoder(64, bytes, sizeof(bytes), iced_x86::DecoderOptions::NONE);
+/// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 /// const iced_x86::Instruction instr = decoder.decode();
 ///
 /// // Hard code the symbols, it's just an example!😄

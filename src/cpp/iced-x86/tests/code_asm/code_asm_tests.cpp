@@ -1053,7 +1053,7 @@ TEST_CASE("code_asm/doc_example") {
 	a.ret_1(123);
 	a.xor_(byte_ptr(rdx + r14 * 4 + 123), 0x10);
 	a.rep().stosd();
-	a.mov(rax, UINT64_C(0x1234'5678'9ABC'DEF0));
+	a.mov(rax, 0x1234'5678'9ABC'DEF0ULL);
 
 	CodeLabel loop_lbl1 = a.create_label();
 	CodeLabel after_loop1 = a.create_label();
