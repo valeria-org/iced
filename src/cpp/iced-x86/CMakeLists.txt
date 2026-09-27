@@ -76,6 +76,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# which makes the decoder ~4% slower. Clang doesn't do it.
 	file(GLOB ICED_X86_DECODER_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/decoder/*.cpp")
 	set_source_files_properties(${ICED_X86_DECODER_SOURCES} PROPERTIES COMPILE_OPTIONS "-fno-tree-slp-vectorize")
+	if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
+		# The generated decoder tables have ~8000 small constant handler objects. GCC (x86) aligns objects >= 32 bytes
+		# to 32 bytes (-malign-data=compat), the padding would add ~37 KB. Clang uses the ABI alignment.
+		file(GLOB ICED_X86_DECODER_DATA_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/decoder/data_*.cpp")
+		set_source_files_properties(${ICED_X86_DECODER_DATA_SOURCES} PROPERTIES COMPILE_OPTIONS "-fno-tree-slp-vectorize;-malign-data=abi")
+	endif()
 endif()
 if(NOT MSVC)
 	# Separate sections so unused code/data can be removed by the linker (--gc-sections)

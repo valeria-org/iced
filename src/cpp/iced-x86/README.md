@@ -132,19 +132,19 @@ The library was written for devices with a C++ runtime but a small stack:
   | API | Worst case stack usage |
   |-----|-----------------------:|
   | `Decoder::decode*()` | < 0.3 KB |
-  | First `Decoder` construction (creates the decoder tables) | 0.75 KB |
   | `InstructionInfoFactory::info()` | 0.7 KB |
   | `Encoder::encode()` | 0.75 KB |
   | `GasFormatter/IntelFormatter/MasmFormatter/NasmFormatter::format()` | 1.4 - 1.7 KB |
   | `BlockEncoder::encode()` | 2.5 KB |
 
 - **No startup code**: there are no global constructors. Big tables are `const` data (in flash/.rodata) and are
-  constant initialized. Only a few tables are created lazily (thread safe function local statics) the first time
-  they're used. Heap usage the first time a component is used:
+  constant initialized, eg. the decoder's ~7900 op code handlers and its tables (the Rust crate creates them on the
+  heap the first time a decoder is created). Only a few tables are created lazily (thread safe function local
+  statics) the first time they're used. Heap usage the first time a component is used:
 
   | Component | One time heap usage |
   |-----------|--------------------:|
-  | Decoder | 70 KB (decoder tables) |
+  | Decoder | 0 |
   | Encoder, op code info (`OpCodeInfo`) | 0 |
   | Instruction info | 0 |
   | Fast formatter | 20 KB |
@@ -154,18 +154,23 @@ The library was written for devices with a C++ runtime but a small stack:
 - **Only what you use is linked**: it's a static library and each component is in its own object files (+
   `-ffunction-sections -fdata-sections`, link with `-Wl,--gc-sections`). Code + read-only data of a statically linked
   x86-64 test program (`-Os -fno-exceptions -fno-rtti`, `ICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF`, includes the
-  parts of libstdc++ it uses):
+  parts of libstdc++ it uses). The decoder tables are another 329 KB of constant data (`.data.rel.ro` since the
+  library is compiled with `-fPIC`: they contain pointers; `.rodata` without `-fPIC`):
 
   | Program | text + rodata |
   |---------|--------------:|
-  | Decoder | 133 KB |
-  | Decoder + fast formatter | 203 KB |
-  | Decoder + nasm formatter | 297 KB |
-  | Decoder + instruction info | 216 KB |
+  | Decoder | 67 KB (+ 329 KB decoder tables) |
+  | Decoder + fast formatter | 137 KB (+ 329 KB decoder tables) |
+  | Decoder + nasm formatter | 231 KB (+ 329 KB decoder tables) |
+  | Decoder + instruction info | 150 KB (+ 329 KB decoder tables) |
   | Encoder | 185 KB |
-  | Decoder + encoder | 314 KB |
+  | Decoder + encoder | 248 KB (+ 329 KB decoder tables) |
   | Block encoder | 217 KB |
   | Code assembler (a few instructions) | 223 KB |
+
+  PIE executables need a relocation for every pointer in the decoder tables: 780 KB of `.rela.dyn` (x86-64), or
+  ~6 KB if linked with `-Wl,-z,pack-relative-relocs` (`DT_RELR`, glibc 2.36+). Link with `-no-pie` or
+  `-Wl,-z,pack-relative-relocs` if the file size matters.
 
 ### Differences from the Rust crate
 

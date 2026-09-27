@@ -30,7 +30,9 @@ struct DecoderTables {
 	const HandlerEntry* handlers_mvex_0f3a;
 };
 
-// Creates the tables the first time it's called (thread safe)
-const DecoderTables& get_decoder_tables() noexcept;
+// Constant data (src/decoder/tables.cpp), the tables are generated (src/decoder/data_*.cpp)
+extern const DecoderTables DECODER_TABLES;
+
+inline const DecoderTables& get_decoder_tables() noexcept { return DECODER_TABLES; }
 
 } // namespace iced_x86::internal

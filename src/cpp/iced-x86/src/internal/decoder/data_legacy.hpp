@@ -5,14 +5,11 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include "iced_x86/decoder.hpp"
 
 namespace iced_x86::internal::decoder_data_legacy {
 
-extern const std::uint8_t TBL_DATA[];
-extern const std::size_t TBL_DATA_SIZE;
-constexpr std::size_t MAX_ID_NAMES = 82;
-constexpr std::size_t HANDLERS_MAP0_INDEX = 81;
+// 1850 handlers (constant data)
+extern const HandlerEntry HANDLERS_MAP0[0x100];
 
 } // namespace iced_x86::internal::decoder_data_legacy

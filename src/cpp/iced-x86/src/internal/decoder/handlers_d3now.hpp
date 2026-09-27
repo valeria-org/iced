@@ -10,7 +10,7 @@
 namespace iced_x86::internal {
 
 struct OpCodeHandler_D3NOW : OpCodeHandler {
-	OpCodeHandler_D3NOW() noexcept : OpCodeHandler(&decode, true) {}
+	constexpr OpCodeHandler_D3NOW() noexcept : OpCodeHandler(&decode, true) {}
 	ICED_DECODE_FN_DECL;
 };
 

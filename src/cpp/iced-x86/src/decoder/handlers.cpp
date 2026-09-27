@@ -5,10 +5,6 @@
 
 namespace iced_x86::internal {
 
-const OpCodeHandler_Invalid NULL_HANDLER{true};
-const OpCodeHandler_Invalid INVALID_HANDLER{true};
-const OpCodeHandler_Invalid INVALID_NO_MODRM_HANDLER{false};
-
 void OpCodeHandler_Invalid::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	decoder.set_invalid_instruction();
 }
@@ -18,7 +14,7 @@ void OpCodeHandler_Simple::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 	instruction.set_code(this_.code);
 }
 
-void OpCodeHandler_Int3::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
+void OpCodeHandler_Simple::decode_int3(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	instruction.set_code(Code::Int3);
 }
 
