@@ -153,6 +153,28 @@ The library was written for devices with a C++ runtime but a small stack:
   | `GasFormatter/IntelFormatter/MasmFormatter/NasmFormatter::format()` | 1.4 - 1.7 KB |
   | `BlockEncoder::encode()` | 2.5 KB |
 
+  Observed (measured at runtime with `tools/stack_usage/run.sh`: bytes from the API call to the deepest written stack
+  byte, incl. the C/C++ runtime functions that are called, while decoding/formatting/encoding all instructions in
+  `libstdc++.so`'s `.text` + 1 MB of random bytes as 16/32/64-bit code). The Rust column is the same measurement with
+  the Rust crate (fat LTO); "first use" is higher in Rust since it creates its tables (on the heap) the first time:
+
+  | API | GCC `-O3` | Clang `-O3` | GCC `-O0` | Clang `-O0` | Rust (first use / after that) |
+  |-----|----------:|------------:|----------:|------------:|------------------------------:|
+  | `Decoder::decode*()` | 96 | 88 | 1.8 K | 2.3 K | 3.5 K / 95 |
+  | `InstructionInfoFactory::info()` | 672 | 624 | 1.8 K | 2.3 K | 3.5 K / 831 |
+  | `Encoder::encode()` (incl. invalid instructions: error messages) | 1.1 K | 808 | 1.8 K | 2.3 K | 3.5 K / 871 |
+  | `FastFormatter::format()` to a `char` buffer | 264 | 272 | 1.8 K | 2.3 K | 3.7 K / 3.7 K (`String`) |
+  | `FastFormatter::format()` with a symbol resolver | 1.0 K | 936 | 2.4 K | 3.0 K | 3.7 K / 3.7 K |
+  | gas/intel/masm/nasm `format()` to a `std::string` | 1.1 - 1.2 K | 0.9 - 1.1 K | 1.8 - 2.0 K | 3.4 - 4.0 K | 9.6 K / 1.0 - 1.2 K |
+  | gas/intel/masm/nasm `format()` with a symbol resolver | 1.3 - 1.5 K | 1.0 - 1.5 K | 2.2 - 2.3 K | 3.5 - 4.5 K | 9.6 K / 1.1 - 1.6 K |
+  | `BlockEncoder::encode()` (~50 K instructions) | 2.0 K | 1.8 K | 2.9 K | 4.8 K | 3.4 K / 2.3 K |
+  | `CodeAssembler` instructions + `assemble()` | 2.5 K | 2.3 K | 3.5 K | 4.5 K | 2.4 K / 2.4 K |
+
+  (The `-O0` numbers are upper bounds: the deepest byte may have been written by library code called outside the
+  measured API call, eg. `Decoder` construction. A dynamically linked program's first call to a shared library
+  function can use ~2.5 KB more stack in the dynamic linker (lazy binding saves the AVX-512 registers); that's not
+  counted (`LD_BIND_NOW=1`), statically linked programs don't have it.)
+
 - **No startup code**: there are no global constructors. Big tables are `const` data (in flash/.rodata) and are
   constant initialized, eg. the decoder's ~7900 op code handlers and its tables (the Rust crate creates them on the
   heap the first time a decoder is created). Only a few tables are created lazily (thread safe function local
