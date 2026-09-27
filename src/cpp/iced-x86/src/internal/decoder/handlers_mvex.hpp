@@ -12,7 +12,7 @@ namespace iced_x86::internal {
 
 struct OpCodeHandler_EH : OpCodeHandler {
 	const OpCodeHandler* handlers[2];
-	OpCodeHandler_EH(const OpCodeHandler* handler_eh0, const OpCodeHandler* handler_eh1) noexcept
+	constexpr OpCodeHandler_EH(const OpCodeHandler* handler_eh0, const OpCodeHandler* handler_eh1) noexcept
 		: OpCodeHandler(&decode, true), handlers{handler_eh0, handler_eh1} {
 		ICED_DEBUG_ASSERT(!is_null_instance_handler(handler_eh0));
 		ICED_DEBUG_ASSERT(!is_null_instance_handler(handler_eh1));
@@ -22,129 +22,79 @@ struct OpCodeHandler_EH : OpCodeHandler {
 
 struct OpCodeHandler_MVEX_M : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_M(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_M(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_MV : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_MV(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-	}
+	explicit constexpr OpCodeHandler_MVEX_MV(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VW : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_HWIb : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_HWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_HWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VWIb : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VHW : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VHW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VHW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VHWIb : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VHWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VHWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VKW : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VKW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VKW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_KHW : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_KHW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_KHW(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_KHWIb : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_KHWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_KHWIb(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VSIB : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VSIB(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VSIB(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_VSIB_V : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_VSIB_V(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_VSIB_V(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 
 struct OpCodeHandler_MVEX_V_VSIB : OpCodeHandler {
 	Code code;
-	explicit OpCodeHandler_MVEX_V_VSIB(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_op_mask_register());
-		ICED_DEBUG_ASSERT(get_mvex_info(code_).can_use_eviction_hint());
-		ICED_DEBUG_ASSERT(!get_mvex_info(code_).ignores_eviction_hint());
-	}
+	explicit constexpr OpCodeHandler_MVEX_V_VSIB(Code code_) noexcept : OpCodeHandler(&decode, true), code(code_) {}
 	ICED_DECODE_FN_DECL;
 };
 

@@ -37,7 +37,7 @@ static_assert(DecoderCore::SF_LOCK == StateFlags::LOCK, "");
 static_assert(DecoderCore::SF_NO_MORE_BYTES == StateFlags::NO_MORE_BYTES, "");
 static_assert(DecoderCore::OP_SIZE64 == static_cast<std::uint8_t>(OpSize::Size64), "");
 
-ICED_FORCE_INLINE HandlerEntry to_handler_entry(const OpCodeHandler* handler) noexcept { return HandlerEntry{handler->decode, handler}; }
+ICED_FORCE_INLINE constexpr HandlerEntry to_handler_entry(const OpCodeHandler* handler) noexcept { return HandlerEntry{handler->decode, handler}; }
 
 // Casts `self_ptr` (the handler passed to its decode fn) to the real handler type
 template <typename T>

@@ -121,11 +121,6 @@ namespace Generator.Enums.Cpp {
 			Int(TypeIds.MvexInfoFlags2, "mvex_info_flags2");
 
 			// Internal enums: decoder
-			Int(TypeIds.SerializedDataKind, "decoder/serialized_data_kind");
-			Int(TypeIds.LegacyOpCodeHandlerKind, "decoder/legacy_op_code_handler_kind");
-			Int(TypeIds.VexOpCodeHandlerKind, "decoder/vex_op_code_handler_kind");
-			Int(TypeIds.EvexOpCodeHandlerKind, "decoder/evex_op_code_handler_kind");
-			Int(TypeIds.MvexOpCodeHandlerKind, "decoder/mvex_op_code_handler_kind");
 			Int(TypeIds.HandlerFlags, "decoder/handler_flags");
 			Int(TypeIds.LegacyHandlerFlags, "decoder/legacy_handler_flags");
 			Int(TypeIds.StateFlags, "decoder/state_flags");
@@ -194,6 +189,13 @@ namespace Generator.Enums.Cpp {
 
 			// Not used by the C++ code
 			toFileInfo.Add(TypeIds.FormatterSyntax, null);
+			// The C++ decoder tables are generated constant data (see CppDecoderTableWriter): the handler kinds are the names of the
+			// handler factory fns (src/internal/decoder/*_ctors.hpp)
+			toFileInfo.Add(TypeIds.SerializedDataKind, null);
+			toFileInfo.Add(TypeIds.LegacyOpCodeHandlerKind, null);
+			toFileInfo.Add(TypeIds.VexOpCodeHandlerKind, null);
+			toFileInfo.Add(TypeIds.EvexOpCodeHandlerKind, null);
+			toFileInfo.Add(TypeIds.MvexOpCodeHandlerKind, null);
 			// The C++ gas/intel/masm/nasm instruction info tables are generated constant data (see CppInstrInfoTableGen)
 			toFileInfo.Add(TypeIds.GasCtorKind, null);
 			toFileInfo.Add(TypeIds.IntelCtorKind, null);

@@ -5,17 +5,14 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include "iced_x86/decoder.hpp"
 
 namespace iced_x86::internal::decoder_data_vex {
 
-extern const std::uint8_t TBL_DATA[];
-extern const std::size_t TBL_DATA_SIZE;
-constexpr std::size_t MAX_ID_NAMES = 16;
-constexpr std::size_t HANDLERS_MAP0_INDEX = 14;
-constexpr std::size_t HANDLERS_0F_INDEX = 15;
-constexpr std::size_t HANDLERS_0F38_INDEX = 12;
-constexpr std::size_t HANDLERS_0F3A_INDEX = 13;
+// 2142 handlers (constant data)
+extern const HandlerEntry HANDLERS_0F38[0x100];
+extern const HandlerEntry HANDLERS_0F3A[0x100];
+extern const HandlerEntry HANDLERS_MAP0[0x100];
+extern const HandlerEntry HANDLERS_0F[0x100];
 
 } // namespace iced_x86::internal::decoder_data_vex

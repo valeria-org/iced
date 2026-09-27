@@ -85,6 +85,10 @@ void OpCodeHandler_EH::decode(const OpCodeHandler* self_ptr, DecoderCore& decode
 
 void OpCodeHandler_MVEX_M::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_M>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
 		decoder.set_invalid_instruction();
@@ -103,6 +107,8 @@ void OpCodeHandler_MVEX_M::decode(const OpCodeHandler* self_ptr, DecoderCore& de
 
 void OpCodeHandler_MVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_MV>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
 		decoder.set_invalid_instruction();
@@ -124,6 +130,10 @@ void OpCodeHandler_MVEX_MV::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 
 void OpCodeHandler_MVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VW>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
 		decoder.set_invalid_instruction();
@@ -147,6 +157,10 @@ void OpCodeHandler_MVEX_VW::decode(const OpCodeHandler* self_ptr, DecoderCore& d
 
 void OpCodeHandler_MVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_HWIb>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
 
@@ -169,6 +183,10 @@ void OpCodeHandler_MVEX_HWIb::decode(const OpCodeHandler* self_ptr, DecoderCore&
 
 void OpCodeHandler_MVEX_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VWIb>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv_invalid_check & decoder.invalid_check_mask) != 0)
 		decoder.set_invalid_instruction();
@@ -194,6 +212,10 @@ void OpCodeHandler_MVEX_VWIb::decode(const OpCodeHandler* self_ptr, DecoderCore&
 
 void OpCodeHandler_MVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VHW>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
 
@@ -218,6 +240,10 @@ void OpCodeHandler_MVEX_VHW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 
 void OpCodeHandler_MVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VHWIb>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
 
@@ -242,6 +268,10 @@ void OpCodeHandler_MVEX_VHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 
 void OpCodeHandler_MVEX_VKW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VKW>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if ((decoder.state.vvvv & decoder.invalid_check_mask) > 7)
 		decoder.set_invalid_instruction();
@@ -266,6 +296,10 @@ void OpCodeHandler_MVEX_VKW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 
 void OpCodeHandler_MVEX_KHW::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_KHW>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
 
@@ -289,6 +323,10 @@ void OpCodeHandler_MVEX_KHW::decode(const OpCodeHandler* self_ptr, DecoderCore& 
 
 void OpCodeHandler_MVEX_KHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_KHWIb>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	instruction.set_code(this_.code);
 
@@ -314,6 +352,10 @@ void OpCodeHandler_MVEX_KHWIb::decode(const OpCodeHandler* self_ptr, DecoderCore
 
 void OpCodeHandler_MVEX_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VSIB>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))
 		decoder.set_invalid_instruction();
@@ -333,6 +375,10 @@ void OpCodeHandler_MVEX_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore&
 
 void OpCodeHandler_MVEX_VSIB_V::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_VSIB_V>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))
 		decoder.set_invalid_instruction();
@@ -354,6 +400,10 @@ void OpCodeHandler_MVEX_VSIB_V::decode(const OpCodeHandler* self_ptr, DecoderCor
 
 void OpCodeHandler_MVEX_V_VSIB::decode(const OpCodeHandler* self_ptr, DecoderCore& decoder, Instruction& instruction) noexcept {
 	const auto& this_ = handler_this<OpCodeHandler_MVEX_V_VSIB>(self_ptr);
+	// Checked here and not in the ctor since the ctor is only called at compile time (MVEX_INFO isn't constexpr)
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_op_mask_register());
+	ICED_DEBUG_ASSERT(get_mvex_info(this_.code).can_use_eviction_hint());
+	ICED_DEBUG_ASSERT(!get_mvex_info(this_.code).ignores_eviction_hint());
 	ICED_DEBUG_ASSERT(decoder.state.encoding() == static_cast<std::uint32_t>(EncodingKind::MVEX));
 	if (decoder.invalid_check_mask != 0 && ((decoder.state.vvvv_invalid_check & 0xF) != 0 || decoder.state.aaa == 0))
 		decoder.set_invalid_instruction();
