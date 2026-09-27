@@ -114,7 +114,17 @@ Measured on the same machine (x86-64, one pinned core), decoding (and formatting
 (the strongest Rust config) and a default `cargo --release` build. C++: GCC 15, `-O3` (CMake `Release`), no LTO.
 Formatters write to a `std::string` / `String`. Lower is better.
 
-@@BENCH@@
+| Benchmark (20 x 1.38 M instructions) | Rust (LTO) | Rust (default) | C++ (GCC 15) |
+|---|---:|---:|---:|
+| Decode | 0.063 s | 0.065 s | 0.061 s |
+| Decode + fast formatter | 0.143 s | 0.132 s | 0.132 s |
+| Decode + gas formatter | 0.249 s | 0.297 s | 0.242 s |
+| Decode + intel formatter | 0.249 s | 0.298 s | 0.237 s |
+| Decode + masm formatter | 0.261 s | 0.321 s | 0.263 s |
+| Decode + nasm formatter | 0.249 s | 0.307 s | 0.246 s |
+
+(best of 5 alternating runs; decoding runs at ~450 MB/s, ~110 M instructions/s. Clang 21 builds are within a few %.
+The benchmarks are in `bench/`, eg. `build/bench/iced_x86_bench_formatter [elf_file] [loops]`.)
 
 The encoder (re-encode every decoded instruction) runs at the same speed as Rust (~47 M instructions/s both).
 
@@ -152,24 +162,31 @@ The library was written for devices with a C++ runtime but a small stack:
 
   The decoder never allocates when decoding. The formatters only append to the output string.
 - **Only what you use is linked**: it's a static library and each component is in its own object files (+
-  `-ffunction-sections -fdata-sections`, link with `-Wl,--gc-sections`). Code + read-only data of a statically linked
-  x86-64 test program (`-Os -fno-exceptions -fno-rtti`, `ICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF`, includes the
-  parts of libstdc++ it uses). The decoder tables are another 329 KB of constant data (`.data.rel.ro` since the
-  library is compiled with `-fPIC`: they contain pointers; `.rodata` without `-fPIC`):
+  `-ffunction-sections -fdata-sections`, link with `-Wl,--gc-sections`). Code + read-only data (incl. the constant
+  tables) of statically linked x86-64 test programs (`-Os -fno-exceptions -fno-rtti -no-pie`,
+  `ICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF`, incl. the parts of libstdc++ they use):
 
-  | Program | text + rodata |
-  |---------|--------------:|
-  | Decoder | 67 KB (+ 329 KB decoder tables) |
-  | Decoder + fast formatter | 137 KB (+ 329 KB decoder tables) |
-  | Decoder + nasm formatter | 231 KB (+ 329 KB decoder tables) |
-  | Decoder + instruction info | 150 KB (+ 329 KB decoder tables) |
-  | Encoder | 185 KB |
-  | Decoder + encoder | 248 KB (+ 329 KB decoder tables) |
-  | Block encoder | 217 KB |
-  | Code assembler (a few instructions) | 223 KB |
+  | Program | Code + read-only data |
+  |---------|----------------------:|
+  | Decoder | 378 KB (329 KB of it is the decoder's constant tables) |
+  | Decoder + fast formatter | 447 KB |
+  | Decoder + instruction info | 461 KB |
+  | Decoder + nasm formatter | 528 KB |
+  | Decoder + gas formatter | 538 KB |
+  | Encoder | 177 KB |
+  | Decoder + encoder | 554 KB |
+  | Block encoder | 209 KB |
+  | Code assembler (a few instructions) | 215 KB |
 
-  PIE executables need a relocation for every pointer in the decoder tables: 780 KB of `.rela.dyn` (x86-64), or
-  ~6 KB if linked with `-Wl,-z,pack-relative-relocs` (`DT_RELR`, glibc 2.36+). Link with `-no-pie` or
+  The Rust crate (and the C++ port before the tables were made constant) creates the decoder tables on the heap
+  (~390 KB of RAM on x86-64): the C++ port trades RAM for flash/ROM. The tables mostly contain pointers so they're
+  smaller on 32-bit targets.
+- **PIC**: the CMake target doesn't force PIC (it follows `CMAKE_POSITION_INDEPENDENT_CODE`, `OFF` by default for
+  static libraries, but note that some toolchains, eg. Ubuntu's GCC, default to `-fPIE`). Use position dependent code
+  on embedded targets if possible: with `-fPIC`/`-fPIE`, the constant tables (they contain pointers) are
+  placed in `.data.rel.ro` instead of `.rodata` (some linker scripts put `.data.rel.ro` in RAM), and PIE
+  executables need a relocation for every pointer in the decoder tables: 780 KB of `.rela.dyn` (x86-64), or ~6 KB
+  if linked with `-Wl,-z,pack-relative-relocs` (`DT_RELR`, glibc 2.36+). Link with `-no-pie` or
   `-Wl,-z,pack-relative-relocs` if the file size matters.
 
 ### Differences from the Rust crate

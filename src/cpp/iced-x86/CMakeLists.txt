@@ -45,7 +45,10 @@ target_include_directories(iced_x86
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_compile_features(iced_x86 PUBLIC cxx_std_17)
-set_target_properties(iced_x86 PROPERTIES CXX_EXTENSIONS OFF POSITION_INDEPENDENT_CODE ON)
+# PIC is controlled by CMAKE_POSITION_INDEPENDENT_CODE (OFF by default for static libraries). Non-PIC code keeps the
+# decoder/encoder/formatter tables (they contain pointers) in .rodata instead of .data.rel.ro, which matters on
+# embedded targets where .data.rel.ro may end up in RAM. Set it to ON if you link the library into a shared library.
+set_target_properties(iced_x86 PROPERTIES CXX_EXTENSIONS OFF)
 
 function(iced_x86_set_warnings target)
 	if(MSVC)
