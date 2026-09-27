@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -10,7 +11,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "iced_x86/code.hpp"
 #include "iced_x86/code_ext.hpp"
@@ -60,14 +60,13 @@ namespace iced_x86 {
 /// const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
 /// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 ///
-/// std::string output;
+/// char output[MyFormatter::MAX_FMT_INSTR_LEN + 1];
 /// iced_x86::Instruction instruction;
 /// MyFormatter formatter;
 /// while (decoder.can_decode()) {
 ///     decoder.decode_out(instruction);
-///     output.clear();
-///     formatter.format(instruction, output);
-///     // do something with 'output' here
+///     std::size_t len = formatter.format(instruction, output);
+///     // do something with 'output' here (NUL terminated, `len` chars)
 /// }
 /// ```
 ///
@@ -89,12 +88,14 @@ struct SpecializedFormatterTraitOptions {
 	/// For fastest code, this should be *disabled*, not enabled.
 	static constexpr bool ENABLE_DB_DW_DD_DQ = false;
 
-	/// The formatter makes sure that it has at least 300 bytes left in its output buffer when it
-	/// writes to it. This is enough space for all formatted instructions.
+	/// The formatter writes to a buffer that has at least `MAX_FMT_INSTR_LEN + 1` bytes (the caller's buffer or
+	/// a buffer on the stack if the caller's buffer is smaller or if a symbol resolver is used). This is enough
+	/// space for all formatted instructions (+ the extra bytes written by its fast string copies).
 	///
-	/// *No formatted instruction will ever get close to being 300 bytes long!*
+	/// *No formatted instruction will ever get close to being `MAX_FMT_INSTR_LEN` (315) bytes long!*
 	///
-	/// If this function returns `false`, the formatter won't verify that it has
+	/// If this function returns `true`, every write is verified (it calls `std::abort()` if there's not
+	/// enough space, this should never happen). If it returns `false`, the formatter won't verify that it has
 	/// enough bytes left when writing to its output buffer.
 	///
 	/// For fastest code, this method should return `false`. Default is `true`.
@@ -371,7 +372,7 @@ struct DefaultFastFormatterTraitOptions : SpecializedFormatterTraitOptions {
 /// };
 /// using MyFormatter = iced_x86::SpecializedFormatter<MyTraitOptions>;
 ///
-/// std::string output;
+/// char output[MyFormatter::MAX_FMT_INSTR_LEN + 1];
 /// MyFormatter formatter;
 /// formatter.format(instr, output);
 /// // output == "vcvtne2ps2bf16 zmm2{k5}{z}, zmm6, dword bcst [rax+0x4]"
@@ -403,15 +404,24 @@ struct DefaultFastFormatterTraitOptions : SpecializedFormatterTraitOptions {
 /// auto formatter = MyFormatter::try_with_options(std::make_unique<MySymbolResolver>()).value();
 /// // mov rcx,[rdx+my_data]
 /// ```
+///
+/// Symbols can have any length so the formatted instruction can be longer than `MAX_FMT_INSTR_LEN` chars: `format()`
+/// returns the full length and truncates the output if the buffer is too small (same as `snprintf()`).
+///
+/// Far branches (`selector:offset`): same as Rust, the symbol resolver is called for the offset and if it returns a
+/// symbol, it's called for the selector. The formatter doesn't allocate memory so it can't copy the first result (the
+/// second call can invalidate its borrowed strings), it calls the symbol resolver again for the offset instead (Rust
+/// copies the first result to the heap). The symbol resolver should return the same symbol if it's called again.
 template <typename TraitOptions>
 class SpecializedFormatter {
 public:
-	/// Creates a new instance of this formatter
-	SpecializedFormatter()
-		: options_()
-		, tables_(&internal::fast::get_fast_fmt_tables())
-		, symbol_resolver_()
-		, buffer_(new std::uint8_t[internal::fast::OUTPUT_BUFFER_SIZE]) {}
+	/// Max length of a formatted instruction (not including the terminating NUL char) if no symbol resolver is used.
+	/// A buffer of `MAX_FMT_INSTR_LEN + 1` bytes (eg. `char buffer[iced_x86::FastFormatter::MAX_FMT_INSTR_LEN + 1]`, a small stack
+	/// or static buffer) is always big enough, see `format()`.
+	static constexpr std::size_t MAX_FMT_INSTR_LEN = internal::fast::MAX_FMT_INSTR_LEN;
+
+	/// Creates a new instance of this formatter. It doesn't allocate any memory (the formatter's tables are constant data).
+	SpecializedFormatter() noexcept : options_(), symbol_resolver_(), limit_(nullptr), output_(nullptr) {}
 
 	/// Creates a new instance of this formatter
 	///
@@ -447,13 +457,79 @@ public:
 	/// see `SpecializedFormatterTraitOptions`
 	FastFormatterOptions& options_mut() noexcept { return options_; }
 
-	/// Formats the whole instruction: prefixes, mnemonic, operands
+	/// Formats the whole instruction: prefixes, mnemonic, operands. The formatted instruction is written to `output` and
+	/// it's always NUL terminated (unless `output_size` is 0). It never allocates memory.
+	///
+	/// Returns the length of the formatted instruction (not including the NUL char). Same as `snprintf()`: if the return
+	/// value is `>= output_size`, the output was truncated (`output` has the first `output_size - 1` chars + a NUL char).
+	/// Call it again with a buffer of at least `return value + 1` bytes to get the whole string.
+	///
+	/// If no symbol resolver is used, the formatted instruction is never longer than `MAX_FMT_INSTR_LEN` chars, so a buffer
+	/// of `MAX_FMT_INSTR_LEN + 1` bytes is always big enough. That's also the fast path: if `output_size > MAX_FMT_INSTR_LEN`
+	/// and there's no symbol resolver, the formatter writes directly to `output` without checking the size of each write.
+	/// Otherwise (smaller buffer or a symbol resolver is used, symbols can have any length) it formats to a buffer on
+	/// the stack (`MAX_FMT_INSTR_LEN + 1` bytes) and copies the text to `output` (and the symbol names, they're copied
+	/// directly to `output`).
+	///
+	/// Bytes after the NUL char are unspecified: the formatter can write to any byte of `output[0..output_size)`.
+	///
+	/// # Arguments
+	///
+	/// - `instruction`: Instruction
+	/// - `output`: Output buffer (can be null if `output_size` is 0)
+	/// - `output_size`: Size of `output` in bytes (incl. the NUL char)
+	std::size_t format(const Instruction& instruction, char* output, std::size_t output_size) {
+		if (ICED_X86_INTERNAL_LIKELY(output_size > MAX_FMT_INSTR_LEN && !has_symbol_resolver())) {
+			auto* const dst = reinterpret_cast<std::uint8_t*>(output);
+			// The last byte is reserved for the NUL char
+			std::uint8_t* const dst_end = format_core(instruction, dst, dst + (output_size - 1));
+			*dst_end = 0;
+			return static_cast<std::size_t>(dst_end - dst);
+		}
+		return format_slow(instruction, output, output_size);
+	}
+
+	/// Formats the whole instruction: prefixes, mnemonic, operands. See `format(const Instruction&, char*, std::size_t)`
+	///
+	/// ```cpp
+	/// char buffer[iced_x86::FastFormatter::MAX_FMT_INSTR_LEN + 1];
+	/// std::size_t len = formatter.format(instruction, buffer);
+	/// ```
+	///
+	/// # Arguments
+	///
+	/// - `instruction`: Instruction
+	/// - `output`: Output buffer
+	template <std::size_t N>
+	std::size_t format(const Instruction& instruction, char (&output)[N]) {
+		return format(instruction, output, N);
+	}
+
+	/// Formats the whole instruction: prefixes, mnemonic, operands and appends it to `output`.
+	///
+	/// This is a convenience wrapper (Rust API parity) around `format(const Instruction&, char*, std::size_t)`. It's not
+	/// part of the library (the formatter itself never uses `std::string`): it formats to a `MAX_FMT_INSTR_LEN + 1` byte
+	/// buffer on the stack and appends it to `output`. If the formatted instruction is longer (only possible if a symbol
+	/// resolver returns long symbols), it formats the instruction again directly into `output` (the symbol resolver is
+	/// called again). Prefer the buffer API if you don't need a `std::string`.
 	///
 	/// # Arguments
 	///
 	/// - `instruction`: Instruction
 	/// - `output`: The formatted instruction is appended to this string
-	void format(const Instruction& instruction, std::string& output);
+	void format(const Instruction& instruction, std::string& output) {
+		char buffer[MAX_FMT_INSTR_LEN + 1];
+		const std::size_t len = format(instruction, buffer, sizeof(buffer));
+		if (ICED_X86_INTERNAL_LIKELY(len < sizeof(buffer)))
+			output.append(buffer, len);
+		else {
+			const std::size_t old_size = output.size();
+			output.resize(old_size + len + 1);
+			const std::size_t len2 = format(instruction, &output[old_size], len + 1);
+			// Remove the NUL char (the new length could be different if the symbol resolver returned another symbol)
+			output.resize(old_size + (len2 < len ? len2 : len));
+		}
+	}
 
 private:
 	using FastString4 = internal::fast::FastString4;
@@ -465,13 +541,22 @@ private:
 
 	static constexpr bool SHOW_USELESS_PREFIXES = true;
 
-	std::uint8_t* buffer_begin() const noexcept { return buffer_.get(); }
-	std::uint8_t* buffer_end() const noexcept { return buffer_.get() + internal::fast::OUTPUT_BUFFER_SIZE; }
+	bool has_symbol_resolver() const noexcept {
+		if constexpr (TraitOptions::ENABLE_SYMBOL_RESOLVER)
+			return static_cast<bool>(symbol_resolver_);
+		else
+			return false;
+	}
+
+	// Formats the instruction to `dst_next_p`, all writes must be < `limit`. Returns the end of the formatted text
+	std::uint8_t* format_core(const Instruction& instruction, std::uint8_t* dst_next_p, std::uint8_t* limit);
+	// Formats the instruction to a scratch buffer on the stack (small `output` buffer or a symbol resolver is used)
+	ICED_X86_INTERNAL_NOINLINE std::size_t format_slow(const Instruction& instruction, char* output, std::size_t output_size);
 
 	ICED_X86_INTERNAL_FORCE_INLINE void verify_bytes_left(const std::uint8_t* dst_next_p, std::size_t num_bytes) const noexcept {
 		if (TraitOptions::verify_output_has_enough_bytes_left()) {
 			// Verify that there's enough bytes left. This should never fail.
-			if (static_cast<std::size_t>(buffer_end() - dst_next_p) < num_bytes)
+			if (static_cast<std::size_t>(limit_ - dst_next_p) < num_bytes)
 				internal::fast::fast_fmt_assert_failed();
 		}
 	}
@@ -518,11 +603,6 @@ private:
 		return dst_next_p + REAL_LEN;
 	}
 
-	// Appends the buffer to the output. The caller can then append anything to the output
-	ICED_X86_INTERNAL_FORCE_INLINE void flush(std::string& output, const std::uint8_t* dst_next_p) const {
-		output.append(reinterpret_cast<const char*>(buffer_begin()), static_cast<std::size_t>(dst_next_p - buffer_begin()));
-	}
-
 	// Only one caller so inline it
 	static ICED_X86_INTERNAL_FORCE_INLINE bool show_segment_prefix(const Instruction& instruction, std::uint32_t op_count) noexcept {
 		for (std::uint32_t i = 0; i < op_count; i++) {
@@ -563,7 +643,7 @@ private:
 	}
 
 	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* format_register(std::uint8_t* dst_next_p, Register register_) const noexcept {
-		return write_fast_str(dst_next_p, tables_->registers[static_cast<std::size_t>(register_)]);
+		return write_fast_str<FastStringRegister::SIZE>(dst_next_p, internal::fast::REGISTERS[static_cast<std::size_t>(register_)]);
 	}
 
 	template <bool UPPERCASE_HEX, bool USE_HEX_PREFIX>
@@ -571,12 +651,12 @@ private:
 
 	std::uint8_t* format_number(std::uint8_t* dst_next_p, std::uint64_t value) const noexcept;
 
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* write_symbol(std::string& output, std::uint8_t* dst_next_p, std::uint64_t address,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* write_symbol(std::uint8_t* dst_next_p, std::uint64_t address,
 															   const SymbolResult& symbol) const {
-		return write_symbol2(output, dst_next_p, address, symbol, true);
+		return write_symbol2(dst_next_p, address, symbol, true);
 	}
 
-	ICED_X86_INTERNAL_COLD std::uint8_t* write_symbol2(std::string& output, std::uint8_t* dst_next_p, std::uint64_t address, const SymbolResult& symbol,
+	ICED_X86_INTERNAL_COLD std::uint8_t* write_symbol2(std::uint8_t* dst_next_p, std::uint64_t address, const SymbolResult& symbol,
 													   bool write_minus_if_signed) const;
 
 	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* format_memory_else_block(std::uint8_t* dst_next_p, bool need_plus, std::uint32_t displ_size,
@@ -615,46 +695,46 @@ private:
 		return dst_next_p;
 	}
 
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* format_memory_code(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* format_memory_code(std::uint8_t* dst_next_p, const Instruction& instruction,
 																	 std::uint32_t operand, Register seg_reg, Register base_reg, Register index_reg,
 																	 std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ,
 																	 std::uint32_t addr_size);
 
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* format_memory(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* format_memory(std::uint8_t* dst_next_p, const Instruction& instruction,
 														   std::uint32_t operand, Register seg_reg, Register base_reg, Register index_reg, std::uint32_t scale,
 														   std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size) {
-		return format_memory_code(output, dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
+		return format_memory_code(dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
 	}
 
 	// This speeds up SpecializedFormatter but slows down FastFormatter so detect which
 	// formatter it is. Both paths are tested (same tests).
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* call_format_memory(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* call_format_memory(std::uint8_t* dst_next_p, const Instruction& instruction,
 																	 std::uint32_t operand, Register seg_reg, Register base_reg, Register index_reg,
 																	 std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ,
 																	 std::uint32_t addr_size) {
 		if constexpr (TraitOptions::INTERNAL_IS_FAST_FORMATTER) {
 			// Less code: call a method
-			return format_memory(output, dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
+			return format_memory(dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
 		}
 		else {
 			// The options are all most likely hard coded so inline and specialize the 'method call'
-			return format_memory_code(output, dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
+			return format_memory_code(dst_next_p, instruction, operand, seg_reg, base_reg, index_reg, scale, displ_size, displ, addr_size);
 		}
 	}
 
 	// The symbol resolver code is in separate (not inlined) methods so the normal code (no symbols) is fast and uses less stack space
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_near_branch(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_near_branch(std::uint8_t* dst_next_p, const Instruction& instruction,
 																  std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm) {
 		if constexpr (TraitOptions::ENABLE_SYMBOL_RESOLVER) {
 			if (symbol_resolver_)
-				return fmt_near_branch_symbol(output, dst_next_p, instruction, operand, imm_size, imm);
+				return fmt_near_branch_symbol(dst_next_p, instruction, operand, imm_size, imm);
 		}
 		return format_number(dst_next_p, imm);
 	}
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_near_branch_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_near_branch_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																	std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm);
 
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_far_branch(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_far_branch(std::uint8_t* dst_next_p, const Instruction& instruction,
 																 std::uint32_t operand, OpKind op_kind) {
 		std::uint32_t imm_size;
 		std::uint64_t imm64;
@@ -668,10 +748,9 @@ private:
 		}
 		if constexpr (TraitOptions::ENABLE_SYMBOL_RESOLVER) {
 			if (symbol_resolver_)
-				return fmt_far_branch_symbol(output, dst_next_p, instruction, operand, imm_size, imm64);
+				return fmt_far_branch_symbol(dst_next_p, instruction, operand, imm_size, imm64);
 		}
 		else {
-			static_cast<void>(output);
 			static_cast<void>(operand);
 			static_cast<void>(imm_size);
 		}
@@ -680,30 +759,28 @@ private:
 		dst_next_p = format_number(dst_next_p, imm64);
 		return dst_next_p;
 	}
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_far_branch_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_far_branch_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																   std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm64);
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_far_branch_symbol2(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
-																	std::uint32_t operand, std::uint64_t imm64, const SymbolResult& symbol);
 
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_imm(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_imm(std::uint8_t* dst_next_p, const Instruction& instruction,
 														  std::uint32_t operand, std::uint64_t imm, std::uint32_t imm_size) {
 		if constexpr (TraitOptions::ENABLE_SYMBOL_RESOLVER) {
 			if (symbol_resolver_)
-				return fmt_imm_symbol(output, dst_next_p, instruction, operand, imm, imm_size);
+				return fmt_imm_symbol(dst_next_p, instruction, operand, imm, imm_size);
 		}
 		return format_number(dst_next_p, imm);
 	}
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_imm_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* fmt_imm_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 															std::uint32_t operand, std::uint64_t imm, std::uint32_t imm_size);
 
-	ICED_X86_INTERNAL_NOINLINE std::uint8_t* format_memory_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_NOINLINE std::uint8_t* format_memory_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																  std::uint32_t operand, std::uint64_t abs_addr, std::uint32_t addr_size, bool need_plus,
 																  std::uint32_t displ_size, std::int64_t displ);
 
 	ICED_X86_INTERNAL_FORCE_INLINE std::uint32_t get_address_size_in_bytes(Register base_reg, Register index_reg, std::uint32_t displ_size,
 																			CodeSize code_size) const noexcept {
-		const std::uint32_t size = static_cast<std::uint32_t>(tables_->reg_to_addr_size[static_cast<std::size_t>(base_reg)]) |
-								   static_cast<std::uint32_t>(tables_->reg_to_addr_size[static_cast<std::size_t>(index_reg)]);
+		const std::uint32_t size = static_cast<std::uint32_t>(internal::REG_TO_ADDR_SIZE[static_cast<std::size_t>(base_reg)]) |
+								   static_cast<std::uint32_t>(internal::REG_TO_ADDR_SIZE[static_cast<std::size_t>(index_reg)]);
 		if (size != 0)
 			return size;
 		if (displ_size >= 2)
@@ -720,7 +797,7 @@ private:
 		}
 	}
 
-	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_memory(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+	ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* fmt_memory(std::uint8_t* dst_next_p, const Instruction& instruction,
 															 std::uint32_t operand, Code code) {
 		const std::uint32_t displ_size = instruction.memory_displ_size();
 		const Register base_reg = instruction.memory_base();
@@ -733,7 +810,7 @@ private:
 		// scale: 1,2,4,8 -> 0,1,2,3
 		const std::uint32_t scale = instruction.memory_index_scale();
 		const std::uint32_t scale_index = (scale >> 1) - (scale >> 3);
-		dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), base_reg, index_reg, scale_index,
+		dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), base_reg, index_reg, scale_index,
 										displ_size, displ, addr_size);
 		if (instruction.is_mvex_eviction_hint())
 			dst_next_p = write_fast_str(dst_next_p, internal::fast::STR_EH);
@@ -741,9 +818,11 @@ private:
 	}
 
 	FastFormatterOptions options_;
-	const internal::fast::FastFmtTables* tables_;
 	std::unique_ptr<SymbolResolver> symbol_resolver_;
-	std::unique_ptr<std::uint8_t[]> buffer_;
+	// End of the output buffer (only used if `TraitOptions::verify_output_has_enough_bytes_left()` is `true`)
+	std::uint8_t* limit_;
+	// The output if `format_slow()` is used (always if there's a symbol resolver), else null
+	internal::fast::FastFmtOutput* output_;
 };
 
 /// Fast formatter with less formatting options and with a masm-like syntax.
@@ -762,7 +841,7 @@ private:
 /// iced_x86::Decoder decoder(64, bytes, iced_x86::DecoderOptions::NONE);
 /// auto instr = decoder.decode();
 ///
-/// std::string output;
+/// char output[iced_x86::FastFormatter::MAX_FMT_INSTR_LEN + 1];
 /// iced_x86::FastFormatter formatter;
 /// formatter.options_mut().set_space_after_operand_separator(true);
 /// formatter.format(instr, output);
@@ -889,7 +968,7 @@ std::uint8_t* SpecializedFormatter<TraitOptions>::format_number(std::uint8_t* ds
 }
 
 template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::write_symbol2(std::string& output, std::uint8_t* dst_next_p, std::uint64_t address,
+std::uint8_t* SpecializedFormatter<TraitOptions>::write_symbol2(std::uint8_t* dst_next_p, std::uint64_t address,
 																const SymbolResult& symbol, bool write_minus_if_signed) const {
 	auto displ = static_cast<std::int64_t>(address - symbol.address);
 	if ((symbol.flags & SymbolFlags::SIGNED) != 0) {
@@ -898,14 +977,17 @@ std::uint8_t* SpecializedFormatter<TraitOptions>::write_symbol2(std::string& out
 		displ = static_cast<std::int64_t>(0ULL - static_cast<std::uint64_t>(displ));
 	}
 
-	// Write the symbol. The symbol can be any length so write everything we've written so far
-	// to the output string and then append the symbol to it. The output buffer is then empty again.
-	flush(output, dst_next_p);
+	// Write the symbol. The symbol can be any length so copy everything we've written so far to the
+	// output and then copy the symbol to it. The scratch buffer is then empty again.
+	// There's a symbol resolver so format_slow() is used and output_ isn't null.
+	assert(output_ != nullptr);
+	internal::fast::FastFmtOutput& out = *output_;
+	internal::fast::fast_fmt_append(out, out.scratch, static_cast<std::size_t>(dst_next_p - out.scratch));
 	for (const auto& part : symbol.text) {
 		const auto s = part.text.as_str();
-		output.append(s.data(), s.size());
+		internal::fast::fast_fmt_append(out, s.data(), s.size());
 	}
-	dst_next_p = buffer_begin();
+	dst_next_p = out.scratch;
 
 	if (displ != 0) {
 		char c;
@@ -929,7 +1011,7 @@ std::uint8_t* SpecializedFormatter<TraitOptions>::write_symbol2(std::string& out
 
 template <typename TraitOptions>
 ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* SpecializedFormatter<TraitOptions>::format_memory_code(
-	std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction, std::uint32_t operand, Register seg_reg, Register base_reg,
+	std::uint8_t* dst_next_p, const Instruction& instruction, std::uint32_t operand, Register seg_reg, Register base_reg,
 	Register index_reg, std::uint32_t scale, std::uint32_t displ_size, std::int64_t displ, std::uint32_t addr_size) {
 	std::uint64_t abs_addr;
 	if (base_reg == Register::RIP) {
@@ -953,12 +1035,11 @@ ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* SpecializedFormatter<TraitOptions>:
 
 	bool show_mem_size = TraitOptions::always_show_memory_size(options_);
 	if (!show_mem_size) {
-		const std::uint32_t flags = tables_->flags[static_cast<std::size_t>(instruction.code())];
+		const std::uint32_t flags = internal::fast::CODE_FLAGS[static_cast<std::size_t>(instruction.code())];
 		show_mem_size = (flags & internal::fast::FAST_FMT_FLAGS_FORCE_MEM_SIZE) != 0 || instruction.is_broadcast();
 	}
 	if (show_mem_size) {
-		const FastStringMemorySize keywords = tables_->memory_sizes[static_cast<std::size_t>(instruction.memory_size())];
-		dst_next_p = write_fast_str(dst_next_p, keywords);
+		dst_next_p = write_fast_str<FastStringMemorySize::SIZE>(dst_next_p, internal::fast::MEMORY_SIZES[static_cast<std::size_t>(instruction.memory_size())]);
 	}
 
 	bool show_seg = TraitOptions::always_show_segment_register(options_);
@@ -1000,12 +1081,11 @@ ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* SpecializedFormatter<TraitOptions>:
 
 	if constexpr (TraitOptions::ENABLE_SYMBOL_RESOLVER) {
 		if (symbol_resolver_)
-			dst_next_p = format_memory_symbol(output, dst_next_p, instruction, operand, abs_addr, addr_size, need_plus, displ_size, displ);
+			dst_next_p = format_memory_symbol(dst_next_p, instruction, operand, abs_addr, addr_size, need_plus, displ_size, displ);
 		else
 			dst_next_p = format_memory_else_block(dst_next_p, need_plus, displ_size, displ, addr_size);
 	}
 	else {
-		static_cast<void>(output);
 		static_cast<void>(operand);
 		static_cast<void>(abs_addr);
 		dst_next_p = format_memory_else_block(dst_next_p, need_plus, displ_size, displ, addr_size);
@@ -1016,56 +1096,54 @@ ICED_X86_INTERNAL_FORCE_INLINE std::uint8_t* SpecializedFormatter<TraitOptions>:
 }
 
 template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_near_branch_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_near_branch_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																		 std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm) {
 	const auto symbol = symbol_resolver_->symbol(instruction, operand, operand, imm, imm_size);
 	if (symbol)
-		return write_symbol(output, dst_next_p, imm, *symbol);
+		return write_symbol(dst_next_p, imm, *symbol);
 	return format_number(dst_next_p, imm);
 }
 
 template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_far_branch_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_far_branch_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																		std::uint32_t operand, std::uint32_t imm_size, std::uint64_t imm64) {
-	// The resolver is called twice (the selector is resolved too) so the first symbol must be copied (its
-	// borrowed strings could be invalidated by the second call)
-	std::vector<SymResTextPart> vec;
-	auto symbol = symbol_resolver_->symbol(instruction, operand, operand, static_cast<std::uint32_t>(imm64), imm_size);
-	if (!symbol) {
+	// Same as Rust: resolve the offset first and only resolve the selector if the offset has a symbol, then write
+	// `selector:offset`. The 2nd call can invalidate the borrowed strings of the 1st result so Rust copies it (heap).
+	// We don't allocate: the 1st result is only used to check if there's a symbol and the resolver is called again
+	// for the offset after the selector has been written.
+	if (!symbol_resolver_->symbol(instruction, operand, operand, static_cast<std::uint32_t>(imm64), imm_size)) {
 		dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
 		dst_next_p = write_fast_ascii_char<true>(dst_next_p, ':');
 		return format_number(dst_next_p, imm64);
 	}
-	symbol->text = symbol->text.to_owned(vec);
-	return fmt_far_branch_symbol2(output, dst_next_p, instruction, operand, imm64, *symbol);
-}
-
-template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_far_branch_symbol2(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
-																		 std::uint32_t operand, std::uint64_t imm64, const SymbolResult& symbol) {
-	const auto selector_symbol = symbol_resolver_->symbol(instruction, operand + 1, operand, instruction.far_branch_selector(), 2);
-	if (selector_symbol)
-		dst_next_p = write_symbol(output, dst_next_p, instruction.far_branch_selector(), *selector_symbol);
-	else
-		dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
+	{
+		const auto selector_symbol = symbol_resolver_->symbol(instruction, operand + 1, operand, instruction.far_branch_selector(), 2);
+		if (selector_symbol)
+			dst_next_p = write_symbol(dst_next_p, instruction.far_branch_selector(), *selector_symbol);
+		else
+			dst_next_p = format_number(dst_next_p, instruction.far_branch_selector());
+	}
 	dst_next_p = write_fast_ascii_char<true>(dst_next_p, ':');
-	return write_symbol(output, dst_next_p, imm64, symbol);
+	const auto symbol = symbol_resolver_->symbol(instruction, operand, operand, static_cast<std::uint32_t>(imm64), imm_size);
+	if (symbol)
+		return write_symbol(dst_next_p, imm64, *symbol);
+	return format_number(dst_next_p, imm64);
 }
 
 template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_imm_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+std::uint8_t* SpecializedFormatter<TraitOptions>::fmt_imm_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																 std::uint32_t operand, std::uint64_t imm, std::uint32_t imm_size) {
 	const auto symbol = symbol_resolver_->symbol(instruction, operand, operand, imm, imm_size);
 	if (symbol) {
 		if ((symbol->flags & SymbolFlags::RELATIVE) == 0)
 			dst_next_p = write_fast_str(dst_next_p, internal::fast::STR_OFFSET);
-		return write_symbol(output, dst_next_p, imm, *symbol);
+		return write_symbol(dst_next_p, imm, *symbol);
 	}
 	return format_number(dst_next_p, imm);
 }
 
 template <typename TraitOptions>
-std::uint8_t* SpecializedFormatter<TraitOptions>::format_memory_symbol(std::string& output, std::uint8_t* dst_next_p, const Instruction& instruction,
+std::uint8_t* SpecializedFormatter<TraitOptions>::format_memory_symbol(std::uint8_t* dst_next_p, const Instruction& instruction,
 																	   std::uint32_t operand, std::uint64_t abs_addr, std::uint32_t addr_size, bool need_plus,
 																	   std::uint32_t displ_size, std::int64_t displ) {
 	const auto symbol = symbol_resolver_->symbol(instruction, operand, operand, abs_addr, addr_size);
@@ -1077,20 +1155,38 @@ std::uint8_t* SpecializedFormatter<TraitOptions>::format_memory_symbol(std::stri
 		else if ((symbol->flags & SymbolFlags::SIGNED) != 0)
 			dst_next_p = write_fast_ascii_char<true>(dst_next_p, '-');
 
-		return write_symbol2(output, dst_next_p, abs_addr, *symbol, false);
+		return write_symbol2(dst_next_p, abs_addr, *symbol, false);
 	}
 	return format_memory_else_block(dst_next_p, need_plus, displ_size, displ, addr_size);
 }
 
 template <typename TraitOptions>
-void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, std::string& output) {
-	std::uint8_t* dst_next_p = buffer_begin();
+std::size_t SpecializedFormatter<TraitOptions>::format_slow(const Instruction& instruction, char* output, std::size_t output_size) {
+	// Everything is written to this buffer (the formatted instruction without the symbols is never longer than
+	// MAX_FMT_INSTR_LEN chars) and then copied to the output (with truncation). Symbols can be any length:
+	// write_symbol2() copies the scratch buffer and the symbol to the output and then continues at the start
+	// of the scratch buffer.
+	std::uint8_t scratch[internal::fast::MAX_FMT_INSTR_LEN + 1];
+	internal::fast::FastFmtOutput out{output, output_size, 0, scratch};
+	output_ = &out;
+	const std::uint8_t* const scratch_end = format_core(instruction, scratch, scratch + internal::fast::MAX_FMT_INSTR_LEN);
+	output_ = nullptr;
+	internal::fast::fast_fmt_append(out, scratch, static_cast<std::size_t>(scratch_end - scratch));
+	return internal::fast::fast_fmt_finish(out);
+}
+
+template <typename TraitOptions>
+std::uint8_t* SpecializedFormatter<TraitOptions>::format_core(const Instruction& instruction, std::uint8_t* dst_next_p, std::uint8_t* limit) {
+	if (TraitOptions::verify_output_has_enough_bytes_left())
+		limit_ = limit;
+	else
+		static_cast<void>(limit);
 
 	const Code code = instruction.code();
-	FastStringMnemonic mnemonic = tables_->mnemonics[static_cast<std::size_t>(code)];
+	FastStringMnemonic mnemonic{&internal::fast::MNEMONICS[internal::fast::MNEMONIC_OFFSETS[static_cast<std::size_t>(code)]]};
 	std::uint32_t op_count = instruction.op_count();
 	if (TraitOptions::use_pseudo_ops(options_)) {
-		const std::uint32_t flags = tables_->flags[static_cast<std::size_t>(code)];
+		const std::uint32_t flags = internal::fast::CODE_FLAGS[static_cast<std::size_t>(code)];
 		const std::uint32_t pseudo_ops_num = flags >> internal::fast::FAST_FMT_FLAGS_PSEUDO_OPS_KIND_SHIFT;
 		if (pseudo_ops_num != 0 && instruction.op_kind(op_count - 1) == OpKind::Immediate8) {
 			if (internal::fast::try_get_pseudo_op(code, pseudo_ops_num, instruction.immediate8(), mnemonic))
@@ -1218,13 +1314,13 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm_size = 2;
 						imm64 = instruction.near_branch16();
 					}
-					dst_next_p = fmt_near_branch(output, dst_next_p, instruction, operand, imm_size, imm64);
+					dst_next_p = fmt_near_branch(dst_next_p, instruction, operand, imm_size, imm64);
 					break;
 				}
 
 				case OpKind::FarBranch16:
 				case OpKind::FarBranch32:
-					dst_next_p = fmt_far_branch(output, dst_next_p, instruction, operand, op_kind);
+					dst_next_p = fmt_far_branch(dst_next_p, instruction, operand, op_kind);
 					break;
 
 				case OpKind::Immediate8:
@@ -1236,7 +1332,7 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm8 = instruction.immediate8();
 					else
 						imm8 = instruction.immediate8_2nd();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm8, 1);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm8, 1);
 					break;
 				}
 
@@ -1249,7 +1345,7 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm16 = instruction.immediate16();
 					else
 						imm16 = static_cast<std::uint16_t>(instruction.immediate8to16());
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm16, 2);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm16, 2);
 					break;
 				}
 
@@ -1262,7 +1358,7 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm32 = instruction.immediate32();
 					else
 						imm32 = static_cast<std::uint32_t>(instruction.immediate8to32());
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm32, 4);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm32, 4);
 					break;
 				}
 
@@ -1278,46 +1374,46 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm64 = static_cast<std::uint64_t>(instruction.immediate8to64());
 					else
 						imm64 = instruction.immediate64();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm64, 8);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm64, 8);
 					break;
 				}
 
 				case OpKind::MemorySegSI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::SI, Register::None,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::SI, Register::None,
 													0, 0, 0, 2);
 					break;
 				case OpKind::MemorySegESI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::ESI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::ESI,
 													Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemorySegRSI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::RSI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::RSI,
 													Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::MemorySegDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::DI, Register::None,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::DI, Register::None,
 													0, 0, 0, 2);
 					break;
 				case OpKind::MemorySegEDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::EDI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::EDI,
 													Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemorySegRDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::RDI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::RDI,
 													Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::MemoryESDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2);
 					break;
 				case OpKind::MemoryESEDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemoryESRDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::Memory:
 				default:
-					dst_next_p = fmt_memory(output, dst_next_p, instruction, operand, code);
+					dst_next_p = fmt_memory(dst_next_p, instruction, operand, code);
 					break;
 				}
 			}
@@ -1328,20 +1424,20 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 					break;
 
 				case OpKind::NearBranch16:
-					dst_next_p = fmt_near_branch(output, dst_next_p, instruction, operand, 2, instruction.near_branch16());
+					dst_next_p = fmt_near_branch(dst_next_p, instruction, operand, 2, instruction.near_branch16());
 					break;
 
 				case OpKind::NearBranch32:
-					dst_next_p = fmt_near_branch(output, dst_next_p, instruction, operand, 4, instruction.near_branch32());
+					dst_next_p = fmt_near_branch(dst_next_p, instruction, operand, 4, instruction.near_branch32());
 					break;
 
 				case OpKind::NearBranch64:
-					dst_next_p = fmt_near_branch(output, dst_next_p, instruction, operand, 8, instruction.near_branch64());
+					dst_next_p = fmt_near_branch(dst_next_p, instruction, operand, 8, instruction.near_branch64());
 					break;
 
 				case OpKind::FarBranch16:
 				case OpKind::FarBranch32:
-					dst_next_p = fmt_far_branch(output, dst_next_p, instruction, operand, op_kind);
+					dst_next_p = fmt_far_branch(dst_next_p, instruction, operand, op_kind);
 					break;
 
 				case OpKind::Immediate8: {
@@ -1350,12 +1446,12 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm8 = instruction.get_declare_byte_value(operand);
 					else
 						imm8 = instruction.immediate8();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm8, 1);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm8, 1);
 					break;
 				}
 
 				case OpKind::Immediate8_2nd:
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, instruction.immediate8_2nd(), 1);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, instruction.immediate8_2nd(), 1);
 					break;
 
 				case OpKind::Immediate16: {
@@ -1364,12 +1460,12 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm16 = instruction.get_declare_word_value(operand);
 					else
 						imm16 = instruction.immediate16();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm16, 2);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm16, 2);
 					break;
 				}
 
 				case OpKind::Immediate8to16:
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, static_cast<std::uint16_t>(instruction.immediate8to16()), 2);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, static_cast<std::uint16_t>(instruction.immediate8to16()), 2);
 					break;
 
 				case OpKind::Immediate32: {
@@ -1378,12 +1474,12 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm32 = instruction.get_declare_dword_value(operand);
 					else
 						imm32 = instruction.immediate32();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm32, 4);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm32, 4);
 					break;
 				}
 
 				case OpKind::Immediate8to32:
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, static_cast<std::uint32_t>(instruction.immediate8to32()), 4);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, static_cast<std::uint32_t>(instruction.immediate8to32()), 4);
 					break;
 
 				case OpKind::Immediate64: {
@@ -1392,54 +1488,54 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 						imm64 = instruction.get_declare_qword_value(operand);
 					else
 						imm64 = instruction.immediate64();
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, imm64, 8);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, imm64, 8);
 					break;
 				}
 
 				case OpKind::Immediate8to64:
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, static_cast<std::uint64_t>(instruction.immediate8to64()), 8);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, static_cast<std::uint64_t>(instruction.immediate8to64()), 8);
 					break;
 
 				case OpKind::Immediate32to64:
-					dst_next_p = fmt_imm(output, dst_next_p, instruction, operand, static_cast<std::uint64_t>(instruction.immediate32to64()), 8);
+					dst_next_p = fmt_imm(dst_next_p, instruction, operand, static_cast<std::uint64_t>(instruction.immediate32to64()), 8);
 					break;
 
 				case OpKind::MemorySegSI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::SI, Register::None,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::SI, Register::None,
 													0, 0, 0, 2);
 					break;
 				case OpKind::MemorySegESI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::ESI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::ESI,
 													Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemorySegRSI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::RSI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::RSI,
 													Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::MemorySegDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::DI, Register::None,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::DI, Register::None,
 													0, 0, 0, 2);
 					break;
 				case OpKind::MemorySegEDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::EDI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::EDI,
 													Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemorySegRDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, instruction.memory_segment(), Register::RDI,
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, instruction.memory_segment(), Register::RDI,
 													Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::MemoryESDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::DI, Register::None, 0, 0, 0, 2);
 					break;
 				case OpKind::MemoryESEDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::EDI, Register::None, 0, 0, 0, 4);
 					break;
 				case OpKind::MemoryESRDI:
-					dst_next_p = call_format_memory(output, dst_next_p, instruction, operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8);
+					dst_next_p = call_format_memory(dst_next_p, instruction, operand, Register::ES, Register::RDI, Register::None, 0, 0, 0, 8);
 					break;
 				case OpKind::Memory:
 				default:
-					dst_next_p = fmt_memory(output, dst_next_p, instruction, operand, code);
+					dst_next_p = fmt_memory(dst_next_p, instruction, operand, code);
 					break;
 				}
 			}
@@ -1484,11 +1580,29 @@ void SpecializedFormatter<TraitOptions>::format(const Instruction& instruction, 
 		}
 	}
 
-	flush(output, dst_next_p);
+	return dst_next_p;
 }
 
+// NOT PART OF THE PUBLIC API. Explicit instantiation (`EXTERN` = `extern`: declaration) of the non-inline member functions.
+// The whole class isn't instantiated so the inline functions (eg. the `std::string` convenience wrapper) are only
+// instantiated by the code that uses them.
+#define ICED_X86_INTERNAL_INSTANTIATE_SPECIALIZED_FORMATTER(EXTERN, TRAIT_OPTIONS) \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::format_core(const Instruction&, std::uint8_t*, std::uint8_t*); \
+	EXTERN template std::size_t SpecializedFormatter<TRAIT_OPTIONS>::format_slow(const Instruction&, char*, std::size_t); \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::format_number(std::uint8_t*, std::uint64_t) const noexcept; \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::write_symbol2(std::uint8_t*, std::uint64_t, const SymbolResult&, bool) \
+		const; \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::fmt_near_branch_symbol(std::uint8_t*, const Instruction&, std::uint32_t, \
+																							   std::uint32_t, std::uint64_t); \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::fmt_far_branch_symbol(std::uint8_t*, const Instruction&, std::uint32_t, \
+																							  std::uint32_t, std::uint64_t); \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::fmt_imm_symbol(std::uint8_t*, const Instruction&, std::uint32_t, \
+																					   std::uint64_t, std::uint32_t); \
+	EXTERN template std::uint8_t* SpecializedFormatter<TRAIT_OPTIONS>::format_memory_symbol( \
+		std::uint8_t*, const Instruction&, std::uint32_t, std::uint64_t, std::uint32_t, bool, std::uint32_t, std::int64_t);
+
 // The library contains these instantiations
-extern template class SpecializedFormatter<DefaultFastFormatterTraitOptions>;
-extern template class SpecializedFormatter<DefaultSpecializedFormatterTraitOptions>;
+ICED_X86_INTERNAL_INSTANTIATE_SPECIALIZED_FORMATTER(extern, DefaultFastFormatterTraitOptions)
+ICED_X86_INTERNAL_INSTANTIATE_SPECIALIZED_FORMATTER(extern, DefaultSpecializedFormatterTraitOptions)
 
 } // namespace iced_x86

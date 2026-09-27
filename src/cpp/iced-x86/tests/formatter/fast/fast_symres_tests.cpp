@@ -3,7 +3,9 @@
 
 // Rust: formatter/fast/tests/symres.rs
 
+#include <algorithm>
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <optional>
 #include <string>
@@ -69,13 +71,35 @@ TEST_CASE("formatter/fast/symres/test_long_symbols") {
 	for (const auto& [op, bytes] : test_cases) {
 		Decoder decoder(64, bytes.data(), bytes.size(), DecoderOptions::NONE);
 		const auto instr = decoder.decode();
+		std::vector<char> big(MAX_SYMBOL_LEN + FastFormatter::MAX_FMT_INSTR_LEN + 1);
 		for (std::size_t symbol_len = 0; symbol_len <= MAX_SYMBOL_LEN; symbol_len++) {
+			const std::string symbol(symbol_len, 'a');
 			// Don't re-use it, always create a new one
-			std::string output;
-			auto resolver = std::make_unique<LongSymbolResolver>(std::string(symbol_len, 'a'), op);
+			auto resolver = std::make_unique<LongSymbolResolver>(symbol, op);
 			auto formatter = FastFormatter::try_with_options(std::move(resolver)).value();
-			formatter.format(instr, output);
-			CHECK(output.size() >= symbol_len);
+
+			// Big buffer
+			const std::size_t len = formatter.format(instr, big.data(), big.size());
+			REQUIRE(len >= symbol_len);
+			REQUIRE(len < big.size());
+			CHECK(std::strlen(big.data()) == len);
+			const std::string output(big.data(), len);
+			CHECK(output.find(symbol) != std::string::npos);
+
+			// Small buffers (truncated output) and a MAX_FMT_INSTR_LEN + 1 byte buffer (truncated if it's a long symbol)
+			char small[16];
+			CHECK(formatter.format(instr, small) == len);
+			CHECK(std::strlen(small) == std::min(len, sizeof(small) - 1));
+			CHECK(output.compare(0, std::strlen(small), small) == 0);
+			char buffer[FastFormatter::MAX_FMT_INSTR_LEN + 1];
+			CHECK(formatter.format(instr, buffer) == len);
+			CHECK(std::strlen(buffer) == std::min(len, sizeof(buffer) - 1));
+			CHECK(output.compare(0, std::strlen(buffer), buffer) == 0);
+
+			// std::string wrapper (formats it twice if it's longer than MAX_FMT_INSTR_LEN)
+			std::string str("x");
+			formatter.format(instr, str);
+			CHECK(str == "x" + output);
 		}
 	}
 }

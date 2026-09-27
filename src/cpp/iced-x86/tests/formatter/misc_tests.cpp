@@ -189,7 +189,11 @@ std::vector<SaeErFormatter> get_sae_er_formatters() {
 	std::vector<SaeErFormatter> formatters;
 	{
 		auto fast = std::make_shared<FastFormatter>();
-		formatters.push_back(SaeErFormatter{" fast", [fast](const Instruction& instruction, std::string& output) { fast->format(instruction, output); },
+		formatters.push_back(SaeErFormatter{" fast",
+											[fast](const Instruction& instruction, std::string& output) {
+												char buffer[FastFormatter::MAX_FMT_INSTR_LEN + 1];
+												output.append(buffer, fast->format(instruction, buffer));
+											},
 											{"{sae}", "{rn}", "{rd}", "{ru}", "{rz}", "{rn-sae}", "{rd-sae}", "{ru-sae}", "{rz-sae}"}});
 	}
 	{

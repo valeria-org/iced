@@ -2,7 +2,7 @@
 // Copyright (C) 2018-present iced project and contributors
 
 // NOT PART OF THE PUBLIC API. Types and tables used by the `SpecializedFormatter<TraitOptions>` template
-// (it's a template so it must be in a public header). The tables are created by the library.
+// (it's a template so it must be in a public header). The tables are constant data defined by the library.
 
 #pragma once
 
@@ -18,6 +18,11 @@
 
 // The fast formatter force-inlines its small helpers when optimizing (ICED_X86_INTERNAL_FORCE_INLINE)
 #include "iced_x86/internal/macros.hpp"
+
+namespace iced_x86::internal {
+/// Address size in bytes (2, 4, 8) or 0 (index = `Register` value)
+extern const std::uint8_t REG_TO_ADDR_SIZE[IcedConstants::REGISTER_ENUM_COUNT];
+} // namespace iced_x86::internal
 
 namespace iced_x86::internal::fast {
 
@@ -90,7 +95,7 @@ constexpr std::array<std::uint8_t, 1 + SIZE> mk_fast_str_data(const char (&s)[N]
 	return result;
 }
 
-// Must be the same as `strings_data::MAX_STRING_LEN` (verified by the library)
+// Must be the same as the generated `MAX_MNEMONIC_LEN` (verified by the library)
 constexpr std::size_t MAX_MNEMONIC_STRING_LEN = 18;
 
 // full fmt'd str = "prefixes mnemonic op0<decorators1>, op1, op2, op3, op4<decorators2>"
@@ -110,6 +115,11 @@ constexpr std::size_t MAX_MNEMONIC_STRING_LEN = 18;
 // full = "es xacquire xrelease lock notrack repe repne prefetch_exclusive fpustate108 ptr fs:[rax+zmm31*8+0x12345678]{k3}{z}, fpustate108 ptr fs:[rax+zmm31*8+0x12345678], fpustate108 ptr fs:[rax+zmm31*8+0x12345678], fpustate108 ptr fs:[rax+zmm31*8+0x12345678], fpustate108 ptr fs:[rax+zmm31*8+0x12345678]{rn-sae}"
 //		- it's not possible to have 5 `fpustate108 ptr fs:[rax+zmm31*8+0x12345678]` operands
 //		  so we'll never get a formatted string this long if there's no symbol resolver.
+//
+// It's also the size of the unchecked write area: the formatter writes whole `FastString`s (and 4 bytes when it writes 2 hex
+// digits) so it can write up to 19 bytes past the end of the formatted text, but real formatted instructions are much shorter
+// (see the comment above), so all writes of an instruction fit in `MAX_FMT_INSTR_LEN` bytes (same as Rust which reserves
+// `MAX_FMT_INSTR_LEN` bytes). This is verified by the tests and by `verify_output_has_enough_bytes_left()` (enabled by default).
 constexpr std::size_t MAX_FMT_INSTR_LEN = sizeof("es xacquire xrelease lock notrack repe repne ") - 1 + MAX_MNEMONIC_STRING_LEN +
 										  sizeof("{k3}{z}{eh}") - 1 +
 										  (IcedConstants::MAX_OP_COUNT * (2 /*", "*/ + sizeof("fpustate108 ptr fs:[rax+zmm31*8+0x12345678]") - 1)) -
@@ -125,30 +135,24 @@ static_assert(MAX_FMT_INSTR_LEN == MAX_MNEMONIC_STRING_LEN + sizeof("es xacquire
 // Make sure it doesn't grow too much without us knowing about it (eg. if more operands are added)
 static_assert(MAX_FMT_INSTR_LEN < 350, "");
 
-/// Size of the formatter's output buffer. The formatter writes to this buffer and then appends it to the output string.
-/// The extra bytes make sure it's always possible to write a whole `FastString` (it can write more bytes than the string length).
-constexpr std::size_t OUTPUT_BUFFER_SIZE = MAX_FMT_INSTR_LEN + 64;
-
 // Must be the same as the generated `FastFmtFlags` values (verified by the library)
 constexpr std::uint32_t FAST_FMT_FLAGS_FORCE_MEM_SIZE = 0x0000'0004;
 constexpr std::uint32_t FAST_FMT_FLAGS_PSEUDO_OPS_KIND_SHIFT = 3;
 
-/// Tables used by the fast formatter (created by the library the first time `get_fast_fmt_tables()` is called)
-struct FastFmtTables {
-	/// Register names (index = `Register` value)
-	const FastStringRegister* registers;
-	/// Mnemonics (index = `Code` value)
-	const FastStringMnemonic* mnemonics;
-	/// `FastFmtFlags` (index = `Code` value)
-	const std::uint8_t* flags;
-	/// Memory size keywords (index = `MemorySize` value)
-	const FastStringMemorySize* memory_sizes;
-	/// Address size in bytes (2, 4, 8) or 0 (index = `Register` value)
-	const std::uint8_t* reg_to_addr_size;
-};
+// The fast formatter's tables. They're constant data (no heap, no startup code) defined by the library
+// (generated: src/formatter/fast/{fmt_data,regs,mem_size_tbl}.cpp).
 
-/// Gets the fast formatter tables (they're created the first time it's called)
-const FastFmtTables& get_fast_fmt_tables();
+/// Register names (index = `Register` value): a length byte followed by `FastStringRegister::SIZE` chars
+extern const std::uint8_t REGISTERS[IcedConstants::REGISTER_ENUM_COUNT][1 + FastStringRegister::SIZE];
+/// All mnemonics: each mnemonic is a length byte followed by the chars. The last one is followed by padding so it's
+/// possible to read `FastStringMnemonic::SIZE` bytes from any mnemonic.
+extern const std::uint8_t MNEMONICS[];
+/// Offset of each `Code`'s mnemonic in `MNEMONICS` (index = `Code` value)
+extern const std::uint16_t MNEMONIC_OFFSETS[IcedConstants::CODE_ENUM_COUNT];
+/// `FastFmtFlags` (index = `Code` value)
+extern const std::uint8_t CODE_FLAGS[IcedConstants::CODE_ENUM_COUNT];
+/// Memory size keywords (index = `MemorySize` value): a length byte followed by `FastStringMemorySize::SIZE` chars
+extern const std::uint8_t MEMORY_SIZES[IcedConstants::MEMORY_SIZE_ENUM_COUNT][1 + FastStringMemorySize::SIZE];
 
 /// Gets the pseudo op mnemonic if there's one.
 ///
@@ -158,10 +162,30 @@ const FastFmtTables& get_fast_fmt_tables();
 /// - `pseudo_ops_num`: `FastFmtFlags` pseudo ops kind (`flags >> FAST_FMT_FLAGS_PSEUDO_OPS_KIND_SHIFT`), 1-based, must not be 0
 /// - `imm8`: Immediate (`instruction.immediate8()`)
 /// - `mnemonic`: Updated with the pseudo op mnemonic if it returns `true`
-bool try_get_pseudo_op(Code code, std::uint32_t pseudo_ops_num, std::uint32_t imm8, FastStringMnemonic& mnemonic);
+bool try_get_pseudo_op(Code code, std::uint32_t pseudo_ops_num, std::uint32_t imm8, FastStringMnemonic& mnemonic) noexcept;
 
 /// Gets the MVEX register/memory conversion decorator (eg. `{cdab}`) or `nullptr` if there's none
-const std::uint8_t* get_mvex_reg_mem_conv_string(Code code, MvexRegMemConv conv);
+const std::uint8_t* get_mvex_reg_mem_conv_string(Code code, MvexRegMemConv conv) noexcept;
+
+/// The output of `SpecializedFormatter::format()` if it can't write directly to the caller's buffer (the buffer is smaller
+/// than `MAX_FMT_INSTR_LEN + 1` bytes or a symbol resolver is used). The formatter writes to `scratch` (a buffer on the stack)
+/// and copies the text to `output` when it's done or before it writes a symbol (symbols can be any length).
+struct FastFmtOutput {
+	/// The caller's buffer (can be null if `output_size` is 0)
+	char* output;
+	/// Size of `output` in bytes (incl. the terminating NUL char)
+	std::size_t output_size;
+	/// Length of the formatted text so far (can be > `output_size - 1` if the text is truncated)
+	std::size_t length;
+	/// Start of the scratch buffer (`MAX_FMT_INSTR_LEN + 1` bytes)
+	std::uint8_t* scratch;
+};
+
+/// Appends `size` chars to the output. Chars that don't fit (the last byte is reserved for the NUL char) are dropped but
+/// counted (`out.length` is always updated).
+void fast_fmt_append(FastFmtOutput& out, const void* data, std::size_t size) noexcept;
+/// Writes the terminating NUL char (if `output_size != 0`) and returns the full length of the formatted text
+std::size_t fast_fmt_finish(FastFmtOutput& out) noexcept;
 
 // Padding so we can read 4 bytes at every index 0-0xFF inclusive
 inline constexpr char HEX_GROUP2_UPPER[0x200 + 2 + 1] =

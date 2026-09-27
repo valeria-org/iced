@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 		line = std::to_string(pos) + " " + std::to_string(instr.len()) + " " + to_string(instr.code()) + " " + to_string(decoder.last_error());
 		Formatter* fs[] = {&masm, &nasm, &gas, &intel};
 		for (auto* fm : fs) { s.clear(); fm->format(instr, s); line += "|" + s; }
-		s.clear(); fast.format(instr, s); line += "|" + s;
+		{ char fb[FastFormatter::MAX_FMT_INSTR_LEN + 1]; fast.format(instr, fb); line += "|"; line += fb; }
 		if (!instr.is_invalid()) {
 			const auto& info = factory.info(instr);
 			line += "|r" + std::to_string(info.used_registers().size()) + "m" + std::to_string(info.used_memory().size());

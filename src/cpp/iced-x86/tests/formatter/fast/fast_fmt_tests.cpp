@@ -3,6 +3,7 @@
 
 // Rust: formatter/fast/tests/mod.rs
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <memory>
@@ -153,7 +154,7 @@ TEST_CASE("formatter/fast/format_hex2") {
 	//			xx00xxxxxxxxxxxx-xxFFxxxxxxxxxxxx
 	//			...
 	//			xxxxxxxxxxxxxx00-xxxxxxxxxxxxxxFF
-	std::string actual_instr;
+	char actual_instr[FastFormatter::MAX_FMT_INSTR_LEN + 1];
 	const std::uint64_t or_values[] = {0, 0x1234'5678'9ABC'DEF1ULL, 0xFEDC'BA98'7654'321FULL};
 	for (const std::uint64_t or_value : or_values) {
 		for (const bool uppercase : {false, true}) {
@@ -181,9 +182,8 @@ TEST_CASE("formatter/fast/format_hex2") {
 
 						const std::string expected_instr = std::string("mov rax,") + prefix + leading_zero + expected_imm + suffix;
 
-						actual_instr.clear();
-						formatter.format(instr, actual_instr);
-						REQUIRE_EQ(actual_instr, expected_instr);
+						const std::size_t len = formatter.format(instr, actual_instr);
+						REQUIRE_EQ(std::string(actual_instr, len), expected_instr);
 					}
 				}
 			}

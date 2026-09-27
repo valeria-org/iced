@@ -15,6 +15,7 @@
 #include "iced_x86/nasm_formatter.hpp"
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -111,7 +112,42 @@ void bench(const char* name, const std::vector<std::uint8_t>& code, std::uint64_
 	}
 	const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
 	const double total_bytes = static_cast<double>(code.size()) * static_cast<double>(loops);
-	std::printf("%-22s %.3f s, %.1f MB/s, %.2f M instr/s (checksum %llu)\n", name, secs, total_bytes / secs / 1e6,
+	std::printf("%-24s %.3f s, %.1f MB/s, %.2f M instr/s (checksum %llu)\n", name, secs, total_bytes / secs / 1e6,
+				static_cast<double>(instr_count) / secs / 1e6, static_cast<unsigned long long>(checksum));
+}
+
+// Decodes + formats all instructions `loops` times. `format` is called with each instruction and a
+// `MAX_FMT_INSTR_LEN + 1` byte buffer (fast formatters) and returns the length of the formatted instruction
+template <typename F>
+void bench_buffer(const char* name, const std::vector<std::uint8_t>& code, std::uint64_t address, unsigned long loops, F&& format) {
+	using namespace iced_x86;
+	std::uint64_t checksum = 0;
+	char output[FastFormatter::MAX_FMT_INSTR_LEN + 1];
+	// Warm up
+	{
+		auto decoder = Decoder::with_ip(64, code.data(), code.size(), address, DecoderOptions::NONE);
+		Instruction instruction;
+		while (decoder.can_decode()) {
+			decoder.decode_out(instruction);
+			checksum += format(instruction, output, sizeof(output));
+		}
+	}
+
+	checksum = 0;
+	auto start = std::chrono::steady_clock::now();
+	std::uint64_t instr_count = 0;
+	for (unsigned long i = 0; i < loops; i++) {
+		auto decoder = Decoder::with_ip(64, code.data(), code.size(), address, DecoderOptions::NONE);
+		Instruction instruction;
+		while (decoder.can_decode()) {
+			decoder.decode_out(instruction);
+			checksum += format(instruction, output, sizeof(output));
+			instr_count++;
+		}
+	}
+	const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
+	const double total_bytes = static_cast<double>(code.size()) * static_cast<double>(loops);
+	std::printf("%-24s %.3f s, %.1f MB/s, %.2f M instr/s (checksum %llu)\n", name, secs, total_bytes / secs / 1e6,
 				static_cast<double>(instr_count) / secs / 1e6, static_cast<unsigned long long>(checksum));
 }
 
@@ -144,14 +180,22 @@ int main(int argc, char** argv) {
 
 	bench("decode only:", code, text_address, loops, [](const Instruction&, std::string&) {});
 
+	// The fast formatters use the buffer API (they never allocate, the buffer is always big enough)
 	FastFormatter fast_formatter;
-	bench("FastFormatter:", code, text_address, loops,
+	bench_buffer("FastFormatter:", code, text_address, loops,
+				 [&fast_formatter](const Instruction& instruction, char* output, std::size_t output_size) {
+					 return fast_formatter.format(instruction, output, output_size);
+				 });
+
+	// Same but it uses the std::string convenience wrapper (formats to a buffer and appends it to the string)
+	bench("FastFormatter (string):", code, text_address, loops,
 		  [&fast_formatter](const Instruction& instruction, std::string& output) { fast_formatter.format(instruction, output); });
 
 	SpecializedFormatter<HardCodedTraitOptions> specialized_formatter;
-	bench("SpecializedFormatter:", code, text_address, loops, [&specialized_formatter](const Instruction& instruction, std::string& output) {
-		specialized_formatter.format(instruction, output);
-	});
+	bench_buffer("SpecializedFormatter:", code, text_address, loops,
+				 [&specialized_formatter](const Instruction& instruction, char* output, std::size_t output_size) {
+					 return specialized_formatter.format(instruction, output, output_size);
+				 });
 
 	GasFormatter gas_formatter;
 	bench("GasFormatter:", code, text_address, loops,
