@@ -13,7 +13,43 @@ API mirrors the Rust API (with `snake_case` names).
 - 👍 The encoder can be used to re-encode decoded instructions at any address
 - 👍 API to get instruction info, eg. read/written registers, memory and rflags bits; CPUID feature flag, control flow info, etc
 - 👍 C++17, no dependencies, compiles with `-fno-exceptions -fno-rtti`
+- 👍 Embedded friendly: small stack usage, no startup code, all tables are constant data (flash/ROM), the decoder and the fast formatter never allocate memory
 - 👍 License: MIT
+
+## Requirements
+
+- A C++17 compiler. Tested with GCC 15 and Clang 21 (x86-64 Linux); the code is standard C++17 and has no platform
+  specific code (MSVC should work but isn't tested yet).
+- CMake 3.16 or later (or any other build system, see [Using it without CMake](#using-it-without-cmake)).
+- Tests only: the whole repository (the tests read the test data in `src/UnitTests/Intel`) and Python 3 (optional,
+  verifies that the examples in this README are up to date).
+
+## Quick start
+
+```cpp
+#include <cstdio>
+#include "iced_x86/iced_x86.hpp"
+
+int main() {
+	using namespace iced_x86;
+	static const std::uint8_t code[] = {0x48, 0x89, 0x5C, 0x24, 0x10, 0x55, 0x48, 0x8D, 0xAC, 0x24, 0x00, 0xFF, 0xFF, 0xFF};
+	Decoder decoder = Decoder::with_ip(64, code, 0x7FF7'1FF3'2800, DecoderOptions::NONE);
+	FastFormatter formatter;
+	char text[FastFormatter::MAX_FMT_INSTR_LEN + 1];
+	for (const Instruction& instr : decoder) {
+		formatter.format(instr, text);
+		std::printf("%016llX %s\n", static_cast<unsigned long long>(instr.ip()), text);
+	}
+}
+```
+
+```sh
+cmake -S src/cpp/iced-x86 -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+c++ -std=c++17 -O2 -Isrc/cpp/iced-x86/include main.cpp build/libiced_x86.a -o main
+```
+
+More examples: [Examples](#examples).
 
 ## Usage
 
@@ -35,7 +71,7 @@ target_link_libraries(my_app PRIVATE iced_x86::iced_x86)
 include(FetchContent)
 FetchContent_Declare(
 	iced_x86
-	GIT_REPOSITORY https://github.com/icedland/iced.git
+	GIT_REPOSITORY https://github.com/valeria-org/iced.git
 	GIT_TAG        <commit-or-tag>
 	SOURCE_SUBDIR  src/cpp/iced-x86
 )
@@ -69,6 +105,74 @@ CMake options:
   formatter; `OFF` = the `std::string` overload uses the generic `FormatterOutput` code, ~8-10% slower)
 - `ICED_X86_WARNINGS_AS_ERRORS`: Treat warnings as errors (default: `OFF`)
 - `ICED_X86_MAX_FRAME_SIZE`: Warn if a function's stack frame is larger than this many bytes, `0` = disabled (default: `1024`)
+
+### Using it without CMake
+
+The library is plain C++17 with no generated build steps, so any build system works: compile every
+`src/cpp/iced-x86/src/**/*.cpp` file with `-Isrc/cpp/iced-x86/include -Isrc/cpp/iced-x86/src` (C++17) and add
+`src/cpp/iced-x86/include` to your program's include path. Recommended flags: `-ffunction-sections -fdata-sections`
+(link with `-Wl,--gc-sections`) so only the parts you use are linked. Eg. with a Makefile:
+
+```make
+ICED_DIR := path/to/iced/src/cpp/iced-x86
+ICED_SRCS := $(shell find $(ICED_DIR)/src -name '*.cpp')
+ICED_OBJS := $(ICED_SRCS:.cpp=.o)
+CXXFLAGS += -std=c++17 -O2 -ffunction-sections -fdata-sections -I$(ICED_DIR)/include
+
+$(ICED_DIR)/src/%.o: $(ICED_DIR)/src/%.cpp
+	$(CXX) $(CXXFLAGS) -I$(ICED_DIR)/src -c $< -o $@
+
+libiced_x86.a: $(ICED_OBJS)
+	$(AR) rcs $@ $^
+```
+
+### Embedded targets / cross compiling
+
+Use your toolchain file as usual (the library has no host specific code or build steps). Recommended settings:
+
+```sh
+cmake -S src/cpp/iced-x86 -B build-arm -G Ninja \
+	-DCMAKE_TOOLCHAIN_FILE=path/to/your-toolchain.cmake \
+	-DCMAKE_BUILD_TYPE=MinSizeRel \
+	-DCMAKE_CXX_FLAGS="-fno-exceptions -fno-rtti" \
+	-DICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF \
+	-DICED_X86_BUILD_TESTS=OFF -DICED_X86_BUILD_EXAMPLES=OFF -DICED_X86_BUILD_BENCH=OFF
+cmake --build build-arm      # -> build-arm/libiced_x86.a
+```
+
+- `-fno-exceptions -fno-rtti` for the whole program (the library doesn't use exceptions or RTTI; errors are returned
+  with `iced_x86::Result<T>`, bugs/invalid arguments call `std::abort()`).
+- Keep position dependent code (don't set `CMAKE_POSITION_INDEPENDENT_CODE`): the constant tables then stay in
+  `.rodata` (flash/ROM). See *PIC* in [Embedded use](#embedded-use).
+- Link with `-Wl,--gc-sections` (the library is compiled with `-ffunction-sections -fdata-sections`).
+- `ICED_X86_FORMATTER_STRING_SPECIALIZATION=OFF` saves ~17-20 KB of code per gas/intel/masm/nasm formatter.
+- Stack: see [Embedded use](#embedded-use) for the measured stack usage of each API. The library needs no heap
+  except: the gas/intel/masm/nasm formatters' state (~100 bytes each), `std::string` output (use the fast formatter
+  or your own `FormatterOutput` instead, see the *Embedded: no heap allocations* example), the encoder's output
+  buffer (`std::vector`, re-used), `InstructionInfoFactory` (two re-used vectors), the block encoder and the code
+  assembler (they create `std::vector`s).
+
+### Regenerating the generated code
+
+Most tables and enums (all files that start with `// ⚠️This file was generated by GENERATOR!🦹‍♂️`) are generated by
+`src/csharp/Intel/Generator` (C#, needs the [.NET 10 SDK](https://dotnet.microsoft.com/download)). The generated
+files are committed so you only need it if you change the generator or the instruction definitions
+(`src/csharp/Intel/Generator/Tables/*.txt`):
+
+```sh
+cd src/csharp/Intel/Generator
+dotnet run -c Release -- -l cpp     # only the C++ files (no -l = all languages)
+```
+
+CI (`build/build-dotnet`) runs the generator and fails if any file changes. `build/build-cpp` builds and tests the
+C++ code with GCC and Clang (Release, Debug, MinSizeRel without exceptions/RTTI).
+
+### Tools
+
+- `bench/`: decoder, encoder and formatter benchmarks (`build/bench/iced_x86_bench_formatter [elf_file] [loops]`)
+- `tools/rust_diff/run.sh`: differential test against the Rust crate (needs `cargo`), see [Correctness](#correctness)
+- `tools/stack_usage/run.sh [--rust]`: measures the stack usage of each API (Linux), see [Embedded use](#embedded-use)
+- [PORTING.md](PORTING.md): design, conventions and internals of the C++ code
 
 ## Building and running tests
 
@@ -116,14 +220,16 @@ Formatters write to a `std::string` / `String` (the C++ fast formatter: see belo
 
 | Benchmark (20 x 1.38 MB, ~330 K instructions) | Rust (LTO) | Rust (default) | C++ (GCC 15) |
 |---|---:|---:|---:|
-| Decode | 0.063 s | 0.065 s | 0.061 s |
-| Decode + fast formatter | 0.143 s | 0.132 s | 0.114 s (`char` buffer), 0.132 s (`std::string`) |
-| Decode + gas formatter | 0.249 s | 0.297 s | 0.242 s |
-| Decode + intel formatter | 0.249 s | 0.298 s | 0.237 s |
-| Decode + masm formatter | 0.261 s | 0.321 s | 0.263 s |
-| Decode + nasm formatter | 0.249 s | 0.307 s | 0.246 s |
+| Decode | 0.064 s | 0.066 s | 0.062 s |
+| Decode + fast formatter (C++: `char` buffer; Rust: `String`) | 0.146 s | 0.135 s | 0.114 s |
+| Decode + fast formatter (C++: `std::string` wrapper) | | | 0.132 s |
+| Decode + fast formatter with hard coded options (`SpecializedFormatter`) | | | 0.101 s |
+| Decode + gas formatter | 0.254 s | 0.305 s | 0.242 s |
+| Decode + intel formatter | 0.256 s | 0.302 s | 0.243 s |
+| Decode + masm formatter | 0.266 s | 0.327 s | 0.262 s |
+| Decode + nasm formatter | 0.253 s | 0.313 s | 0.250 s |
 
-(best of 5 alternating runs; decoding runs at ~450 MB/s, ~110 M instructions/s. Clang 21 builds are within a few %.
+(best of 3 alternating runs; decoding runs at ~450 MB/s, ~110 M instructions/s. Clang 21 builds are within a few %.
 The C++ fast formatter writes to a caller provided `char` buffer (`format(instruction, char* output, std::size_t size)`);
 the `std::string` overload is a convenience wrapper that formats to a buffer and appends it to the string. With hard coded
 options (`SpecializedFormatter<TraitOptions>`, `verify_output_has_enough_bytes_left()` = `false`): 0.100 s.
@@ -175,10 +281,10 @@ The library was written for devices with a C++ runtime but a small stack:
   function can use ~2.5 KB more stack in the dynamic linker (lazy binding saves the AVX-512 registers); that's not
   counted (`LD_BIND_NOW=1`), statically linked programs don't have it.)
 
-- **No startup code**: there are no global constructors. Big tables are `const` data (in flash/.rodata) and are
-  constant initialized, eg. the decoder's ~7900 op code handlers and its tables (the Rust crate creates them on the
-  heap the first time a decoder is created). Only a few tables are created lazily (thread safe function local
-  statics) the first time they're used. Heap usage the first time a component is used:
+- **No startup code, no RAM tables**: there are no global constructors, no lazily created tables (no locks) and no
+  `.bss`/`.data` tables. All tables are `const` data (in flash/.rodata) and are constant initialized, eg. the
+  decoder's ~7900 op code handlers (the Rust crate creates its decoder and formatter tables on the heap the first time
+  they're used). Heap usage the first time a component is used:
 
   | Component | One time heap usage |
   |-----------|--------------------:|
@@ -186,7 +292,7 @@ The library was written for devices with a C++ runtime but a small stack:
   | Encoder, op code info (`OpCodeInfo`) | 0 |
   | Instruction info | 0 |
   | Fast formatter | 0 (it never allocates memory) |
-  | gas/intel/masm/nasm formatters | 0 (+ a 256 byte buffer per formatter instance) |
+  | gas/intel/masm/nasm formatters | 0 (+ ~100 bytes per formatter instance, + a 256 byte buffer if `format(instr, std::string&)` is used) |
 
   The decoder never allocates when decoding. The gas/intel/masm/nasm formatters only append to the output string.
   The fast formatter (`FastFormatter`, `SpecializedFormatter<TraitOptions>`) formats to a caller provided buffer (eg.
@@ -1408,6 +1514,109 @@ int main() {
 <!-- example-end -->
 
 Also compile with optimizations (`-DCMAKE_BUILD_TYPE=Release`) and consider enabling LTO (`-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON`).
+
+### Embedded: no heap allocations
+
+Decodes and formats instructions without allocating any memory: the decoder, `FastFormatter` (formats to a `char`
+buffer) and a gas/intel/masm/nasm formatter that writes to a fixed size buffer (a custom `FormatterOutput`). It counts
+all `operator new` calls to verify it.
+
+<!-- example: embedded.cpp -->
+```cpp
+// Disassembling on an embedded device: no heap allocations, small stack, fixed size buffers.
+//
+// - The decoder and all tables are constant data: nothing is allocated or initialized at runtime
+// - `FastFormatter` formats to a caller provided char buffer and never allocates memory
+// - The other formatters (gas/intel/masm/nasm) can write to your own `FormatterOutput`, eg. a fixed size buffer.
+//   They allocate ~100 bytes when they're created (their number formatter) but nothing when formatting.
+//
+// This example counts all calls to `operator new` to show that nothing is allocated while decoding and formatting.
+
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <new>
+#include <string_view>
+
+#include "iced_x86/iced_x86.hpp"
+
+using namespace iced_x86;
+
+static std::size_t heap_allocations = 0;
+void* operator new(std::size_t size) {
+	heap_allocations++;
+	if (void* p = std::malloc(size != 0 ? size : 1))
+		return p;
+	std::abort();
+}
+void operator delete(void* p) noexcept { std::free(p); }
+void operator delete(void* p, std::size_t) noexcept { std::free(p); }
+
+// A `FormatterOutput` that writes to a fixed size char buffer (the text is truncated if it doesn't fit)
+class FixedBufferOutput final : public FormatterOutput {
+public:
+	void clear() noexcept {
+		len_ = 0;
+		buffer_[0] = '\0';
+	}
+	const char* c_str() const noexcept { return buffer_; }
+
+	void write(std::string_view text, FormatterTextKind kind) override {
+		static_cast<void>(kind);
+		const std::size_t n = text.size() < sizeof(buffer_) - 1 - len_ ? text.size() : sizeof(buffer_) - 1 - len_;
+		std::memcpy(buffer_ + len_, text.data(), n);
+		len_ += n;
+		buffer_[len_] = '\0';
+	}
+
+private:
+	char buffer_[128] = {};
+	std::size_t len_ = 0;
+};
+
+// The code to disassemble (could also be read from flash, a debug interface, etc.)
+static const std::uint8_t CODE[] = {
+	0x48, 0x89, 0x5C, 0x24, 0x10, 0x55, 0x48, 0x8D, 0xAC, 0x24, 0x00, 0xFF, 0xFF, 0xFF, 0x48, 0x81,
+	0xEC, 0x00, 0x02, 0x00, 0x00, 0x48, 0x8B, 0x05, 0x18, 0x57, 0x0A, 0x00, 0xC5, 0xF8, 0x10, 0x44,
+	0x24, 0x20, 0xE8, 0x10, 0x00, 0x00, 0x00, 0x74, 0xF0,
+};
+static constexpr std::uint64_t CODE_RIP = 0x7FF7'1FF3'2800;
+
+int main() {
+	// Everything can be created on the stack or statically: FastFormatter is 32 bytes, Decoder ~300 bytes,
+	// MasmFormatter ~400 bytes, and the output buffers are as big as you want them to be. They're static here so
+	// they don't use any stack.
+	static FastFormatter fast_formatter;
+	static MasmFormatter masm_formatter;
+	static FixedBufferOutput masm_output;
+	static char fast_output[FastFormatter::MAX_FMT_INSTR_LEN + 1];
+
+	// Change some options (they're stored in the formatter, no allocation)
+	masm_formatter.options_mut().set_first_operand_char_index(8);
+	fast_formatter.options_mut().set_space_after_operand_separator(true);
+
+	const std::size_t allocations_before = heap_allocations;
+
+	Decoder decoder = Decoder::with_ip(64, CODE, CODE_RIP, DecoderOptions::NONE);
+	Instruction instruction;
+	while (decoder.can_decode()) {
+		decoder.decode_out(instruction);
+
+		fast_formatter.format(instruction, fast_output);
+
+		masm_output.clear();
+		masm_formatter.format(instruction, masm_output);
+
+		std::printf("%016llX %-40s %s\n", static_cast<unsigned long long>(instruction.ip()), fast_output, masm_output.c_str());
+	}
+
+	std::printf("Heap allocations while decoding and formatting: %zu\n", heap_allocations - allocations_before);
+	return heap_allocations == allocations_before ? 0 : 1;
+}
+```
+<!-- example-end -->
 
 ### Create and encode instructions
 

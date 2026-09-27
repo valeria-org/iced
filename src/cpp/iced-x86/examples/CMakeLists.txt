@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2018-present iced project and contributors
 
-# Examples (the same examples as the Rust crate's README.md). Each *.cpp file is a separate executable.
+# Examples (the Rust crate's README.md examples + C++ specific ones). Each *.cpp file is a separate executable.
 # Each example also gets a test that runs it and compares its stdout with expected/<name>.txt
 # (run_example.cmake). The example code is copied to ../README.md by update_readme.py.
 file(GLOB ICED_X86_EXAMPLE_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")

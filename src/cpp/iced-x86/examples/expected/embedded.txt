@@ -1,0 +1,9 @@
+00007FF71FF32800 mov [rsp+10h], rbx                       mov     [rsp+10h],rbx
+00007FF71FF32805 push rbp                                 push    rbp
+00007FF71FF32806 lea rbp, [rsp-100h]                      lea     rbp,[rsp-100h]
+00007FF71FF3280E sub rsp, 200h                            sub     rsp,200h
+00007FF71FF32815 mov rax, [7FF71FFD7F34h]                 mov     rax,[7FF71FFD7F34h]
+00007FF71FF3281C vmovups xmm0, [rsp+20h]                  vmovups xmm0,[rsp+20h]
+00007FF71FF32822 call 7FF71FF32837h                       call    00007FF71FF32837h
+00007FF71FF32827 je 7FF71FF32819h                         je      short 00007FF71FF32819h
+Heap allocations while decoding and formatting: 0
