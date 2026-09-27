@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (C) 2018-present iced project and contributors
 
+#include <cstddef>
 #include <cstdint>
-#include <string>
+#include <cstdio>
 
 #include "iced_x86/iced_x86.hpp"
 
@@ -22,16 +23,24 @@ static void how_to_disassemble_really_fast() {
 	static const std::uint8_t bytes[] = {0x62, 0xF2, 0x4F, 0xDD, 0x72, 0x50, 0x01};
 	Decoder decoder(64, bytes, DecoderOptions::NONE);
 
-	std::string output;
+	// The formatter writes to a caller provided buffer (it never allocates memory). If there's no symbol
+	// resolver, the formatted instruction is never longer than MAX_FMT_INSTR_LEN chars (+ a NUL char).
+	char output[MyFormatter::MAX_FMT_INSTR_LEN + 1];
 	Instruction instruction;
 	MyFormatter formatter;
 	while (decoder.can_decode()) {
 		decoder.decode_out(instruction);
-		output.clear();
-		formatter.format(instruction, output);
+		// Returns the length of the formatted instruction, `output` is NUL terminated
+		const std::size_t len = formatter.format(instruction, output);
 		// do something with 'output' here, eg.:
-		//     std::printf("%s\n", output.c_str());
+		std::printf("%s (%zu chars)\n", output, len);
 	}
+
+	// If the buffer is too small, the output is truncated (and NUL terminated) and it returns the length of the
+	// whole formatted instruction (same as snprintf())
+	char small[16];
+	const std::size_t len = formatter.format(instruction, small);
+	std::printf("%s (%zu chars)\n", small, len);
 }
 
 int main() {

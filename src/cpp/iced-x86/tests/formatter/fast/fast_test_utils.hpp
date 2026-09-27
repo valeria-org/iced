@@ -5,11 +5,14 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "formatter/formatter_test_utils.hpp"
 #include "iced_x86/fast_formatter.hpp"
@@ -107,13 +110,63 @@ std::unique_ptr<SpecializedFormatter<TraitOptions>> fast_create_resolver(std::un
 	return fmt;
 }
 
+// Formats the instruction with the buffer API and returns the formatted string. It also verifies all output paths:
+// - a `MAX_FMT_INSTR_LEN + 1` byte buffer (the fast path if there's no symbol resolver; all writes are verified since
+//   verify_output_has_enough_bytes_left() returns true)
+// - an exact fit buffer, truncated output (buffer is 1 byte too small), 1 byte buffer, 0 byte buffer (scratch buffer path)
+// - the `std::string` convenience wrapper
+template <typename TraitOptions>
+std::string fast_format(SpecializedFormatter<TraitOptions>& formatter, const Instruction& instruction) {
+	using Formatter = SpecializedFormatter<TraitOptions>;
+	char buffer[Formatter::MAX_FMT_INSTR_LEN + 1];
+	std::memset(buffer, 'X', sizeof(buffer));
+	const std::size_t len = formatter.format(instruction, buffer);
+	std::string result;
+	if (len < sizeof(buffer)) {
+		REQUIRE(buffer[len] == '\0');
+		result.assign(buffer, len);
+	}
+	else {
+		// Only possible with a symbol resolver
+		REQUIRE(buffer[sizeof(buffer) - 1] == '\0');
+		std::vector<char> big(len + 100, 'X');
+		REQUIRE(formatter.format(instruction, big.data(), big.size()) == len);
+		REQUIRE(big[len] == '\0');
+		result.assign(big.data(), len);
+		CHECK(std::memcmp(buffer, result.data(), sizeof(buffer) - 1) == 0);
+	}
+	REQUIRE(result.find('\0') == std::string::npos);
+
+	std::vector<char> exact(len + 1, 'X');
+	CHECK(formatter.format(instruction, exact.data(), exact.size()) == len);
+	CHECK(exact[len] == '\0');
+	CHECK(std::memcmp(exact.data(), result.data(), len) == 0);
+
+	if (len > 0) {
+		std::vector<char> small(len, 'X');
+		CHECK(formatter.format(instruction, small.data(), small.size()) == len);
+		CHECK(small[len - 1] == '\0');
+		CHECK(std::memcmp(small.data(), result.data(), len - 1) == 0);
+	}
+
+	char one = 'X';
+	CHECK(formatter.format(instruction, &one, 1) == len);
+	CHECK(one == '\0');
+	CHECK(formatter.format(instruction, nullptr, 0) == len);
+
+	std::string str("abc");
+	formatter.format(instruction, str);
+	CHECK(str == "abc" + result);
+
+	return result;
+}
+
 // Rust: formatter/tests/mod.rs
 
 template <typename TraitOptions>
 void format_test_instruction_fast_core(const Instruction& instruction, const std::string& formatted_string, SpecializedFormatter<TraitOptions>& formatter,
 									   const std::string& context) {
-	std::string actual_formatted_string;
-	formatter.format(instruction, actual_formatted_string);
+	const std::string actual_formatted_string = fast_format(formatter, instruction);
 	CHECK_MSG(actual_formatted_string == formatted_string,
 			  "Formatted string: '" + actual_formatted_string + "' != expected: '" + formatted_string + "' " + context);
 }
@@ -156,8 +209,7 @@ void simple_format_test_fast(std::uint32_t bitness, const std::string& hex_bytes
 							 const InitDecoderFn& init_decoder) {
 	const auto bytes = to_vec_u8(hex_bytes);
 	const auto instruction = decode_test_instruction(bitness, bytes, ip, code, decoder_options, init_decoder);
-	std::string output;
-	formatter.format(instruction, output);
+	const std::string output = fast_format(formatter, instruction);
 	CHECK_MSG(output == formatted_string, "Formatted string: '" + output + "' != expected: '" + formatted_string + "', line " + std::to_string(line_number));
 }
 

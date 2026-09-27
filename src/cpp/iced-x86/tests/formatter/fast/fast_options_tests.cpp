@@ -137,12 +137,9 @@ void test_option(const std::vector<std::uint8_t>& bytes, const char* disasm) {
 	const auto instr = Decoder::with_ip(64, bytes.data(), bytes.size(), 0x1234'5678'9ABC'DEF1ULL, DecoderOptions::NONE).decode();
 
 	MyFormatter formatter;
-	std::string output;
 
 	for (int i = 0; i < 2; i++) {
-		output.clear();
-		formatter.format(instr, output);
-		CHECK_EQ(output, std::string(disasm));
+		CHECK_EQ(fast_format(formatter, instr), std::string(disasm));
 		invert_options(formatter.options_mut());
 	}
 }

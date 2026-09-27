@@ -3,6 +3,8 @@
 
 #include "iced_x86/fast_formatter.hpp"
 
+#include <cstring>
+
 #include "iced_x86/mvex_conv_fn.hpp"
 #include "internal/mvex/mvex.hpp"
 
@@ -51,7 +53,7 @@ static constexpr std::array<std::uint8_t, 1 + 12> MVEX_REG_MEM_CONSTS_64[IcedCon
 };
 // clang-format on
 
-const std::uint8_t* get_mvex_reg_mem_conv_string(Code code, MvexRegMemConv conv) {
+const std::uint8_t* get_mvex_reg_mem_conv_string(Code code, MvexRegMemConv conv) noexcept {
 	ICED_ASSERT(IcedConstants::is_mvex(code));
 	const auto& mvex = get_mvex_info(code);
 	if (mvex.conv_fn == MvexConvFn::None)
@@ -61,10 +63,25 @@ const std::uint8_t* get_mvex_reg_mem_conv_string(Code code, MvexRegMemConv conv)
 	return mvex.is_conv_fn_32() ? MVEX_REG_MEM_CONSTS_32[index].data() : MVEX_REG_MEM_CONSTS_64[index].data();
 }
 
+void fast_fmt_append(FastFmtOutput& out, const void* data, std::size_t size) noexcept {
+	// The last byte is reserved for the NUL char
+	if (out.length + 1 < out.output_size) {
+		const std::size_t left = out.output_size - 1 - out.length;
+		std::memcpy(out.output + out.length, data, size <= left ? size : left);
+	}
+	out.length += size;
+}
+
+std::size_t fast_fmt_finish(FastFmtOutput& out) noexcept {
+	if (out.output_size != 0)
+		out.output[out.length < out.output_size ? out.length : out.output_size - 1] = '\0';
+	return out.length;
+}
+
 } // namespace internal::fast
 
-// The library contains these instantiations
-template class SpecializedFormatter<DefaultFastFormatterTraitOptions>;
-template class SpecializedFormatter<DefaultSpecializedFormatterTraitOptions>;
+// The library contains these instantiations (only the non-inline member functions, see the header)
+ICED_X86_INTERNAL_INSTANTIATE_SPECIALIZED_FORMATTER(, DefaultFastFormatterTraitOptions)
+ICED_X86_INTERNAL_INSTANTIATE_SPECIALIZED_FORMATTER(, DefaultSpecializedFormatterTraitOptions)
 
 } // namespace iced_x86

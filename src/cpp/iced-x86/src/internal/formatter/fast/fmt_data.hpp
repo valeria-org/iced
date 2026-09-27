@@ -6,13 +6,20 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 
 namespace iced_x86::internal::fast {
 
-/// Serialized formatter table data (one entry per `Code` value)
-extern const std::uint8_t FORMATTER_TBL_DATA[];
-/// Size of `FORMATTER_TBL_DATA` in bytes
-extern const std::size_t FORMATTER_TBL_DATA_SIZE;
+// `MNEMONICS`, `MNEMONIC_OFFSETS` and `CODE_FLAGS` are declared in `iced_x86/internal/fast_fmt.hpp`
+
+/// Number of mnemonics in `MNEMONICS`
+constexpr std::size_t MNEMONICS_COUNT = 1900;
+/// Length of the longest mnemonic
+constexpr std::size_t MAX_MNEMONIC_LEN = 18;
+/// Number of readable bytes after each length byte (`FastStringMnemonic::SIZE`)
+constexpr std::size_t MNEMONIC_VALID_STRING_LENGTH = 20;
+/// Number of padding bytes after the last mnemonic
+constexpr std::size_t MNEMONICS_PADDING_SIZE = 11;
+/// Size of `MNEMONICS` in bytes
+constexpr std::size_t MNEMONICS_SIZE = 16208;
 
 } // namespace iced_x86::internal::fast

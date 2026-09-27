@@ -14,9 +14,10 @@ namespace Generator.Formatters.Cpp {
 	/// <summary>
 	/// Generates the formatter tables that aren't part of the serialized instruction tables:
 	/// <list type="bullet">
-	/// <item><c>src/internal/formatter/&lt;syntax&gt;/mem_size_tbl_data.hpp</c>: memory size keywords + broadcast data (all 5 formatters)</item>
+	/// <item><c>src/internal/formatter/&lt;syntax&gt;/mem_size_tbl_data.hpp</c>: memory size keywords + broadcast data (gas/intel/masm/nasm)</item>
+	/// <item><c>src/formatter/fast/mem_size_tbl.cpp</c>: memory size keywords (fast formatter)</item>
 	/// <item><c>src/internal/formatter/fmt_consts.hpp</c> + <c>src/formatter/fmt_consts.cpp</c>: generated regions (formatter string constants)</item>
-	/// <item><c>src/formatter/regs_tbl.cpp</c> + <c>src/internal/formatter/regs_tbl.hpp</c>: register names (fast formatter)</item>
+	/// <item><c>src/formatter/fast/regs.cpp</c>: register names (fast formatter)</item>
 	/// <item><c>src/formatter/regs_tbl_ls.cpp</c>, <c>src/formatter/gas/regs.cpp</c>, <c>src/formatter/nasm/regs.cpp</c>: register name <c>FormatterString</c> tables</item>
 	/// <item><c>src/formatter/fmt_flow_control.cpp</c>: <c>get_flow_control()</c></item>
 	/// </list>
@@ -145,38 +146,36 @@ namespace Generator.Formatters.Cpp {
 		}
 
 		void GenerateFast(MemorySizeDef[] defs) {
-			var switchValues = defs.Select(a => a.Fast).Distinct().OrderBy(a => a.Value).Select(kw => {
-				var s = (FastMemoryKeywords)kw.Value == FastMemoryKeywords.None ? string.Empty : (kw.RawName + "_").Replace('_', ' ');
-				return (kw, s);
-			}).ToArray();
-			var maxMemSizeLen = switchValues.Max(a => a.s.Length);
 			// If this fails, the C++ fast formatter must also be updated, see FastStringMemorySize
 			const int FastStringMemorySize = 16;
-			if (maxMemSizeLen > FastStringMemorySize)
+			string GetKeywords(EnumValue kw) => (FastMemoryKeywords)kw.Value == FastMemoryKeywords.None ? string.Empty : (kw.RawName + "_").Replace('_', ' ');
+			if (defs.Max(a => GetKeywords(a.Fast).Length) > FastStringMemorySize)
 				throw new InvalidOperationException();
-			WriteMemSizeTblHeader("fast", false, writer => {
-				writer.WriteLine("/// Index into `MEM_SIZE_TBL_STRINGS` of each `MemorySize`");
-				WriteByteArray(writer, "MEM_SIZE_TBL_DATA", "std::uint8_t", defs.Select(a => checked((uint)(byte)a.Fast.Value)), defs.Length, a => $"0x{a:X2}");
+
+			// A fixed size table (no pointers), declared in `iced_x86/internal/fast_fmt.hpp`
+			var filename = CppConstants.GetSrcFilename(genTypes, "formatter", "fast", "mem_size_tbl.cpp");
+			using (var writer = new FileWriter(TargetLanguage.Cpp, FileUtils.OpenWrite(filename))) {
+				writer.WriteFileHeader();
+				writer.WriteLine("#include \"iced_x86/internal/fast_fmt.hpp\"");
 				writer.WriteLine();
-				writer.WriteLine($"constexpr std::size_t MEM_SIZE_TBL_STRINGS_COUNT = {switchValues.Length};");
-				writer.WriteLine($"constexpr std::size_t MEM_SIZE_TBL_STRING_SIZE = {FastStringMemorySize};");
-				writer.WriteLine("/// Memory keywords: a length byte followed by `MEM_SIZE_TBL_STRING_SIZE` chars (padded with spaces)");
+				var ns = GetMemSizeTblNamespace("fast");
+				CppConstants.WriteNamespaceBegin(writer, ns);
 				writer.WriteLine("// clang-format off");
-				writer.WriteLine($"inline constexpr char MEM_SIZE_TBL_STRINGS[MEM_SIZE_TBL_STRINGS_COUNT][1 + MEM_SIZE_TBL_STRING_SIZE + 1] = {{");
+				writer.WriteLine("/// Memory size keywords: a length byte followed by the ASCII chars (padded with spaces). Index = `MemorySize` value");
+				writer.WriteLine($"extern const std::uint8_t MEMORY_SIZES[IcedConstants::MEMORY_SIZE_ENUM_COUNT][1 + {FastStringMemorySize}] = {{");
 				using (writer.Indent()) {
-					var paddedString = new char[FastStringMemorySize];
-					foreach (var (kw, s) in switchValues) {
-						for (int i = 0; i < paddedString.Length; i++)
-							paddedString[i] = ' ';
-						for (int i = 0; i < s.Length; i++)
-							paddedString[i] = s[i];
-						writer.WriteLine($"\"\\x{s.Length:X2}\" \"{new string(paddedString)}\",");
+					foreach (var def in defs) {
+						var s = GetKeywords(def.Fast);
+						var bytes = new List<string> { $"0x{s.Length:X2}" };
+						for (int i = 0; i < FastStringMemorySize; i++)
+							bytes.Add($"0x{(i < s.Length ? (byte)s[i] : (byte)' '):X2}");
+						writer.WriteLine($"{{{string.Join(", ", bytes)}}},// {def.MemorySize.Name(idConverter)} = \"{s}\"");
 					}
 				}
 				writer.WriteLine("};");
 				writer.WriteLine("// clang-format on");
-				writer.WriteLine($"constexpr std::size_t MAX_MEMORY_SIZE_STR_LEN = {maxMemSizeLen};");
-			});
+				CppConstants.WriteNamespaceEnd(writer, ns);
+			}
 		}
 
 		void GenerateGas(MemorySizeDef[] defs, Dictionary<string, string> fmtConsts1) {
@@ -299,61 +298,30 @@ namespace Generator.Formatters.Cpp {
 			const int FastStringRegisterSize = 8;
 
 			foreach (var reg in registers) {
-				if (reg.Length > FastStringRegisterSize) {
+				if (reg.Length > FastStringRegisterSize || Encoding.UTF8.GetByteCount(reg) != reg.Length) {
 					// Requires updating the C++ fast formatter's `FastStringRegister` to match the new aligned size
 					throw new InvalidOperationException();
 				}
 			}
-			var lastReg = registers[^1];
-			int extraPadding = FastStringRegisterSize - lastReg.Length;
-			if (extraPadding < 0)
-				throw new InvalidOperationException();
-			int totalLen = registers.Length + registers.Sum(a => a.Length) + extraPadding;
-			int maxLen = registers.Max(a => a.Length);
 
-			const string ns = CppConstants.InternalNamespace + "::regs_tbl";
-			var headerFilename = CppConstants.GetInternalFilename(genTypes, "formatter", "regs_tbl.hpp");
-			using (var writer = new FileWriter(TargetLanguage.Cpp, FileUtils.OpenWrite(headerFilename))) {
-				CppConstants.WriteHeaderFileHeader(writer);
-				writer.WriteLine("#include <cstddef>");
-				writer.WriteLine("#include <cstdint>");
-				writer.WriteLine();
-				CppConstants.WriteNamespaceBegin(writer, ns);
-				writer.WriteLine($"constexpr std::size_t MAX_STRING_LENGTH = {maxLen};");
-				writer.WriteLine($"constexpr std::size_t VALID_STRING_LENGTH = {FastStringRegisterSize};");
-				writer.WriteLine($"constexpr std::size_t PADDING_SIZE = {extraPadding};");
-				writer.WriteLine($"constexpr std::size_t REGS_DATA_SIZE = {totalLen};");
-				writer.WriteLine("/// Register names (one per `Register` value): a length byte followed by the ASCII chars. The last string is followed by");
-				writer.WriteLine("/// padding so it's possible to read `VALID_STRING_LENGTH` bytes from any string.");
-				writer.WriteLine("extern const std::uint8_t REGS_DATA[REGS_DATA_SIZE];");
-				CppConstants.WriteNamespaceEnd(writer, ns);
-			}
-
-			var srcFilename = CppConstants.GetSrcFilename(genTypes, "formatter", "regs_tbl.cpp");
+			// The fast formatter's register names: a fixed size table (no pointers), declared in `iced_x86/internal/fast_fmt.hpp`
+			var srcFilename = CppConstants.GetSrcFilename(genTypes, "formatter", "fast", "regs.cpp");
 			using (var writer = new FileWriter(TargetLanguage.Cpp, FileUtils.OpenWrite(srcFilename))) {
 				writer.WriteFileHeader();
-				writer.WriteLine("#include \"internal/formatter/regs_tbl.hpp\"");
+				writer.WriteLine("#include \"iced_x86/internal/fast_fmt.hpp\"");
 				writer.WriteLine();
+				const string ns = CppConstants.InternalNamespace + "::fast";
 				CppConstants.WriteNamespaceBegin(writer, ns);
 				writer.WriteLine("// clang-format off");
-				writer.WriteLine("extern const std::uint8_t REGS_DATA[REGS_DATA_SIZE] = {");
+				writer.WriteLine("/// Register names: a length byte followed by the ASCII chars (padded with spaces). Index = `Register` value");
+				writer.WriteLine($"extern const std::uint8_t REGISTERS[IcedConstants::REGISTER_ENUM_COUNT][1 + {FastStringRegisterSize}] = {{");
 				using (writer.Indent()) {
 					foreach (var register in registers) {
-						var bytes = Encoding.UTF8.GetBytes(register);
-						writer.Write($"0x{bytes.Length:X2}");
-						foreach (var b in bytes)
-							writer.Write($", 0x{b:X2}");
-						writer.Write(",");
-						writer.WriteCommentLine(register);
+						var bytes = new List<string> { $"0x{register.Length:X2}" };
+						for (int i = 0; i < FastStringRegisterSize; i++)
+							bytes.Add($"0x{(i < register.Length ? (byte)register[i] : (byte)' '):X2}");
+						writer.WriteLine($"{{{string.Join(", ", bytes)}}},// {register}");
 					}
-					writer.WriteCommentLine("Padding so it's possible to read FastStringRegister::SIZE bytes from the last value");
-					if (extraPadding > 0) {
-						for (int i = 0; i < extraPadding; i++)
-							writer.WriteByte(0);
-						writer.WriteLine();
-					}
-					else
-						writer.WriteCommentLine("No padding needed");
 				}
 				writer.WriteLine("};");
 				writer.WriteLine("// clang-format on");
